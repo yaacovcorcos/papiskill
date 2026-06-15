@@ -1,0 +1,29 @@
+id: x-twitter-scraper
+name: X Twitter Scraper
+summary: Use Xquik's X data API, MCP server, and SDKs from coding agents.
+description: A portable agent skill for Xquik's X data workflows, including tweet search, user lookup, follower export, media download, monitors, webhooks, MCP, SDK setup, and confirmation-gated write actions.
+version: 2.4.16
+license: MIT
+visibility: public
+categories:
+  - api-integration
+  - data
+tags:
+  - x
+  - twitter
+  - mcp
+  - sdk
+  - social-data
+compatible_with:
+  - codex
+  - claude-code
+  - cursor
+  - generic-agent
+install_targets:
+  codex: ~/.codex/skills/x-twitter-scraper
+  claude-code: ~/.claude/skills/x-twitter-scraper
+  cursor: ~/.cursor/skills/x-twitter-scraper
+homepage: https://docs.xquik.com
+source_url: https://github.com/Xquik-dev/x-twitter-scraper
+maintainers:
+  - github: Xquik-dev
