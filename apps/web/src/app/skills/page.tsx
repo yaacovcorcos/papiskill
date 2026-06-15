@@ -14,6 +14,20 @@ const compatibilityLabels: Record<string, string> = {
   "generic-agent": "Generic",
 };
 
+function skillReference(skill: { registryKind: string; slug: string; author: string | null }) {
+  if (skill.registryKind === "profile" && skill.author) {
+    return `${skill.author}/${skill.slug}`;
+  }
+  return `official/${skill.slug}`;
+}
+
+function skillHref(skill: { registryKind: string; slug: string; author: string | null }) {
+  if (skill.registryKind === "profile" && skill.author) {
+    return `/u/${skill.author}/skills/${skill.slug}`;
+  }
+  return `/skills/official/${skill.slug}`;
+}
+
 export default async function SkillsPage({
   searchParams,
 }: {
@@ -96,7 +110,7 @@ export default async function SkillsPage({
                   </div>
                   <div className="min-w-0 flex-1">
                     <div className="flex flex-wrap items-center gap-2">
-                      <Link href={`/skills/official/${skill.slug}`} className="text-base font-semibold hover:underline">
+                      <Link href={skillHref(skill)} className="text-base font-semibold hover:underline">
                         {skill.name}
                       </Link>
                       <Badge variant={skill.registryKind === "global" ? "blue" : "neutral"}>
@@ -114,14 +128,14 @@ export default async function SkillsPage({
                 <div className="mt-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                   <code className="inline-flex min-w-0 items-center gap-2 rounded-md border border-border bg-slate-50 px-3 py-2 font-mono text-xs text-slate-800">
                     <Terminal className="size-3.5 shrink-0" aria-hidden />
-                    <span className="truncate">{skill.installCommand}</span>
+                    <span className="truncate">{`papiskill install ${skillReference(skill)}`}</span>
                   </code>
                   <div className="flex gap-2">
-                    <Link href={`/api/v1/skills/official/${skill.slug}`} className="inline-flex items-center gap-2 rounded-md border border-border px-3 py-2 text-sm font-semibold hover:bg-slate-50">
+                    <Link href={`/download/${skillReference(skill)}`} className="inline-flex items-center gap-2 rounded-md border border-border px-3 py-2 text-sm font-semibold hover:bg-slate-50">
                       <Download className="size-4" aria-hidden />
                       Download
                     </Link>
-                    <Link href={`/dashboard/fork?skill=official/${skill.slug}`} className="inline-flex items-center gap-2 rounded-md border border-border px-3 py-2 text-sm font-semibold hover:bg-slate-50">
+                    <Link href={`/dashboard/fork?skill=${skillReference(skill)}`} className="inline-flex items-center gap-2 rounded-md border border-border px-3 py-2 text-sm font-semibold hover:bg-slate-50">
                       <GitFork className="size-4" aria-hidden />
                       Fork
                     </Link>
@@ -165,7 +179,7 @@ export default async function SkillsPage({
               <div className="mt-6">
                 <div className="mb-2 flex items-center justify-between">
                   <h3 className="text-sm font-semibold">SKILL.md excerpt</h3>
-                  <Link href={`/skills/official/${selected.slug}`} className="text-sm font-medium text-accent hover:underline">Full view</Link>
+                  <Link href={skillHref(selected)} className="text-sm font-medium text-accent hover:underline">Full view</Link>
                 </div>
                 <pre className="max-h-[360px] overflow-hidden rounded-lg border border-border bg-slate-50 p-4 font-mono text-xs leading-6 text-slate-800">
                   {selected.markdown.slice(0, 900)}

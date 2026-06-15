@@ -10,6 +10,7 @@ export function serializeSkillSummary(skill: Skill & { owner?: { profile: { hand
     registryKind: skill.registryKind.toLowerCase(),
     visibility: skill.visibility.toLowerCase(),
     compatibleWith: skill.compatibleWith,
+    categories: skill.categories,
     tags: skill.tags,
   };
 }
@@ -24,6 +25,7 @@ export function serializeForkSummary(fork: SkillFork & { owner: { profile: { han
     registryKind: "profile",
     visibility: fork.visibility.toLowerCase(),
     compatibleWith: fork.compatibleWith,
+    categories: fork.categories,
     tags: fork.tags,
   };
 }

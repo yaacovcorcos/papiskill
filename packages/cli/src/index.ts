@@ -5,6 +5,7 @@ import { readSkillPackageFromDirectory, validateSkillPackage, type AgentTarget }
 import { getSkill, getMe, searchSkills } from "./api.js";
 import { clearConfig, defaultApiUrl, readConfig, writeConfig } from "./config.js";
 import { installSkill } from "./install.js";
+import { getInstalledSkill, getInstalledSkills, recordInstall } from "./manifest.js";
 
 const program = new Command();
 
@@ -50,7 +51,62 @@ program.command("install")
       target: options.target,
       directory: options.dir,
     });
+    await recordInstall({
+      reference,
+      name: skill.name,
+      slug: skill.slug,
+      registryKind: skill.registryKind,
+      directory,
+      files: skill.files.map((file) => file.path),
+      installedAt: new Date().toISOString(),
+    });
     console.log(`Installed ${skill.registryKind}/${skill.slug} to ${directory}`);
+  });
+
+program.command("installed")
+  .description("List skills installed by this CLI.")
+  .action(async () => {
+    const skills = await getInstalledSkills();
+    if (skills.length === 0) {
+      console.log("No skills installed yet. Run `papiskill search` and `papiskill install <reference>`.");
+      return;
+    }
+    for (const skill of skills) {
+      console.log(`${skill.reference}\t${skill.name}\t${skill.directory}`);
+    }
+  });
+
+program.command("update")
+  .description("Reinstall an already-installed skill from the live registry.")
+  .argument("[reference]", "installed skill reference")
+  .option("--all", "update every installed skill")
+  .action(async (reference: string | undefined, options: { all?: boolean }) => {
+    const config = await commandConfig();
+    const installed = options.all
+      ? await getInstalledSkills()
+      : reference
+        ? [await getInstalledSkill(reference)]
+        : [];
+    const skills = installed.filter((skill): skill is NonNullable<typeof skill> => Boolean(skill));
+
+    if (skills.length === 0) {
+      throw new Error(options.all ? "No installed skills to update." : "Provide an installed reference or use --all.");
+    }
+
+    for (const entry of skills) {
+      const skill = await getSkill(config, entry.reference);
+      const directory = await installSkill(skill, { directory: entry.directory });
+      await recordInstall({
+        reference: entry.reference,
+        name: skill.name,
+        slug: skill.slug,
+        registryKind: skill.registryKind,
+        directory,
+        files: skill.files.map((file) => file.path),
+        installedAt: new Date().toISOString(),
+      });
+      console.log(`Updated ${entry.reference} in ${directory}`);
+    }
   });
 
 program.command("download")

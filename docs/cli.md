@@ -25,9 +25,14 @@ papiskill install official/code-review --target codex
 papiskill install official/code-review --target claude-code
 papiskill install official/code-review --target cursor
 papiskill install official/code-review --dir ./skills/code-review
+papiskill installed
+papiskill update official/code-review
+papiskill update --all
 papiskill download official/code-review
 papiskill validate ./my-skill
 ```
+
+Installs are recorded in the local CLI manifest at `~/.config/papiskill/installed.json` by default, or under `$XDG_CONFIG_HOME/papiskill/installed.json` when `XDG_CONFIG_HOME` is set. The manifest stores the registry reference, skill name, install directory, package file list, and install timestamp so users can audit and update local copies.
 
 ## Private commands
 

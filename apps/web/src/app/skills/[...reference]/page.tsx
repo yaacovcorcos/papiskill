@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { notFound } from "next/navigation";
 import ReactMarkdown from "react-markdown";
 import { ArrowLeft, Download, GitFork, ShieldCheck, Terminal } from "lucide-react";
 import { AppHeader } from "@/components/app-header";
@@ -6,6 +7,13 @@ import { Badge } from "@/components/badge";
 import { getCatalogSkills } from "@/lib/server/catalog";
 
 export const dynamic = "force-dynamic";
+
+function skillReference(skill: { registryKind: string; slug: string; author: string | null }) {
+  if (skill.registryKind === "profile" && skill.author) {
+    return `${skill.author}/${skill.slug}`;
+  }
+  return `official/${skill.slug}`;
+}
 
 export default async function SkillDetailPage({
   params,
@@ -15,7 +23,9 @@ export default async function SkillDetailPage({
   const { reference } = await params;
   const slug = reference.at(-1) ?? "";
   const skills = await getCatalogSkills();
-  const skill = skills.find((item) => item.slug === slug) ?? skills[0];
+  const skill = skills.find((item) => item.slug === slug);
+  if (!skill) notFound();
+  const referenceId = skillReference(skill);
 
   return (
     <>
@@ -26,13 +36,7 @@ export default async function SkillDetailPage({
           Back to skills
         </Link>
 
-        {!skill ? (
-          <div className="rounded-lg border border-border p-8">
-            <h1 className="text-2xl font-semibold">Skill not found</h1>
-            <p className="mt-2 text-muted">The registry does not have that skill yet.</p>
-          </div>
-        ) : (
-          <div className="grid gap-8 lg:grid-cols-[1fr_320px]">
+        <div className="grid gap-8 lg:grid-cols-[1fr_320px]">
             <article className="min-w-0">
               <div className="border-b border-border pb-6">
                 <div className="mb-3 flex flex-wrap items-center gap-2">
@@ -55,10 +59,10 @@ export default async function SkillDetailPage({
                 <h2 className="text-sm font-semibold uppercase tracking-[0.14em] text-muted">Install</h2>
                 <code className="mt-3 flex items-center gap-2 rounded-md bg-slate-950 px-3 py-3 font-mono text-xs text-white">
                   <Terminal className="size-4 shrink-0" aria-hidden />
-                  <span className="break-all">{skill.installCommand}</span>
+                  <span className="break-all">{`papiskill install ${referenceId}`}</span>
                 </code>
                 <div className="mt-4 grid grid-cols-2 gap-2">
-                  <Link href={`/api/v1/skills/official/${skill.slug}`} className="inline-flex items-center justify-center gap-2 rounded-md border border-border px-3 py-2 text-sm font-semibold hover:bg-slate-50">
+                  <Link href={`/download/${referenceId}`} className="inline-flex items-center justify-center gap-2 rounded-md border border-border px-3 py-2 text-sm font-semibold hover:bg-slate-50">
                     <Download className="size-4" aria-hidden />
                     Download
                   </Link>
@@ -89,8 +93,7 @@ export default async function SkillDetailPage({
                 </p>
               </div>
             </aside>
-          </div>
-        )}
+        </div>
       </main>
     </>
   );
