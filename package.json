@@ -10,7 +10,7 @@
   ],
   "scripts": {
     "dev": "npm --workspace @papiskill/web run dev",
-    "build": "npm --workspace @papiskill/skill-core run build && npm --workspace papiskill run build && npm --workspace @papiskill/web run build",
+    "build": "npm run db:generate && npm --workspace @papiskill/skill-core run build && npm --workspace papiskill run build && npm --workspace @papiskill/web run build",
     "lint": "npm run lint --workspaces --if-present",
     "typecheck": "npm --workspace @papiskill/skill-core run typecheck && npm --workspace @papiskill/skill-core run build && npm --workspace papiskill run typecheck && npm --workspace @papiskill/web run typecheck",
     "test": "npm run test --workspaces --if-present",
