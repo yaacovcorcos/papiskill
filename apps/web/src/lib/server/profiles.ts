@@ -10,7 +10,7 @@ export function deriveHandle(user: Pick<User, "email" | "name" | "id">): string 
     .slice(0, 32) || `user-${user.id.slice(0, 8)}`;
 }
 
-export async function ensureProfile(user: Pick<User, "id" | "email" | "name" | "image">) {
+export async function ensureProfile(user: Pick<User, "id" | "email" | "name"> & { image?: string | null }) {
   const prisma = getPrisma();
   const existing = await prisma.profile.findUnique({
     where: { userId: user.id },
