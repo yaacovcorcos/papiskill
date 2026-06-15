@@ -1,0 +1,291 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum SkillRegistryKind {
+  GLOBAL
+  COMMUNITY
+}
+
+enum SkillVisibility {
+  PUBLIC
+  PRIVATE
+  UNLISTED
+}
+
+enum ValidationLevel {
+  ERROR
+  WARNING
+}
+
+enum DownloadSubjectType {
+  SKILL
+  FORK
+}
+
+model User {
+  id              String      @id @default(cuid())
+  name            String
+  email           String      @unique
+  emailVerified   Boolean     @default(false)
+  image           String?
+  isCurator       Boolean     @default(false)
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+  sessions        Session[]
+  accounts        Account[]
+  profile         Profile?
+  ownedSkills     Skill[]     @relation("SkillOwner")
+  forks           SkillFork[]
+  stars           SkillStar[]
+  apiTokens       ApiToken[]
+  downloads       DownloadEvent[]
+
+  @@index([createdAt])
+  @@index([isCurator, createdAt])
+}
+
+model Session {
+  id        String   @id @default(cuid())
+  userId    String
+  token     String   @unique
+  expiresAt DateTime
+  ipAddress String?
+  userAgent String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model Account {
+  id                    String    @id @default(cuid())
+  userId                String
+  providerId            String
+  accountId             String
+  accessToken           String?
+  refreshToken          String?
+  idToken               String?
+  accessTokenExpiresAt  DateTime?
+  refreshTokenExpiresAt DateTime?
+  scope                 String?
+  password              String?
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([providerId, accountId])
+  @@index([userId])
+}
+
+model Verification {
+  id         String   @id @default(cuid())
+  identifier String
+  value      String
+  expiresAt  DateTime
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@index([identifier, createdAt])
+  @@index([expiresAt])
+}
+
+model Profile {
+  id        String   @id @default(cuid())
+  userId    String   @unique
+  handle    String   @unique
+  name      String?
+  bio       String?
+  avatarUrl String?
+  githubUrl String?
+  website   String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([handle])
+}
+
+model Skill {
+  id             String            @id @default(cuid())
+  slug           String
+  name           String
+  summary        String
+  description    String
+  registryKind   SkillRegistryKind @default(GLOBAL)
+  visibility     SkillVisibility   @default(PUBLIC)
+  authorName     String?
+  authorUrl      String?
+  ownerId        String?
+  sourcePath     String?
+  sourceUrl      String?
+  packageHash    String?
+  version        String            @default("0.1.0")
+  license        String            @default("MIT")
+  categories     String[]
+  tags           String[]
+  compatibleWith String[]
+  installTargets Json              @default("{}")
+  publishedAt    DateTime?
+  createdAt      DateTime          @default(now())
+  updatedAt      DateTime          @updatedAt
+  owner          User?             @relation("SkillOwner", fields: [ownerId], references: [id], onDelete: SetNull)
+  versions       SkillVersion[]
+  files          SkillFile[]
+  validations    SkillValidation[]
+  stars          SkillStar[]
+  downloads      DownloadEvent[]
+  forks          SkillFork[]
+
+  @@unique([registryKind, slug])
+  @@index([visibility, registryKind, updatedAt])
+  @@index([ownerId])
+}
+
+model SkillVersion {
+  id          String   @id @default(cuid())
+  skillId     String
+  version     String
+  packageHash String
+  notes       String?
+  createdAt   DateTime @default(now())
+  skill       Skill    @relation(fields: [skillId], references: [id], onDelete: Cascade)
+
+  @@unique([skillId, version])
+  @@index([skillId, createdAt])
+}
+
+model SkillFile {
+  id        String   @id @default(cuid())
+  skillId   String
+  path      String
+  content   String
+  sizeBytes Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  skill     Skill    @relation(fields: [skillId], references: [id], onDelete: Cascade)
+
+  @@unique([skillId, path])
+}
+
+model SkillValidation {
+  id        String          @id @default(cuid())
+  skillId   String
+  level     ValidationLevel
+  code      String
+  message   String
+  path      String?
+  createdAt DateTime        @default(now())
+  skill     Skill           @relation(fields: [skillId], references: [id], onDelete: Cascade)
+
+  @@index([skillId, level])
+}
+
+model SkillFork {
+  id             String          @id @default(cuid())
+  ownerId        String
+  sourceSkillId  String?
+  slug           String
+  name           String
+  summary        String
+  description    String
+  visibility     SkillVisibility @default(PRIVATE)
+  version        String          @default("0.1.0")
+  license        String          @default("MIT")
+  categories     String[]
+  tags           String[]
+  compatibleWith String[]
+  installTargets Json            @default("{}")
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+  publishedAt    DateTime?
+  owner          User            @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  sourceSkill    Skill?          @relation(fields: [sourceSkillId], references: [id], onDelete: SetNull)
+  files          SkillForkFile[]
+  validations    SkillForkValidation[]
+  downloads      DownloadEvent[]
+
+  @@unique([ownerId, slug])
+  @@index([visibility, updatedAt])
+  @@index([sourceSkillId])
+}
+
+model SkillForkFile {
+  id        String    @id @default(cuid())
+  forkId    String
+  path      String
+  content   String
+  sizeBytes Int
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  fork      SkillFork @relation(fields: [forkId], references: [id], onDelete: Cascade)
+
+  @@unique([forkId, path])
+}
+
+model SkillForkValidation {
+  id        String          @id @default(cuid())
+  forkId    String
+  level     ValidationLevel
+  code      String
+  message   String
+  path      String?
+  createdAt DateTime        @default(now())
+  fork      SkillFork       @relation(fields: [forkId], references: [id], onDelete: Cascade)
+
+  @@index([forkId, level])
+}
+
+model SkillStar {
+  id        String   @id @default(cuid())
+  userId    String
+  skillId   String
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  skill     Skill    @relation(fields: [skillId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, skillId])
+  @@index([skillId, createdAt])
+}
+
+model DownloadEvent {
+  id          String              @id @default(cuid())
+  userId      String?
+  skillId     String?
+  forkId      String?
+  subjectType DownloadSubjectType
+  userAgent   String?
+  ipHash      String?
+  createdAt   DateTime            @default(now())
+  user        User?               @relation(fields: [userId], references: [id], onDelete: SetNull)
+  skill       Skill?              @relation(fields: [skillId], references: [id], onDelete: Cascade)
+  fork        SkillFork?          @relation(fields: [forkId], references: [id], onDelete: Cascade)
+
+  @@index([skillId, createdAt])
+  @@index([forkId, createdAt])
+  @@index([userId, createdAt])
+}
+
+model ApiToken {
+  id         String    @id @default(cuid())
+  userId     String
+  name       String
+  prefix     String
+  tokenHash  String    @unique
+  lastUsedAt DateTime?
+  expiresAt  DateTime?
+  revokedAt  DateTime?
+  createdAt  DateTime  @default(now())
+  user       User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, createdAt])
+  @@index([prefix])
+}

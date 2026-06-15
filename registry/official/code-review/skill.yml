@@ -1,0 +1,24 @@
+id: code-review
+name: Code Review
+summary: Review code changes for bugs, regressions, missing tests, and risky assumptions.
+description: A portable code-review skill for AI agents. It focuses review output on concrete findings, file references, severity, test gaps, and residual risk.
+version: 1.0.0
+license: MIT
+visibility: public
+categories:
+  - coding
+tags:
+  - review
+  - testing
+  - reliability
+compatible_with:
+  - codex
+  - claude-code
+  - cursor
+  - generic-agent
+install_targets:
+  codex: ~/.codex/skills/code-review
+  claude-code: ~/.claude/skills/code-review
+  cursor: ~/.cursor/skills/code-review
+maintainers:
+  - github: yaacovcorcos

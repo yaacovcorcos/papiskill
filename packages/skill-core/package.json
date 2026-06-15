@@ -1,0 +1,30 @@
+{
+  "name": "@papiskill/skill-core",
+  "version": "0.1.0",
+  "description": "Shared parser, schema, validation, and install target logic for PapiSkill packages.",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "vitest run",
+    "validate:registry": "tsx src/validate-registry.ts ../../registry"
+  },
+  "dependencies": {
+    "yaml": "^2.8.2",
+    "zod": "^4.2.1"
+  },
+  "devDependencies": {
+    "@types/node": "^20.19.26",
+    "tsx": "^4.21.0",
+    "typescript": "^5.9.3",
+    "vitest": "^4.0.16"
+  }
+}

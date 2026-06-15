@@ -1,0 +1,24 @@
+id: skill-authoring
+name: Skill Authoring
+summary: Draft portable SKILL.md packages with clear scope, metadata, examples, and safety boundaries.
+description: A skill for creating high-quality agent skills that are portable across tools, easy to inspect, and safe to install.
+version: 1.0.0
+license: MIT
+visibility: public
+categories:
+  - documentation
+tags:
+  - skills
+  - authoring
+  - documentation
+compatible_with:
+  - codex
+  - claude-code
+  - cursor
+  - generic-agent
+install_targets:
+  codex: ~/.codex/skills/skill-authoring
+  claude-code: ~/.claude/skills/skill-authoring
+  cursor: ~/.cursor/skills/skill-authoring
+maintainers:
+  - github: yaacovcorcos

@@ -1,0 +1,29 @@
+{
+  "name": "papiskill",
+  "version": "0.1.0",
+  "description": "CLI for searching, installing, downloading, validating, and authenticating PapiSkill packages.",
+  "type": "module",
+  "bin": {
+    "papiskill": "./dist/index.js"
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "dev": "tsx src/index.ts",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@papiskill/skill-core": "0.1.0",
+    "commander": "^14.0.2",
+    "zod": "^4.2.1"
+  },
+  "devDependencies": {
+    "@types/node": "^20.19.26",
+    "tsx": "^4.21.0",
+    "typescript": "^5.9.3",
+    "vitest": "^4.0.16"
+  }
+}
