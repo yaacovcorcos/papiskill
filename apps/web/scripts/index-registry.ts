@@ -1,6 +1,7 @@
 import { createHash } from "node:crypto";
 import path from "node:path";
-import { loadRegistry, validateSkillPackage } from "@papiskill/skill-core";
+import { validateSkillPackage } from "@papiskill/skill-core";
+import { loadRegistry } from "@papiskill/skill-core/registry-loader";
 import { SkillRegistryKind, ValidationLevel } from "@prisma/client";
 import { getPrisma } from "../src/lib/server/prisma";
 

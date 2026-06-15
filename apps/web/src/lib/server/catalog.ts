@@ -1,7 +1,6 @@
-import { loadRegistry } from "@papiskill/skill-core";
 import { SkillVisibility } from "@prisma/client";
-import path from "node:path";
 import { getPrisma } from "./prisma";
+import { generatedRegistry } from "./generated-registry";
 import { serializeForkSummary, serializeSkillSummary } from "./skill-serializers";
 
 export interface CatalogSkill {
@@ -96,34 +95,17 @@ export async function getCatalogSkills(query = ""): Promise<CatalogSkill[]> {
 }
 
 async function getFileCatalogSkills(query = ""): Promise<CatalogSkill[]> {
-  const registryRoot = path.resolve(process.cwd(), "../../registry");
-  const packages = await loadRegistry(registryRoot);
   const normalizedQuery = query.trim().toLowerCase();
-  return packages
+  return generatedRegistry
     .filter((entry) => {
       if (!normalizedQuery) return true;
       const text = [
-        entry.manifest.name,
-        entry.manifest.summary,
-        entry.manifest.description,
-        ...entry.manifest.tags,
-        ...entry.manifest.categories,
+        entry.name,
+        entry.summary,
+        entry.description,
+        ...entry.tags,
+        ...entry.categories,
       ].join(" ").toLowerCase();
       return text.includes(normalizedQuery);
-    })
-    .map((entry) => ({
-      id: entry.manifest.id,
-      slug: entry.manifest.id,
-      name: entry.manifest.name,
-      summary: entry.manifest.summary,
-      description: entry.manifest.description,
-      registryKind: entry.registryKind === "official" ? "global" : "community",
-      visibility: entry.manifest.visibility,
-      author: entry.manifest.maintainers[0]?.github ?? entry.manifest.maintainers[0]?.name ?? null,
-      compatibleWith: entry.manifest.compatible_with,
-      tags: entry.manifest.tags,
-      categories: entry.manifest.categories,
-      installCommand: `papiskill install official/${entry.manifest.id}`,
-      markdown: entry.skillMarkdown,
-    }));
+    });
 }
