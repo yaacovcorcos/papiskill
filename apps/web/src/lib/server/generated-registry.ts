@@ -10,6 +10,8 @@ export const generatedRegistry: CatalogSkill[] = [
     "registryKind": "global",
     "visibility": "public",
     "author": "yaacovcorcos",
+    "version": "1.0.0",
+    "license": "MIT",
     "compatibleWith": [
       "codex",
       "claude-code",
@@ -56,6 +58,8 @@ export const generatedRegistry: CatalogSkill[] = [
     "registryKind": "global",
     "visibility": "public",
     "author": "yaacovcorcos",
+    "version": "1.0.0",
+    "license": "MIT",
     "compatibleWith": [
       "codex",
       "claude-code",
@@ -101,6 +105,8 @@ export const generatedRegistry: CatalogSkill[] = [
     "registryKind": "global",
     "visibility": "public",
     "author": "yaacovcorcos",
+    "version": "1.0.0",
+    "license": "MIT",
     "compatibleWith": [
       "codex",
       "claude-code",
@@ -159,6 +165,8 @@ export const generatedRegistry: CatalogSkill[] = [
     "registryKind": "global",
     "visibility": "public",
     "author": "yaacovcorcos",
+    "version": "1.0.0",
+    "license": "MIT",
     "compatibleWith": [
       "codex",
       "claude-code",

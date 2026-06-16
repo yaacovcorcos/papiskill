@@ -2,6 +2,7 @@ import { createHash } from "node:crypto";
 import { Prisma, SkillRegistryKind, SkillVisibility, ValidationLevel, type SkillFork, type User } from "@prisma/client";
 import { validateSkillPackage, type SkillValidationResult } from "@papiskill/skill-core";
 import YAML from "yaml";
+import { getFileRegistrySkill, type CatalogSkillDetail } from "./catalog";
 import { getPrisma } from "./prisma";
 import { readableForkVisibilityWhere } from "./visibility";
 
@@ -177,7 +178,10 @@ export async function getVisibleLibrarySource(reference: string, actorId?: strin
       },
       include: { files: { orderBy: { path: "asc" } } },
     });
-    if (!skill) return null;
+    if (!skill) {
+      const fallback = await getFileRegistrySkill(`${namespace}/${slug}`);
+      return fallback ? librarySourceFromCatalogSkill(fallback) : null;
+    }
     return {
       sourceSkillId: skill.id,
       sourceReference: `${namespace === "community" ? "community" : "official"}/${skill.slug}`,
@@ -229,6 +233,26 @@ export async function getVisibleLibrarySource(reference: string, actorId?: strin
     compatibleWith: fork.compatibleWith,
     installTargets: fork.installTargets,
     files: fork.files,
+  };
+}
+
+export function librarySourceFromCatalogSkill(skill: CatalogSkillDetail): LibrarySource {
+  const namespace = skill.registryKind === "community" ? "community" : "official";
+  return {
+    sourceReference: `${namespace}/${skill.slug}`,
+    sourceVersion: undefined,
+    sourcePackageHash: packageHash(skill.files),
+    slug: skill.slug,
+    name: skill.name,
+    summary: skill.summary,
+    description: skill.description,
+    version: skill.version,
+    license: skill.license,
+    categories: skill.categories,
+    tags: skill.tags,
+    compatibleWith: skill.compatibleWith,
+    installTargets: skill.installTargets,
+    files: skill.files,
   };
 }
 

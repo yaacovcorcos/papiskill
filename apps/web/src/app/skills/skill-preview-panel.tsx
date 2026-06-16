@@ -50,7 +50,8 @@ export function SkillPreviewPanel({
               value={validationSummary(selected.validationIssues)}
               icon={<ShieldCheck className="size-4 text-emerald-600" />}
             />
-            <DetailRow label="License" value="MIT" />
+            <DetailRow label="Version" value={selected.version} />
+            <DetailRow label="License" value={selected.license} />
             <DetailRow
               label="Stars"
               value={String(selected.starCount)}

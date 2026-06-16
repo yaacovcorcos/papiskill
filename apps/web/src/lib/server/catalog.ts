@@ -16,6 +16,8 @@ export interface CatalogSkill {
   registryKind: string;
   visibility: string;
   author: string | null;
+  version: string;
+  license: string;
   compatibleWith: string[];
   tags: string[];
   categories: string[];

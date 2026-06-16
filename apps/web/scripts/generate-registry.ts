@@ -32,6 +32,8 @@ async function main() {
         manifest.maintainers[0]?.github ??
         manifest.maintainers[0]?.name ??
         null,
+      version: manifest.version,
+      license: manifest.license,
       compatibleWith: manifest.compatible_with,
       tags: manifest.tags.map((tag) => tag.toLowerCase()),
       categories: manifest.categories.map((category) => category.toLowerCase()),

@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import YAML from "yaml";
-import { buildBlankLibraryDraft, validateForkDraftPackage } from "./library";
+import { buildBlankLibraryDraft, librarySourceFromCatalogSkill, validateForkDraftPackage } from "./library";
 
 const baseDraft = {
   slug: "code-review",
@@ -105,5 +105,46 @@ describe("buildBlankLibraryDraft", () => {
       expect.objectContaining({ path: "SKILL.md" }),
       expect.objectContaining({ path: "skill.yml" }),
     ]);
+  });
+});
+
+describe("librarySourceFromCatalogSkill", () => {
+  it("builds a copyable source from file-backed official registry details", () => {
+    const source = librarySourceFromCatalogSkill({
+      id: "code-review",
+      slug: "code-review",
+      name: "Code Review",
+      summary: "Review changes.",
+      description: "Review code changes before promotion.",
+      registryKind: "global",
+      visibility: "public",
+      author: "yaacov",
+      version: "1.2.3",
+      license: "Apache-2.0",
+      compatibleWith: ["generic-agent"],
+      categories: ["coding"],
+      tags: ["review"],
+      installCommand: "papiskill install official/code-review",
+      starCount: 0,
+      commentCount: 0,
+      validationIssues: [],
+      markdown: "# Code Review",
+      files: [
+        { path: "SKILL.md", content: "# Code Review" },
+        { path: "skill.yml", content: "id: code-review" },
+      ],
+      installTargets: { "generic-agent": "~/.agents/skills/code-review" },
+    });
+
+    expect(source).toMatchObject({
+      sourceReference: "official/code-review",
+      slug: "code-review",
+      name: "Code Review",
+      version: "1.2.3",
+      license: "Apache-2.0",
+      installTargets: { "generic-agent": "~/.agents/skills/code-review" },
+    });
+    expect(source.sourceSkillId).toBeUndefined();
+    expect(source.files).toHaveLength(2);
   });
 });

@@ -89,6 +89,8 @@ export default async function SkillDetailPage({
                 <h2 className="text-sm font-semibold uppercase tracking-[0.14em] text-muted">Metadata</h2>
                 <dl className="mt-4 space-y-3 text-sm">
                   <Meta label="Author" value={skill.author ?? "PapiSkill"} />
+                  <Meta label="Version" value={skill.version} />
+                  <Meta label="License" value={skill.license} />
                   <Meta label="Visibility" value={skill.visibility} />
                   <Meta label="Categories" value={skill.categories.join(", ")} />
                   <Meta label="Tags" value={skill.tags.join(", ")} />

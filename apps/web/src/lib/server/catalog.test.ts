@@ -83,6 +83,8 @@ function skill(overrides: Partial<CatalogSkill>): CatalogSkill {
     registryKind: overrides.registryKind ?? "global",
     visibility: "public",
     author: "author",
+    version: "1.0.0",
+    license: "MIT",
     compatibleWith: ["generic-agent"],
     tags: [],
     categories: ["coding"],
