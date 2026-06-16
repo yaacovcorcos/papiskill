@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import YAML from "yaml";
 import { validateForkDraftPackage } from "./library";
 
 const baseDraft = {
@@ -32,9 +33,37 @@ describe("validateForkDraftPackage", () => {
 
     expect(result.hasBlockingErrors).toBe(false);
     expect(result.validation.ok).toBe(true);
-    expect(result.skillYml).toContain('name: "Code Review"');
+    expect(YAML.parse(result.skillYml)).toMatchObject({
+      name: "Code Review",
+      install_targets: { "generic-agent": "~/.agents/skills" },
+    });
     expect(result.files).toContainEqual({ path: "SKILL.md", content: baseDraft.skillMarkdown });
     expect(result.files).toContainEqual({ path: "docs/checklist.md", content: "supporting docs stay attached" });
+  });
+
+  it("serializes YAML safely when editable fields contain YAML syntax", () => {
+    const result = validateForkDraftPackage({
+      ...baseDraft,
+      name: "Review: API #1",
+      summary: "Review code paths: auth, cache, and CLI behavior.",
+      description: "Line one includes #hash.\nLine two includes key: value.",
+      tags: ["review:api", "cache # hot"],
+      installTargets: {
+        codex: "~/skills/code-review:dev # local",
+        "generic-agent": "~/.agents/skills",
+      },
+    });
+
+    expect(result.hasBlockingErrors).toBe(false);
+    expect(YAML.parse(result.skillYml)).toMatchObject({
+      name: "Review: API #1",
+      description: "Line one includes #hash.\nLine two includes key: value.",
+      tags: ["review:api", "cache # hot"],
+      install_targets: {
+        codex: "~/skills/code-review:dev # local",
+        "generic-agent": "~/.agents/skills",
+      },
+    });
   });
 
   it("flags invalid draft metadata as a blocking package error", () => {

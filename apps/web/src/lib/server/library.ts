@@ -1,6 +1,7 @@
 import { createHash } from "node:crypto";
 import { Prisma, SkillRegistryKind, SkillVisibility, ValidationLevel, type SkillFork, type User } from "@prisma/client";
 import { validateSkillPackage, type SkillValidationResult } from "@papiskill/skill-core";
+import YAML from "yaml";
 import { getPrisma } from "./prisma";
 import { readableForkVisibilityWhere } from "./visibility";
 
@@ -263,24 +264,22 @@ export function buildSkillYml(input: {
   compatibleWith: string[];
   installTargets: Record<string, string>;
 }) {
-  const lines = [
-    `id: ${input.id}`,
-    `name: ${JSON.stringify(input.name)}`,
-    `summary: ${JSON.stringify(input.summary)}`,
-    `description: ${JSON.stringify(input.description)}`,
-    `version: ${input.version}`,
-    `license: ${input.license}`,
-    `visibility: ${input.visibility}`,
-    "categories:",
-    ...input.categories.map((item) => `  - ${item}`),
-    "tags:",
-    ...input.tags.map((item) => `  - ${item}`),
-    "compatible_with:",
-    ...input.compatibleWith.map((item) => `  - ${item}`),
-    "install_targets:",
-    ...Object.entries(input.installTargets).map(([key, value]) => `  ${key}: ${value}`),
-  ];
-  return `${lines.join("\n")}\n`;
+  return YAML.stringify(
+    {
+      id: input.id,
+      name: input.name,
+      summary: input.summary,
+      description: input.description,
+      version: input.version,
+      license: input.license,
+      visibility: input.visibility,
+      categories: input.categories,
+      tags: input.tags,
+      compatible_with: input.compatibleWith,
+      install_targets: input.installTargets,
+    },
+    { lineWidth: 0 },
+  );
 }
 
 export function jsonObject(value: Prisma.JsonValue): Prisma.InputJsonValue {
