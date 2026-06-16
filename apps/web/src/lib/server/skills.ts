@@ -34,6 +34,7 @@ export async function searchVisibleSkills(query: string) {
     prisma.skillFork.findMany({
       where: {
         visibility: SkillVisibility.PUBLIC,
+        archivedAt: null,
         ...(q ? {
           OR: [
             { name: { contains: q, mode: "insensitive" as const } },
@@ -94,6 +95,7 @@ async function getProfileFork(handle: string, slug: string, actor?: Pick<User, "
     where: {
       slug,
       owner: { profile: { handle } },
+      archivedAt: null,
       OR: [
         { visibility: SkillVisibility.PUBLIC },
         { visibility: SkillVisibility.UNLISTED },

@@ -1,6 +1,6 @@
 import { errorResponse, jsonResponse } from "@/lib/server/http";
 import { getCatalogSkills } from "@/lib/server/catalog";
-import { getTokenUser } from "@/lib/server/request-auth";
+import { getSessionUser, getTokenUser } from "@/lib/server/request-auth";
 import { getSkillByReference } from "@/lib/server/skills";
 
 export async function GET(
@@ -8,7 +8,7 @@ export async function GET(
   context: { params: Promise<{ reference: string[] }> },
 ) {
   const { reference } = await context.params;
-  const actor = await getTokenUser(request);
+  const actor = await getActor(request);
   const joinedReference = reference.join("/");
   const skill = await getDatabaseSkill(joinedReference, actor) ?? await getCatalogFallback(joinedReference);
   if (!skill) {
@@ -17,7 +17,15 @@ export async function GET(
   return jsonResponse(skill);
 }
 
-async function getDatabaseSkill(reference: string, actor: Awaited<ReturnType<typeof getTokenUser>>) {
+async function getActor(request: Request) {
+  try {
+    return await getTokenUser(request) ?? await getSessionUser();
+  } catch {
+    return null;
+  }
+}
+
+async function getDatabaseSkill(reference: string, actor: Awaited<ReturnType<typeof getActor>>) {
   if (!process.env.DATABASE_URL) return null;
   try {
     return await getSkillByReference(reference, actor);

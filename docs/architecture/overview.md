@@ -16,7 +16,7 @@ PapiSkill is a monorepo with three production surfaces:
 | Community Git-reviewed package files | Git repo under `registry/community` |
 | Indexed search metadata | Postgres |
 | User profile | Postgres |
-| User forks | Postgres |
+| User library skills | Postgres |
 | Stars/download events | Postgres |
 | CLI tokens | Postgres, hashed |
 | Auth sessions/accounts | Better Auth tables in Postgres |
@@ -37,7 +37,7 @@ flowchart LR
 ## Request Boundaries
 
 - Public registry reads can be anonymous.
-- Private fork reads require owner session or valid CLI token.
+- Private library reads require owner session or valid CLI token.
 - Mutations require session authentication.
 - API token management requires session authentication.
 - Global registry mutations do not happen directly through the app; they go through collaborator publishing and GitHub PRs.

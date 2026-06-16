@@ -12,6 +12,9 @@ function skillReference(skill: { registryKind: string; slug: string; author: str
   if (skill.registryKind === "profile" && skill.author) {
     return `${skill.author}/${skill.slug}`;
   }
+  if (skill.registryKind === "community") {
+    return `community/${skill.slug}`;
+  }
   return `official/${skill.slug}`;
 }
 
@@ -66,9 +69,9 @@ export default async function SkillDetailPage({
                     <Download className="size-4" aria-hidden />
                     Download
                   </Link>
-                  <Link href={`/dashboard/fork?skill=official/${skill.slug}`} className="inline-flex items-center justify-center gap-2 rounded-md bg-slate-950 px-3 py-2 text-sm font-semibold text-white hover:bg-slate-800">
+                  <Link href={`/dashboard/fork?skill=${referenceId}`} className="inline-flex items-center justify-center gap-2 rounded-md bg-slate-950 px-3 py-2 text-sm font-semibold text-white hover:bg-slate-800">
                     <GitFork className="size-4" aria-hidden />
-                    Fork
+                    Copy to library
                   </Link>
                 </div>
               </div>

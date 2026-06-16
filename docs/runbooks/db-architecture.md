@@ -17,15 +17,17 @@
 | Auth | `User`, `Session`, `Account`, `Verification` |
 | Profiles | `Profile` |
 | Registry | `Skill`, `SkillVersion`, `SkillFile`, `SkillValidation` |
-| Forks | `SkillFork`, `SkillForkVersion`, `SkillForkFile` |
+| User library | `SkillFork`, `SkillForkFile`, `SkillForkValidation` |
 | Engagement | `SkillStar`, `DownloadEvent` |
 | CLI | `ApiToken` |
 
 ## Invariants
 
 - Globally published curated skills are indexed from Git, not authored directly in the database.
-- Public user forks may be indexed and shown in search.
-- Private forks are visible only to the owning user or a valid owner API token.
+- Public user library skills may be indexed and shown in search.
+- Private library skills are visible only to the owning user or a valid owner API token.
+- Unlisted library skills are not listed on public profiles but can be resolved by direct reference when access rules allow it.
+- `sourceSkillId`, `sourceForkId`, `sourceReference`, `sourceVersion`, and `sourcePackageHash` preserve source lineage for update checks and attribution.
 - API tokens are stored hashed.
 - Download events must not expose private skill metadata to other users.
 - Skill IDs are lowercase slugs.

@@ -193,6 +193,10 @@ model SkillFork {
   id             String          @id @default(cuid())
   ownerId        String
   sourceSkillId  String?
+  sourceForkId   String?
+  sourceReference String?
+  sourceVersion  String?
+  sourcePackageHash String?
   slug           String
   name           String
   summary        String
@@ -206,16 +210,22 @@ model SkillFork {
   installTargets Json            @default("{}")
   createdAt      DateTime        @default(now())
   updatedAt      DateTime        @updatedAt
+  lastValidatedAt DateTime?
+  archivedAt     DateTime?
   publishedAt    DateTime?
   owner          User            @relation(fields: [ownerId], references: [id], onDelete: Cascade)
   sourceSkill    Skill?          @relation(fields: [sourceSkillId], references: [id], onDelete: SetNull)
+  sourceFork     SkillFork?      @relation("ForkSource", fields: [sourceForkId], references: [id], onDelete: SetNull)
+  derivedForks   SkillFork[]     @relation("ForkSource")
   files          SkillForkFile[]
   validations    SkillForkValidation[]
   downloads      DownloadEvent[]
 
   @@unique([ownerId, slug])
+  @@index([ownerId, archivedAt, updatedAt])
   @@index([visibility, updatedAt])
   @@index([sourceSkillId])
+  @@index([sourceForkId])
 }
 
 model SkillForkFile {

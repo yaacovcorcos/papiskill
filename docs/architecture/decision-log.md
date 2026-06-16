@@ -31,3 +31,11 @@ Decision: Globally visible curated skills live in `registry/official` and are pu
 Why: The user wants any author's skill to become globally discoverable without forcing users to browse profile pages. "Official" in product language means curator-published global visibility, not sole authorship by the maintainer.
 
 Constraints: User profile skills may be public immediately but are not globally curated until approved/published.
+
+## 2026-06-16 - User Libraries Use SkillFork Rows
+
+Decision: A user's editable library is represented by `SkillFork` rows owned by that user, with files in `SkillForkFile`, validation notes in `SkillForkValidation`, and source lineage stored on the row.
+
+Why: Library items are profile-owned copies of a visible source skill. They need stable `handle/slug` references, public/private/unlisted visibility, validation, downloads, and source attribution. A separate `Library` table would duplicate ownership and visibility without adding a distinct domain.
+
+Constraints: Public profile pages list only `PUBLIC` library skills. `UNLISTED` library skills are reachable by direct reference when permitted. `PRIVATE` library skills require owner session or owner API token. Archived library rows remain in Postgres but are excluded from public and dashboard active lists.

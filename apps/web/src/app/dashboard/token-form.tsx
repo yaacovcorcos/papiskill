@@ -12,7 +12,7 @@ export function TokenForm() {
     <form action={action} className="rounded-lg border border-border bg-white p-5 shadow-sm">
       <h2 className="text-lg font-semibold">Create CLI token</h2>
       <p className="mt-2 text-sm leading-6 text-muted">
-        Tokens allow `papiskill` to install your private forks. Copy the token now; it is shown once.
+        Tokens allow `papiskill` to install your private library skills. Copy the token now; it is shown once.
       </p>
       <label className="mt-4 block text-sm font-medium">
         Token name

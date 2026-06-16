@@ -1,6 +1,18 @@
 import type { User } from "@prisma/client";
 import { getPrisma } from "./prisma";
 
+const reservedHandles = new Set([
+  "api",
+  "auth",
+  "dashboard",
+  "docs",
+  "download",
+  "global",
+  "official",
+  "skills",
+  "u",
+]);
+
 export function deriveHandle(user: Pick<User, "email" | "name" | "id">): string {
   const emailName = user.email.split("@")[0] || user.name || user.id;
   return emailName
@@ -8,6 +20,24 @@ export function deriveHandle(user: Pick<User, "email" | "name" | "id">): string 
     .replace(/[^a-z0-9-]+/g, "-")
     .replace(/^-+|-+$/g, "")
     .slice(0, 32) || `user-${user.id.slice(0, 8)}`;
+}
+
+export function normalizeHandle(value: string): string {
+  return value
+    .toLowerCase()
+    .replace(/[^a-z0-9-]+/g, "-")
+    .replace(/^-+|-+$/g, "")
+    .slice(0, 32);
+}
+
+export function validateHandle(value: string): string | null {
+  if (!/^[a-z0-9][a-z0-9-]{1,30}[a-z0-9]$/.test(value)) {
+    return "Use 3-32 lowercase letters, numbers, or hyphens.";
+  }
+  if (reservedHandles.has(value)) {
+    return "That handle is reserved.";
+  }
+  return null;
 }
 
 export async function ensureProfile(user: Pick<User, "id" | "email" | "name"> & { image?: string | null }) {

@@ -18,7 +18,7 @@ export const metadata: Metadata = {
     default: "PapiSkill",
     template: "%s | PapiSkill",
   },
-  description: "Discover, fork, edit, install, and contribute portable SKILL.md packages for AI agents.",
+  description: "Discover, copy, edit, install, and contribute portable SKILL.md packages for AI agents.",
 };
 
 export default function RootLayout({

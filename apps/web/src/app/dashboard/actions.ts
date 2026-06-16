@@ -2,15 +2,27 @@
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
-import { Prisma, SkillVisibility, ValidationLevel } from "@prisma/client";
-import { validateSkillPackage } from "@papiskill/skill-core";
+import { SkillVisibility } from "@prisma/client";
 import { getSessionUser } from "@/lib/server/request-auth";
-import { ensureProfile } from "@/lib/server/profiles";
+import { ensureProfile, normalizeHandle, validateHandle } from "@/lib/server/profiles";
 import { getPrisma } from "@/lib/server/prisma";
 import { createApiToken } from "@/lib/server/tokens";
+import {
+  buildSkillYml,
+  createLibraryCopy,
+  normalizeSlug,
+  persistForkValidation,
+  recordFromJson,
+  uniqueLibrarySlug,
+} from "@/lib/server/library";
 
 export interface TokenActionState {
   token?: string;
+  error?: string;
+}
+
+export interface ProfileActionState {
+  ok?: boolean;
   error?: string;
 }
 
@@ -47,55 +59,81 @@ export async function revokeTokenAction(formData: FormData) {
   revalidatePath("/dashboard");
 }
 
-export async function forkSkillAction(formData: FormData) {
+export async function updateProfileAction(
+  _previousState: ProfileActionState,
+  formData: FormData,
+): Promise<ProfileActionState> {
+  const user = await getRequiredUser();
+  const profile = await ensureProfile(user);
+  const handle = normalizeHandle(stringField(formData, "handle"));
+  const handleError = validateHandle(handle);
+  if (handleError) {
+    return { error: handleError };
+  }
+
+  const taken = await getPrisma().profile.findFirst({
+    where: {
+      handle,
+      userId: { not: user.id },
+    },
+    select: { id: true },
+  });
+  if (taken) {
+    return { error: "That handle is already taken." };
+  }
+
+  const website = optionalUrl(stringField(formData, "website"));
+  if (website === false) {
+    return { error: "Website must be a valid http or https URL." };
+  }
+
+  await getPrisma().profile.update({
+    where: { id: profile.id },
+    data: {
+      handle,
+      name: nullableField(formData, "name"),
+      bio: nullableField(formData, "bio"),
+      website,
+    },
+  });
+
+  revalidatePath("/dashboard");
+  revalidatePath("/dashboard/profile");
+  revalidatePath(`/u/${profile.handle}`);
+  revalidatePath(`/u/${handle}`);
+  return { ok: true };
+}
+
+export async function copySkillToLibraryAction(formData: FormData) {
   const user = await getRequiredUser();
   await ensureProfile(user);
   const reference = stringField(formData, "reference");
   const visibility = visibilityField(formData, "visibility");
-  const slug = reference.split("/").filter(Boolean).at(-1);
-  if (!slug) {
+  if (!reference) {
     redirect("/skills");
   }
 
-  const sourceSkill = await getPrisma().skill.findFirst({
-    where: { slug },
-    include: { files: true },
-  });
-  if (!sourceSkill) {
+  let forkId: string | null = null;
+  try {
+    const fork = await createLibraryCopy({ reference, user, visibility });
+    forkId = fork.id;
+  } catch {
     redirect("/skills");
   }
 
-  const fork = await getPrisma().skillFork.create({
-    data: {
-      ownerId: user.id,
-      sourceSkillId: sourceSkill.id,
-      slug: await uniqueForkSlug(user.id, sourceSkill.slug),
-      name: sourceSkill.name,
-      summary: sourceSkill.summary,
-      description: sourceSkill.description,
-      visibility,
-      version: sourceSkill.version,
-      license: sourceSkill.license,
-      categories: sourceSkill.categories,
-      tags: sourceSkill.tags,
-      compatibleWith: sourceSkill.compatibleWith,
-      installTargets: jsonObject(sourceSkill.installTargets),
-      files: {
-        create: sourceSkill.files.map((file) => ({
-          path: file.path,
-          content: file.content,
-          sizeBytes: file.sizeBytes,
-        })),
-      },
-    },
-  });
+  revalidatePath("/dashboard");
+  revalidatePath("/dashboard/library");
+  redirect(`/dashboard/library/${forkId}/edit`);
+}
 
-  redirect(`/dashboard/skills/${fork.id}/edit`);
+export async function forkSkillAction(formData: FormData) {
+  return copySkillToLibraryAction(formData);
 }
 
 export async function saveForkAction(formData: FormData) {
   const user = await getRequiredUser();
   const forkId = stringField(formData, "forkId");
+  const requestedSlug = normalizeSlug(stringField(formData, "slug"));
   const name = stringField(formData, "name");
   const summary = stringField(formData, "summary");
   const description = stringField(formData, "description");
@@ -110,8 +148,9 @@ export async function saveForkAction(formData: FormData) {
     redirect("/dashboard");
   }
 
+  const slug = requestedSlug === fork.slug ? fork.slug : await uniqueLibrarySlug(user.id, requestedSlug);
   const skillYml = buildSkillYml({
-    id: fork.slug,
+    id: slug,
     name,
     summary,
     description,
@@ -128,6 +167,7 @@ export async function saveForkAction(formData: FormData) {
     getPrisma().skillFork.update({
       where: { id: fork.id },
       data: {
+        slug,
         name,
         summary,
         description,
@@ -161,46 +201,20 @@ export async function saveForkAction(formData: FormData) {
         sizeBytes: Buffer.byteLength(skillMarkdown),
       },
     }),
-    getPrisma().skillForkValidation.deleteMany({ where: { forkId: fork.id } }),
   ]);
 
   const files = await getPrisma().skillForkFile.findMany({
     where: { forkId: fork.id },
     orderBy: { path: "asc" },
   });
-  const validation = validateSkillPackage(files.map((file) => ({
+  await persistForkValidation(fork.id, files.map((file) => ({
     path: file.path,
     content: file.content,
   })));
 
-  await getPrisma().skillForkValidation.createMany({
-    data: validation.issues.map((issue) => ({
-      forkId: fork.id,
-      level: issue.level === "error" ? ValidationLevel.ERROR : ValidationLevel.WARNING,
-      code: issue.code,
-      message: issue.message,
-      path: issue.path,
-    })),
-  });
-
-  revalidatePath(`/dashboard/skills/${fork.id}/edit`);
+  revalidatePath(`/dashboard/library/${fork.id}/edit`);
   revalidatePath("/dashboard");
-}
-
-function jsonObject(value: Prisma.JsonValue): Prisma.InputJsonValue {
-  if (!value || typeof value !== "object" || Array.isArray(value)) {
-    return {};
-  }
-  return value as Prisma.InputJsonObject;
-}
-
-function recordFromJson(value: Prisma.JsonValue): Record<string, string> {
-  if (!value || typeof value !== "object" || Array.isArray(value)) {
-    return {};
-  }
-  return Object.fromEntries(
-    Object.entries(value).filter((entry): entry is [string, string] => typeof entry[1] === "string"),
-  );
+  revalidatePath("/dashboard/library");
 }
 
 async function getRequiredUser() {
@@ -211,21 +225,24 @@ async function getRequiredUser() {
   return user;
 }
 
-async function uniqueForkSlug(userId: string, baseSlug: string): Promise<string> {
-  let slug = baseSlug;
-  for (let index = 1; index < 50; index += 1) {
-    const existing = await getPrisma().skillFork.findUnique({
-      where: { ownerId_slug: { ownerId: userId, slug } },
-    });
-    if (!existing) return slug;
-    slug = `${baseSlug}-${index + 1}`;
-  }
-  return `${baseSlug}-${Date.now()}`;
-}
-
 function stringField(formData: FormData, key: string): string {
   const value = formData.get(key);
   return typeof value === "string" ? value.trim() : "";
+}
+
+function nullableField(formData: FormData, key: string): string | null {
+  return stringField(formData, key) || null;
+}
+
+function optionalUrl(value: string): string | null | false {
+  if (!value) return null;
+  try {
+    const url = new URL(value);
+    if (url.protocol !== "http:" && url.protocol !== "https:") return false;
+    return url.toString();
+  } catch {
+    return false;
+  }
 }
 
 function visibilityField(formData: FormData, key: string): SkillVisibility {
@@ -233,37 +250,4 @@ function visibilityField(formData: FormData, key: string): SkillVisibility {
   if (value === "PUBLIC") return SkillVisibility.PUBLIC;
   if (value === "UNLISTED") return SkillVisibility.UNLISTED;
   return SkillVisibility.PRIVATE;
-}
-
-function buildSkillYml(input: {
-  id: string;
-  name: string;
-  summary: string;
-  description: string;
-  visibility: string;
-  version: string;
-  license: string;
-  categories: string[];
-  tags: string[];
-  compatibleWith: string[];
-  installTargets: Record<string, string>;
-}) {
-  const lines = [
-    `id: ${input.id}`,
-    `name: ${JSON.stringify(input.name)}`,
-    `summary: ${JSON.stringify(input.summary)}`,
-    `description: ${JSON.stringify(input.description)}`,
-    `version: ${input.version}`,
-    `license: ${input.license}`,
-    `visibility: ${input.visibility}`,
-    "categories:",
-    ...input.categories.map((item) => `  - ${item}`),
-    "tags:",
-    ...input.tags.map((item) => `  - ${item}`),
-    "compatible_with:",
-    ...input.compatibleWith.map((item) => `  - ${item}`),
-    "install_targets:",
-    ...Object.entries(input.installTargets).map(([key, value]) => `  ${key}: ${value}`),
-  ];
-  return `${lines.join("\n")}\n`;
 }

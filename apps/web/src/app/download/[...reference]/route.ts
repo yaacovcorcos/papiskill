@@ -1,6 +1,6 @@
 import { errorResponse } from "@/lib/server/http";
 import { getCatalogSkills } from "@/lib/server/catalog";
-import { getTokenUser } from "@/lib/server/request-auth";
+import { getSessionUser, getTokenUser } from "@/lib/server/request-auth";
 import { getSkillByReference } from "@/lib/server/skills";
 
 export async function GET(
@@ -28,7 +28,7 @@ export async function GET(
 async function getActor(request: Request) {
   if (!process.env.DATABASE_URL) return null;
   try {
-    return await getTokenUser(request);
+    return await getTokenUser(request) ?? await getSessionUser();
   } catch {
     return null;
   }

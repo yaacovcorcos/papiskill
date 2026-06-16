@@ -101,7 +101,7 @@ export default async function UserSkillPage({ params }: { params: Params }) {
                 </Link>
                 <Link href={`/dashboard/fork?skill=${reference}`} className="inline-flex items-center justify-center gap-2 rounded-md bg-slate-950 px-3 py-2 text-sm font-semibold text-white hover:bg-slate-800">
                   <GitFork className="size-4" aria-hidden />
-                  Fork
+                  Copy to library
                 </Link>
               </div>
             </div>

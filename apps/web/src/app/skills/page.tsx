@@ -71,7 +71,7 @@ export default async function SkillsPage({
             <div>
               <h1 className="text-2xl font-semibold tracking-tight">Skills</h1>
               <p className="mt-1 text-sm text-muted">
-                Discover, install, fork, and improve portable agent skills.
+                Discover, install, copy, and improve portable agent skills.
               </p>
             </div>
             <Link
@@ -147,7 +147,7 @@ export default async function SkillsPage({
                     <Link href={`/download/${reference}`} aria-label={`Download ${skill.name}`} title="Download" className="inline-grid size-10 place-items-center rounded-md border border-border text-slate-700 hover:bg-slate-50 hover:text-slate-950">
                       <Download className="size-4" aria-hidden />
                     </Link>
-                    <Link href={`/dashboard/fork?skill=${reference}`} aria-label={`Fork ${skill.name}`} title="Fork" className="inline-grid size-10 place-items-center rounded-md border border-border text-slate-700 hover:bg-slate-50 hover:text-slate-950">
+                    <Link href={`/dashboard/fork?skill=${reference}`} aria-label={`Copy ${skill.name} to library`} title="Copy to library" className="inline-grid size-10 place-items-center rounded-md border border-border text-slate-700 hover:bg-slate-50 hover:text-slate-950">
                       <GitFork className="size-4" aria-hidden />
                     </Link>
                   </div>

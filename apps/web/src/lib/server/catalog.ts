@@ -46,6 +46,7 @@ export async function getCatalogSkills(query = ""): Promise<CatalogSkill[]> {
         prisma.skillFork.findMany({
           where: {
             visibility: SkillVisibility.PUBLIC,
+            archivedAt: null,
             ...(q ? {
               OR: [
                 { name: { contains: q, mode: "insensitive" } },

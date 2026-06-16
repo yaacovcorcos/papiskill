@@ -17,7 +17,7 @@ Server-side ownership checks are mandatory.
 
 ## Sensitive Surfaces
 
-- private forks
+- private library skills
 - API tokens
 - GitHub OAuth account linkage
 - skill downloads
@@ -28,7 +28,7 @@ Server-side ownership checks are mandatory.
 
 - No secrets in source control.
 - API tokens hashed at rest.
-- Private fork access requires owner session or owner token.
+- Private library access requires owner session or owner token.
 - Mutations must derive user ID from server session.
 - Do not execute skill scripts in the web app.
 - Display warnings for packages containing scripts or risky instructions.

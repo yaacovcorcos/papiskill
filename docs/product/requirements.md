@@ -53,9 +53,9 @@ Required:
 - no password login in v1
 - API token management for CLI
 
-### Fork
+### Library
 
-Authenticated users can fork any visible skill into their profile.
+Authenticated users can copy any visible skill into their personal library.
 
 Required:
 
@@ -65,14 +65,16 @@ Required:
 - validation before save
 - download/export
 - optional public profile publishing
+- stable profile-scoped reference such as `handle/skill-slug`
 
 ### Edit
 
-Users can edit their own skill forks in the browser.
+Users can edit their own library skills in the browser.
 
 Required:
 
 - metadata form
+- slug/reference form
 - `SKILL.md` editor
 - preview
 - validation and safety warnings
@@ -112,7 +114,7 @@ Required:
 - search public registry
 - inspect skill
 - install global/public skill
-- login and install private own forks
+- login and install private own library skills
 - validate local package
 - install into Codex, Claude Code, Cursor, generic, or custom target paths
 

@@ -49,4 +49,4 @@ Rules:
 - store only hash and prefix
 - allow revoke
 - scope tokens to the owning user
-- private fork API routes accept tokens only for owner resources
+- private library API routes accept tokens only for owner resources
