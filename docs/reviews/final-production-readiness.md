@@ -2,7 +2,7 @@
 
 Date: 2026-06-17
 
-This review records the current production state after the quality pass ending at commit `9802f90`.
+This review records the current production state after the production quality passes on June 17, 2026.
 It is not a claim that every v1 product decision is finished. It separates shipped surfaces from the
 remaining work that needs explicit review before calling the whole product complete.
 
@@ -21,13 +21,11 @@ The remaining blockers for declaring the overall build complete are:
 ## Production deploy evidence
 
 - Production domain: `https://papiskill.com`
-- Latest verified production deployment: `dpl_21Kx3aE4jgpLA2s5WcKoj1dSFre3`
-- Latest pushed commit at the time of this audit: `9802f90`
-- Live health API returned `{ "ok": true, "service": "papiskill" }`.
-- Live skill API for `official/code-review` returned `version: "1.0.0"`, `license: "MIT"`, and the expected `mentions-network` validation warning.
-- CLI `info official/code-review` against `https://papiskill.com` returned the skill metadata and validation warning.
-- GitHub Actions `check` succeeded for `9802f90`.
-- `npm audit --audit-level=moderate` reported zero vulnerabilities.
+- Recent production smoke checks returned live health API `{ "ok": true, "service": "papiskill" }`.
+- Recent live skill API checks for `official/code-review` returned `version: "1.0.0"`, `license: "MIT"`, and the expected `mentions-network` validation warning.
+- CLI `info official/code-review` against `https://papiskill.com` returned the skill metadata and validation warning in recent production checks.
+- GitHub Actions `check` has been kept green on pushed production commits.
+- `npm audit --audit-level=moderate` has reported zero vulnerabilities in recent release checks.
 
 ## Requirement checklist
 
@@ -36,13 +34,13 @@ The remaining blockers for declaring the overall build complete are:
 | Public registry for official skills | Shipped | `/skills`, `/api/v1/skills`, generated registry fallback, database-backed catalog when indexed |
 | Official skill detail pages | Shipped | `/skills/official/[slug]`, markdown rendering, validation panel, download and fork actions |
 | User profiles | Shipped | `/u/[handle]`, `/u/[handle]/skills/[slug]`, profile update dashboard |
-| Public/private personal forks | Shipped in code; needs auth browser pass | `SkillFork.visibility`, dashboard library, profile visibility checks |
-| In-browser editing | Shipped in code; needs auth browser pass | dashboard library edit form, validation before save, generated `skill.yml` |
+| Public/private personal forks | Shipped in code; needs signed-in browser pass | `SkillFork.visibility`, dashboard library, action-level ownership tests, profile visibility checks |
+| In-browser editing | Shipped in code; needs signed-in browser pass | dashboard library edit form, validation before save, generated `skill.yml`, action-level save tests |
 | Download/export | Shipped | `/download/[...reference]`, package archive tests, CLI download/install |
 | Git-backed official registry | Shipped | `registry/official`, registry validation, generated registry |
 | Contribution path | Shipped as docs/runbook | docs contributing and registry operations runbooks |
-| GitHub OAuth | Configured in code and production env; needs browser auth pass | Better Auth GitHub provider and sign-in route |
-| API tokens for private CLI access | Shipped in code; needs auth browser pass | token model, token create/revoke UI, CLI login/whoami/logout |
+| GitHub OAuth | Configured in code and production env; needs user-assisted browser auth pass | Better Auth GitHub provider and sign-in route; GitHub credential prompt reached in automated pass |
+| API tokens for private CLI access | Shipped in code; needs signed-in browser pass | token model, token create/revoke UI, action-level token tests, CLI login/whoami/logout |
 | Stars and comments | Shipped foundation; moderation still backlog | star/comment tables, detail panel, server actions, engagement tests |
 | Validation warnings visible | Shipped | cards, detail pages, profile detail pages, CLI info |
 | Vercel production deployment | Shipped | production deployment and domain alias |
@@ -52,8 +50,10 @@ The remaining blockers for declaring the overall build complete are:
 
 ### Authenticated flows
 
-The server-side implementation covers ownership checks for library copies, edits, token creation, and
-private/unlisted visibility. Before completion, run a browser pass while signed in with GitHub:
+The server-side implementation and action-level tests cover ownership checks for library copies, edits,
+token creation, token revocation, and private/unlisted visibility. The automated production browser pass
+reached GitHub credential entry and stopped there. Before completion, run a browser pass while signed in
+with GitHub:
 
 - sign in
 - create or update profile
@@ -63,6 +63,9 @@ private/unlisted visibility. Before completion, run a browser pass while signed 
 - publish to public profile
 - download the public profile skill
 - create and revoke a CLI token
+
+See `docs/reviews/authenticated-flow-verification.md` for the current blocker and coverage added while
+live auth remains user-assisted.
 
 ### Engagement
 
