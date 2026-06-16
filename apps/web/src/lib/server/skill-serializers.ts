@@ -1,4 +1,12 @@
-import type { Prisma, Skill, SkillFile, SkillFork, SkillForkFile } from "@prisma/client";
+import type {
+  Prisma,
+  Skill,
+  SkillFile,
+  SkillFork,
+  SkillForkFile,
+  SkillForkValidation,
+  SkillValidation,
+} from "@prisma/client";
 
 export function serializeSkillSummary(skill: Skill & { owner?: { profile: { handle: string } | null } | null }) {
   return {
@@ -32,6 +40,7 @@ export function serializeForkSummary(fork: SkillFork & { owner: { profile: { han
 
 export function serializeSkillDetail(skill: Skill & {
   files: SkillFile[];
+  validations?: SkillValidation[];
   owner?: { profile: { handle: string } | null } | null;
 }) {
   const markdown = skill.files.find((file) => file.path === "SKILL.md")?.content ?? "";
@@ -41,11 +50,13 @@ export function serializeSkillDetail(skill: Skill & {
     markdown,
     files: skill.files.map((file) => ({ path: file.path, content: file.content })),
     installTargets: normalizeJsonRecord(skill.installTargets),
+    validationIssues: serializeValidationIssues(skill.validations),
   };
 }
 
 export function serializeForkDetail(fork: SkillFork & {
   files: SkillForkFile[];
+  validations?: SkillForkValidation[];
   owner: { profile: { handle: string } | null };
 }) {
   const markdown = fork.files.find((file) => file.path === "SKILL.md")?.content ?? "";
@@ -55,7 +66,17 @@ export function serializeForkDetail(fork: SkillFork & {
     markdown,
     files: fork.files.map((file) => ({ path: file.path, content: file.content })),
     installTargets: normalizeJsonRecord(fork.installTargets),
+    validationIssues: serializeValidationIssues(fork.validations),
   };
+}
+
+function serializeValidationIssues(validations: Array<SkillValidation | SkillForkValidation> = []) {
+  return validations.map((issue) => ({
+    level: issue.level.toLowerCase() as "error" | "warning",
+    code: issue.code,
+    message: issue.message,
+    path: issue.path,
+  }));
 }
 
 function normalizeJsonRecord(value: Prisma.JsonValue): Record<string, string> {

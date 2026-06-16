@@ -37,6 +37,14 @@ program.command("info")
     console.log(skill.summary);
     console.log(`Compatible with: ${skill.compatibleWith.join(", ")}`);
     console.log(`Tags: ${skill.tags.join(", ") || "none"}`);
+    if (skill.validationIssues.length === 0) {
+      console.log("Validation: no warnings");
+    } else {
+      console.log(`Validation: ${skill.validationIssues.length} issue${skill.validationIssues.length === 1 ? "" : "s"}`);
+      for (const issue of skill.validationIssues) {
+        console.log(`- ${issue.level.toUpperCase()} ${issue.code}: ${issue.message}${issue.path ? ` (${issue.path})` : ""}`);
+      }
+    }
   });
 
 program.command("install")

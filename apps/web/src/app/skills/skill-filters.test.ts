@@ -122,6 +122,7 @@ function skill(overrides: Partial<CatalogSkill>): CatalogSkill {
     installCommand: "papiskill install official/skill",
     starCount: 0,
     commentCount: 0,
+    validationIssues: overrides.validationIssues ?? [],
     updatedAt: overrides.updatedAt,
   };
 }

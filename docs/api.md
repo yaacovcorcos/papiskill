@@ -22,7 +22,7 @@ GET /api/v1/skills?q=review
 
 Returns public global skills and public profile skills.
 
-The list response returns summary metadata, not full package file bodies. Use the detail endpoint before installing or downloading a skill package.
+The list response returns summary metadata, validation warning summaries, and engagement counts, not full package file bodies. Use the detail endpoint before installing or downloading a skill package.
 
 ## Get skill
 
@@ -46,6 +46,19 @@ Vercel-CDN-Cache-Control: public, max-age=60, stale-while-revalidate=300
 ```
 
 Authenticated or owner-scoped private reads are not shared-cacheable.
+
+Skill responses include `validationIssues`, an array of validation warnings or errors:
+
+```json
+{
+  "level": "warning",
+  "code": "mentions-network",
+  "message": "Skill mentions network access, URLs, API keys, tokens, or webhooks.",
+  "path": "SKILL.md"
+}
+```
+
+Clients should show these issues before install or download actions.
 
 ## Current token user
 

@@ -7,6 +7,7 @@ import {
 import { SkillMarkdown } from "./skill-markdown";
 import { SkillMarkdownEditor } from "./skill-markdown-editor";
 import { SkillSourceBlock } from "./skill-source-block";
+import { SkillValidationBadges, SkillValidationPanel, validationSummary } from "./skill-validation";
 
 describe("SkillMarkdown", () => {
   it("renders designed markdown without YAML frontmatter", () => {
@@ -89,5 +90,29 @@ describe("RegistrySourceCard", () => {
       "https://github.com/yaacovcorcos/papiskill/edit/main/registry/official/code-review/SKILL.md",
     );
     expect(html).toContain("Contribution guide");
+  });
+});
+
+describe("SkillValidation", () => {
+  it("renders warning counts and warning messages", () => {
+    const issues = [
+      {
+        level: "warning" as const,
+        code: "mentions-network",
+        message: "Skill mentions network access.",
+        path: "SKILL.md",
+      },
+    ];
+
+    const badges = renderToStaticMarkup(<SkillValidationBadges issues={issues} />);
+    const panel = renderToStaticMarkup(
+      <SkillValidationPanel issues={issues} note="Review before installing." />,
+    );
+
+    expect(validationSummary(issues)).toBe("1 warning");
+    expect(badges).toContain("1 warning");
+    expect(panel).toContain("Validation issues");
+    expect(panel).toContain("Skill mentions network access.");
+    expect(panel).toContain("SKILL.md");
   });
 });

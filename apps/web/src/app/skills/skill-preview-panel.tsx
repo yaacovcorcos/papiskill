@@ -3,6 +3,7 @@ import type { ReactNode } from "react";
 import { MessageSquare, ShieldCheck, Star } from "lucide-react";
 import { Badge } from "@/components/badge";
 import { SkillMarkdown } from "@/components/skill-markdown";
+import { SkillValidationBadges, validationSummary } from "@/components/skill-validation";
 import type { CatalogSkill } from "@/lib/server/catalog";
 import {
   compatibilityLabels,
@@ -28,7 +29,7 @@ export function SkillPreviewPanel({
                 <h2 className="text-xl font-semibold tracking-tight">
                   {selected.name}
                 </h2>
-                <Badge variant="green">Verified</Badge>
+                <SkillValidationBadges issues={selected.validationIssues} />
               </div>
               <p className="mt-1 text-sm text-muted">
                 by {selected.author ?? "PapiSkill"}
@@ -46,7 +47,7 @@ export function SkillPreviewPanel({
             />
             <DetailRow
               label="Safety"
-              value="Review warnings before install"
+              value={validationSummary(selected.validationIssues)}
               icon={<ShieldCheck className="size-4 text-emerald-600" />}
             />
             <DetailRow label="License" value="MIT" />

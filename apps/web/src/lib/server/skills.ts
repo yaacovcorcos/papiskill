@@ -115,6 +115,7 @@ async function getGlobalSkill(slug: string, registryKind?: SkillRegistryKind) {
     },
     include: {
       files: { orderBy: { path: "asc" } },
+      validations: { orderBy: { createdAt: "desc" } },
       owner: { include: { profile: true } },
     },
   });
@@ -136,6 +137,7 @@ async function getProfileFork(handle: string, slug: string, actor?: Pick<User, "
     },
     include: {
       files: { orderBy: { path: "asc" } },
+      validations: { orderBy: { createdAt: "desc" } },
       owner: { include: { profile: true } },
     },
   });

@@ -1,13 +1,14 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ArrowLeft, Download, GitFork, ShieldCheck, Terminal } from "lucide-react";
+import { ArrowLeft, Download, GitFork, Terminal } from "lucide-react";
 import { SkillVisibility } from "@prisma/client";
 import { AppHeader } from "@/components/app-header";
 import { Badge } from "@/components/badge";
 import { SkillMarkdown } from "@/components/skill-markdown";
 import { SkillEngagementPanel } from "@/components/skill-engagement-panel";
 import { SkillSourceBlock } from "@/components/skill-source-block";
+import { SkillValidationBadges, SkillValidationPanel } from "@/components/skill-validation";
 import { hasDatabaseUrl } from "@/lib/server/db-env";
 import { getSessionUser } from "@/lib/server/request-auth";
 import { getPrisma } from "@/lib/server/prisma";
@@ -85,7 +86,7 @@ export default async function UserSkillPage({ params }: { params: Params }) {
             <div className="border-b border-border pb-6">
               <div className="mb-3 flex flex-wrap items-center gap-2">
                 <Badge>{skill.visibility}</Badge>
-                <Badge variant="green">Profile copy</Badge>
+                <SkillValidationBadges issues={skill.validationIssues} />
               </div>
               <h1 className="text-4xl font-semibold tracking-tight">{skill.name}</h1>
               <p className="mt-3 max-w-2xl text-lg leading-8 text-muted">{skill.summary}</p>
@@ -139,15 +140,10 @@ export default async function UserSkillPage({ params }: { params: Params }) {
               </div>
             </div>
 
-            <div className="mt-4 rounded-lg border border-emerald-200 bg-emerald-50 p-5 text-sm text-emerald-900">
-              <div className="flex items-center gap-2 font-semibold">
-                <ShieldCheck className="size-4" aria-hidden />
-                Trust note
-              </div>
-              <p className="mt-2 leading-6">
-                Profile skills belong to their authors. Review the full instructions before installing or adapting them.
-              </p>
-            </div>
+            <SkillValidationPanel
+              issues={skill.validationIssues}
+              note="Profile skills belong to their authors. Review validation warnings and full instructions before installing or adapting them."
+            />
           </aside>
         </div>
       </main>

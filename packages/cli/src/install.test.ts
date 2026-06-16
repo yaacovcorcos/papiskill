@@ -17,6 +17,7 @@ const demoSkill: ApiSkillDetail = {
   visibility: "public",
   compatibleWith: ["generic-agent"],
   tags: [],
+  validationIssues: [],
   installTargets: {},
   files: [
     { path: "skill.yml", content: "id: demo" },

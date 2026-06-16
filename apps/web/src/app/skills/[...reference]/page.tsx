@@ -1,12 +1,13 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ArrowLeft, Download, GitFork, ShieldCheck, Terminal } from "lucide-react";
+import { ArrowLeft, Download, GitFork, Terminal } from "lucide-react";
 import { AppHeader } from "@/components/app-header";
 import { Badge } from "@/components/badge";
 import { RegistrySourceCard } from "@/components/registry-source-card";
 import { SkillMarkdown } from "@/components/skill-markdown";
 import { SkillEngagementPanel } from "@/components/skill-engagement-panel";
 import { SkillSourceBlock } from "@/components/skill-source-block";
+import { SkillValidationBadges, SkillValidationPanel } from "@/components/skill-validation";
 import { hasDatabaseUrl } from "@/lib/server/db-env";
 import { getSkillEngagement } from "@/lib/server/engagement";
 import { getSessionUser } from "@/lib/server/request-auth";
@@ -54,7 +55,7 @@ export default async function SkillDetailPage({
                   <Badge variant={skill.registryKind === "global" ? "blue" : "neutral"}>
                     {skill.registryKind === "global" ? "Global registry" : "Profile skill"}
                   </Badge>
-                  <Badge variant="green">Validated</Badge>
+                  <SkillValidationBadges issues={skill.validationIssues} />
                 </div>
                 <h1 className="text-4xl font-semibold tracking-tight">{skill.name}</h1>
                 <p className="mt-3 max-w-2xl text-lg leading-8 text-muted">{skill.summary}</p>
@@ -108,15 +109,10 @@ export default async function SkillDetailPage({
 
               <RegistrySourceCard registryKind={skill.registryKind} slug={skill.slug} />
 
-              <div className="mt-4 rounded-lg border border-emerald-200 bg-emerald-50 p-5 text-sm text-emerald-900">
-                <div className="flex items-center gap-2 font-semibold">
-                  <ShieldCheck className="size-4" aria-hidden />
-                  Trust note
-                </div>
-                <p className="mt-2 leading-6">
-                  PapiSkill validates package structure and highlights risky content. Review any scripts or network behavior before installing third-party skills.
-                </p>
-              </div>
+              <SkillValidationPanel
+                issues={skill.validationIssues}
+                note="PapiSkill validates package structure and highlights risky content before install. Review warnings before installing third-party skills."
+              />
             </aside>
         </div>
       </main>

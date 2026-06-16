@@ -11,6 +11,12 @@ const apiSkillSummarySchema = z.object({
   visibility: z.string(),
   compatibleWith: z.array(z.string()),
   tags: z.array(z.string()),
+  validationIssues: z.array(z.object({
+    level: z.enum(["error", "warning"]),
+    code: z.string(),
+    message: z.string(),
+    path: z.string().nullable().optional(),
+  })).default([]),
 });
 
 const apiSkillDetailSchema = apiSkillSummarySchema.extend({

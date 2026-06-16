@@ -3,6 +3,7 @@ import { ArrowRight, Download, Eye, GitFork, Terminal } from "lucide-react";
 import { Badge } from "@/components/badge";
 import { CopyButton } from "@/components/copy-button";
 import { EngagementCounts } from "@/components/skill-engagement-panel";
+import { SkillValidationBadges } from "@/components/skill-validation";
 import type { CatalogSkill } from "@/lib/server/catalog";
 import {
   skillHref,
@@ -31,7 +32,7 @@ export function SkillCard({ skill }: { skill: CatalogSkill }) {
             >
               {statusBadgeLabel(skill.registryKind)}
             </Badge>
-            <Badge variant="green">Validated</Badge>
+            <SkillValidationBadges issues={skill.validationIssues} />
           </div>
           <p className="mt-1 text-sm text-muted">
             by {skill.author ?? "PapiSkill"}

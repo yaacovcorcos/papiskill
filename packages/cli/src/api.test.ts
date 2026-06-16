@@ -22,6 +22,7 @@ describe("installReferenceForSkill", () => {
     visibility: "public",
     compatibleWith: ["codex"],
     tags: ["review"],
+    validationIssues: [],
   };
 
   it("prints stable CLI install references for each registry kind", () => {

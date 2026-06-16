@@ -24,12 +24,20 @@ export interface CatalogSkill {
   files?: Array<{ path: string; content: string }>;
   starCount: number;
   commentCount: number;
+  validationIssues: CatalogValidationIssue[];
   updatedAt?: string;
 }
 
 export interface CatalogSkillDetail extends CatalogSkill {
   files: Array<{ path: string; content: string }>;
   installTargets: Record<string, string>;
+}
+
+export interface CatalogValidationIssue {
+  level: "error" | "warning";
+  code: string;
+  message: string;
+  path?: string | null;
 }
 
 export interface CatalogFilters {
@@ -137,6 +145,7 @@ export async function getCatalogSkills(
                   ? { where: { path: "SKILL.md" }, take: 1 }
                   : false,
                 owner: { include: { profile: true } },
+                validations: true,
                 _count: {
                   select: {
                     stars: true,
@@ -156,6 +165,7 @@ export async function getCatalogSkills(
                   ? { where: { path: "SKILL.md" }, take: 1 }
                   : false,
                 owner: { include: { profile: true } },
+                validations: true,
                 _count: {
                   select: {
                     stars: true,
@@ -190,6 +200,12 @@ export async function getCatalogSkills(
             : {}),
           starCount: skill._count.stars,
           commentCount: skill._count.comments,
+          validationIssues: skill.validations.map((issue) => ({
+            level: issue.level.toLowerCase() as "error" | "warning",
+            code: issue.code,
+            message: issue.message,
+            path: issue.path,
+          })),
           updatedAt: skill.updatedAt.toISOString(),
         };
       });
@@ -210,6 +226,7 @@ export async function getCatalogSkills(
                 ...fileSkill,
                 starCount: databaseSkill.starCount,
                 commentCount: databaseSkill.commentCount,
+                validationIssues: databaseSkill.validationIssues,
                 updatedAt: databaseSkill.updatedAt,
               }
             : fileSkill;
@@ -235,6 +252,12 @@ export async function getCatalogSkills(
               : {}),
             starCount: fork._count.stars,
             commentCount: fork._count.comments,
+            validationIssues: fork.validations.map((issue) => ({
+              level: issue.level.toLowerCase() as "error" | "warning",
+              code: issue.code,
+              message: issue.message,
+              path: issue.path,
+            })),
             updatedAt: fork.updatedAt.toISOString(),
           };
         }),

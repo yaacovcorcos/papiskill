@@ -1,6 +1,7 @@
 import { writeFile } from "node:fs/promises";
 import path from "node:path";
 import { loadRegistry } from "../../../packages/skill-core/src/registry-loader";
+import { validateSkillPackage } from "../../../packages/skill-core/src/validation";
 
 const registryRoot = path.resolve(process.cwd(), "../../registry");
 const outputPath = path.resolve(
@@ -11,6 +12,7 @@ const outputPath = path.resolve(
 async function main() {
   const packages = await loadRegistry(registryRoot);
   const skills = packages.map((registryPackage) => {
+    const validation = validateSkillPackage(registryPackage.files);
     const manifest = registryPackage.manifest;
     const registryKind =
       registryPackage.registryKind === "official" ? "global" : "community";
@@ -36,6 +38,7 @@ async function main() {
       installCommand: `papiskill install ${registryPackage.registryKind}/${manifest.id}`,
       starCount: 0,
       commentCount: 0,
+      validationIssues: validation.issues,
       markdown,
       files: registryPackage.files,
     };
