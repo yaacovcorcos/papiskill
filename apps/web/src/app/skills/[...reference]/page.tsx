@@ -69,7 +69,7 @@ export default async function SkillDetailPage({
                   <span className="break-all">{`papiskill install ${referenceId}`}</span>
                 </code>
                 <div className="mt-4 grid grid-cols-2 gap-2">
-                  <Link href={`/download/${referenceId}`} prefetch={false} className="inline-flex items-center justify-center gap-2 rounded-md border border-border px-3 py-2 text-sm font-semibold hover:bg-slate-50">
+                  <Link href={`/download/${referenceId}?format=zip`} prefetch={false} className="inline-flex items-center justify-center gap-2 rounded-md border border-border px-3 py-2 text-sm font-semibold hover:bg-slate-50">
                     <Download className="size-4" aria-hidden />
                     Download
                   </Link>

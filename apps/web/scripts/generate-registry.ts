@@ -37,6 +37,7 @@ async function main() {
       starCount: 0,
       commentCount: 0,
       markdown,
+      files: registryPackage.files,
     };
   });
 

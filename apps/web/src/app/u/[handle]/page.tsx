@@ -140,7 +140,7 @@ export default async function UserProfilePage({
                       </div>
                     </div>
                     <div className="flex shrink-0 gap-2">
-                      <Link href={`/download/${skill.reference}`} prefetch={false} className="inline-flex items-center gap-2 rounded-md border border-border px-3 py-2 text-sm font-semibold hover:bg-slate-50">
+                      <Link href={`/download/${skill.reference}?format=zip`} prefetch={false} className="inline-flex items-center gap-2 rounded-md border border-border px-3 py-2 text-sm font-semibold hover:bg-slate-50">
                         <Download className="size-4" aria-hidden />
                         Download
                       </Link>

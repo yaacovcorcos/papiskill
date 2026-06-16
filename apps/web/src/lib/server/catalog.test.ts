@@ -15,6 +15,7 @@ describe("generated registry reference lookup", () => {
         slug: "code-review",
         registryKind: "global",
         files: expect.arrayContaining([
+          expect.objectContaining({ path: "skill.yml" }),
           expect.objectContaining({ path: "SKILL.md" }),
         ]),
       }),

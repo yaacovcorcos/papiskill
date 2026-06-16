@@ -120,6 +120,7 @@ Warnings are visible but may not block user forks.
 
 The web app and CLI support:
 
-- single `SKILL.md` download
+- package `.zip` download from web download buttons, preserving `skill.yml`, `SKILL.md`, and supporting package files
+- explicit single `SKILL.md` download through `/download/<reference>?format=md`
 - package JSON representation
 - directory install through CLI

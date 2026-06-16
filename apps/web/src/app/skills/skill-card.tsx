@@ -78,7 +78,7 @@ export function SkillCard({ skill }: { skill: CatalogSkill }) {
             <Eye className="size-4" aria-hidden />
           </Link>
           <Link
-            href={`/download/${reference}`}
+            href={`/download/${reference}?format=zip`}
             prefetch={false}
             aria-label={`Download ${skill.name}`}
             title="Download"

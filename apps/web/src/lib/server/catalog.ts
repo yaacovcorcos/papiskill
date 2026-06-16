@@ -21,6 +21,7 @@ export interface CatalogSkill {
   categories: string[];
   installCommand: string;
   markdown?: string;
+  files?: Array<{ path: string; content: string }>;
   starCount: number;
   commentCount: number;
 }
@@ -334,7 +335,7 @@ export async function getFileRegistrySkill(
 
   return {
     ...skill,
-    files: [
+    files: skill.files ?? [
       {
         path: "SKILL.md",
         content: skill.markdown ?? "",

@@ -55,7 +55,7 @@ export function EditLibrarySkillForm({
         </div>
         <div className="flex flex-wrap gap-2">
           <CopyButton value={installCommand} label="Copy install command" />
-          <Link href={`/download/${reference}`} aria-label="Download" title="Download" className="inline-grid size-10 place-items-center rounded-md border border-border text-slate-700 hover:bg-slate-50 hover:text-slate-950">
+          <Link href={`/download/${reference}?format=zip`} aria-label="Download" title="Download package" className="inline-grid size-10 place-items-center rounded-md border border-border text-slate-700 hover:bg-slate-50 hover:text-slate-950">
             <Download className="size-4" aria-hidden />
           </Link>
           {showPublicLink ? (

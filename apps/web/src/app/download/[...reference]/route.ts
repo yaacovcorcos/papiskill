@@ -1,6 +1,7 @@
 import { errorResponse, publicCatalogCacheHeaders } from "@/lib/server/http";
 import { getFileRegistrySkill } from "@/lib/server/catalog";
 import { hasDatabaseUrl } from "@/lib/server/db-env";
+import { buildSkillPackageZip, packageDownloadFilename } from "@/lib/server/package-archive";
 import { isPublicRegistryReference } from "@/lib/server/references";
 import { getSessionUser, getTokenUser } from "@/lib/server/request-auth";
 import { getSkillByReference } from "@/lib/server/skills";
@@ -21,11 +22,35 @@ export async function GET(
     return errorResponse("Skill not found.", 404);
   }
 
+  const url = new URL(request.url);
+  const format = url.searchParams.get("format") ?? "md";
+  if (format === "zip") {
+    const zip = buildSkillPackageZip({
+      slug: skill.slug,
+      files: skill.files,
+    });
+    const body = new Uint8Array(zip).buffer;
+    return new Response(body, {
+      status: 200,
+      headers: {
+        "Content-Type": "application/zip",
+        "Content-Disposition": `attachment; filename="${packageDownloadFilename(skill.slug)}"`,
+        ...(isPublicRegistry
+          ? publicCatalogCacheHeaders
+          : { "Cache-Control": "private, no-store" }),
+      },
+    });
+  }
+
+  if (format !== "md") {
+    return errorResponse("Unsupported download format.", 400);
+  }
+
   return new Response(skill.markdown, {
     status: 200,
     headers: {
       "Content-Type": "text/markdown; charset=utf-8",
-      "Content-Disposition": `attachment; filename="${safeFilename(skill.slug)}.md"`,
+      "Content-Disposition": `attachment; filename="${packageDownloadFilename(skill.slug, "md")}"`,
       ...(isPublicRegistry
         ? publicCatalogCacheHeaders
         : { "Cache-Control": "private, no-store" }),
@@ -53,8 +78,4 @@ async function getDatabaseSkill(reference: string, actor: Awaited<ReturnType<typ
 
 async function getCatalogFallback(reference: string) {
   return getFileRegistrySkill(reference);
-}
-
-function safeFilename(slug: string) {
-  return slug.replace(/[^a-z0-9_.-]/gi, "-") || "SKILL";
 }
