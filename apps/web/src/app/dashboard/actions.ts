@@ -206,7 +206,7 @@ function recordFromJson(value: Prisma.JsonValue): Record<string, string> {
 async function getRequiredUser() {
   const user = await getSessionUser();
   if (!user) {
-    redirect("/api/auth/sign-in/github");
+    redirect("/auth/sign-in");
   }
   return user;
 }

@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Github } from "lucide-react";
+import { GithubSignInButton } from "@/components/github-sign-in-button";
 
 const navItems = [
   { href: "/skills", label: "Skills" },
@@ -36,13 +36,9 @@ export function AppHeader() {
           >
             CLI
           </Link>
-          <Link
-            href="/api/auth/sign-in/github"
+          <GithubSignInButton
             className="inline-flex items-center gap-2 rounded-md border border-border bg-white px-3.5 py-2 text-sm font-semibold text-slate-950 shadow-sm hover:bg-slate-50"
-          >
-            <Github className="size-4" aria-hidden />
-            Sign in with GitHub
-          </Link>
+          />
         </div>
       </div>
     </header>
