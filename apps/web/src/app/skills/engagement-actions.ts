@@ -2,12 +2,13 @@
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
-import { SkillCommentStatus } from "@prisma/client";
+import { Prisma, SkillCommentStatus } from "@prisma/client";
 import { ensureProfile } from "@/lib/server/profiles";
 import { getSessionUser } from "@/lib/server/request-auth";
 import { getPrisma } from "@/lib/server/prisma";
 import {
   engagementPathForReference,
+  engagementRevalidationPaths,
   engagementTargetWhere,
   getPublicEngagementTarget,
   normalizeCommentBody,
@@ -30,13 +31,18 @@ export async function toggleStarAction(formData: FormData) {
   if (existing) {
     await getPrisma().skillStar.delete({ where: { id: existing.id } });
   } else {
-    await getPrisma().skillStar.create({
-      data: { userId: user.id, ...targetWhere },
-    });
+    try {
+      await getPrisma().skillStar.create({
+        data: { userId: user.id, ...targetWhere },
+      });
+    } catch (error) {
+      if (!isUniqueConstraintError(error)) {
+        throw error;
+      }
+    }
   }
 
-  revalidatePath(target.path);
-  revalidatePath("/skills");
+  revalidateEngagementPaths(target);
 }
 
 export async function createCommentAction(formData: FormData) {
@@ -61,8 +67,7 @@ export async function createCommentAction(formData: FormData) {
     },
   });
 
-  revalidatePath(target.path);
-  revalidatePath("/skills");
+  revalidateEngagementPaths(target);
 }
 
 export async function deleteCommentAction(formData: FormData) {
@@ -87,8 +92,17 @@ export async function deleteCommentAction(formData: FormData) {
     },
   });
 
-  revalidatePath(target.path);
-  revalidatePath("/skills");
+  revalidateEngagementPaths(target);
+}
+
+function revalidateEngagementPaths(target: { path: string }) {
+  for (const path of engagementRevalidationPaths(target)) {
+    revalidatePath(path);
+  }
+}
+
+function isUniqueConstraintError(error: unknown) {
+  return error instanceof Prisma.PrismaClientKnownRequestError && error.code === "P2002";
 }
 
 async function getRequiredUser() {

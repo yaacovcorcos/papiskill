@@ -42,6 +42,18 @@ Required:
 - source repo or profile attribution
 - install commands
 - download/export
+- public star and comment counts
+
+### Engage
+
+Users can see public stars and comments on globally published and public profile skills. Authenticated users can star skills and leave comments.
+
+Required:
+
+- GitHub login for star/comment writes
+- public read access for visible comments and counts
+- owner-only comment deletion
+- profile and registry lists reflect current engagement counts
 
 ### Authenticate
 

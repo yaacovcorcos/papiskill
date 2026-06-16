@@ -3,9 +3,10 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { cache } from "react";
 import { Download, GitFork, UserRound } from "lucide-react";
-import { SkillVisibility } from "@prisma/client";
+import { SkillCommentStatus, SkillVisibility } from "@prisma/client";
 import { AppHeader } from "@/components/app-header";
 import { Badge } from "@/components/badge";
+import { EngagementCounts } from "@/components/skill-engagement-panel";
 import { hasDatabaseUrl } from "@/lib/server/db-env";
 import { getPrisma } from "@/lib/server/prisma";
 import { serializeForkSummary, serializeSkillSummary } from "@/lib/server/skill-serializers";
@@ -62,7 +63,15 @@ export default async function UserProfilePage({
         ownerId: profile.userId,
         visibility: SkillVisibility.PUBLIC,
       },
-      include: { owner: { include: { profile: true } } },
+      include: {
+        owner: { include: { profile: true } },
+        _count: {
+          select: {
+            stars: true,
+            comments: { where: { status: SkillCommentStatus.VISIBLE } },
+          },
+        },
+      },
       orderBy: { updatedAt: "desc" },
       take: 50,
     }),
@@ -72,7 +81,15 @@ export default async function UserProfilePage({
         visibility: SkillVisibility.PUBLIC,
         archivedAt: null,
       },
-      include: { owner: { include: { profile: true } } },
+      include: {
+        owner: { include: { profile: true } },
+        _count: {
+          select: {
+            stars: true,
+            comments: { where: { status: SkillCommentStatus.VISIBLE } },
+          },
+        },
+      },
       orderBy: { updatedAt: "desc" },
       take: 50,
     }),
@@ -84,12 +101,16 @@ export default async function UserProfilePage({
       href: `/skills/community/${skill.slug}`,
       reference: `community/${skill.slug}`,
       kindLabel: skill.registryKind.toLowerCase(),
+      starCount: skill._count.stars,
+      commentCount: skill._count.comments,
     })),
     ...forks.map((fork) => ({
       ...serializeForkSummary(fork),
       href: `/u/${profile.handle}/skills/${fork.slug}`,
       reference: `${profile.handle}/${fork.slug}`,
       kindLabel: fork.visibility.toLowerCase(),
+      starCount: fork._count.stars,
+      commentCount: fork._count.comments,
     })),
   ];
 
@@ -137,6 +158,9 @@ export default async function UserProfilePage({
                       <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-700">{skill.summary}</p>
                       <div className="mt-3 flex flex-wrap gap-2">
                         {skill.tags.map((tag) => <Badge key={tag}>{tag}</Badge>)}
+                      </div>
+                      <div className="mt-3">
+                        <EngagementCounts stars={skill.starCount} comments={skill.commentCount} />
                       </div>
                     </div>
                     <div className="flex shrink-0 gap-2">

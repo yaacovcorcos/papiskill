@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
   engagementPathForReference,
+  engagementRevalidationPaths,
   engagementTargetWhere,
   maxCommentBodyLength,
   normalizeCommentBody,
@@ -15,6 +16,25 @@ describe("engagementPathForReference", () => {
 
   it("routes profile references to public profile skill pages", () => {
     expect(engagementPathForReference("yaacov/my-skill")).toBe("/u/yaacov/skills/my-skill");
+  });
+});
+
+describe("engagementRevalidationPaths", () => {
+  it("revalidates registry detail, registry list, and API list paths", () => {
+    expect(engagementRevalidationPaths({ path: "/skills/official/code-review" })).toEqual([
+      "/skills/official/code-review",
+      "/skills",
+      "/api/v1/skills",
+    ]);
+  });
+
+  it("also revalidates the profile page for profile skill engagement", () => {
+    expect(engagementRevalidationPaths({ path: "/u/yaacov/skills/my-skill" })).toEqual([
+      "/u/yaacov/skills/my-skill",
+      "/skills",
+      "/api/v1/skills",
+      "/u/yaacov",
+    ]);
   });
 });
 

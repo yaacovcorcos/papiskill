@@ -37,6 +37,20 @@ export function engagementTargetWhere(target: Pick<EngagementTarget, "kind" | "i
     : { forkId: target.id };
 }
 
+export function engagementRevalidationPaths(target: Pick<EngagementTarget, "path">): string[] {
+  const paths = new Set<string>([
+    target.path,
+    "/skills",
+    "/api/v1/skills",
+  ]);
+  const profileMatch = target.path.match(/^\/u\/([^/]+)\/skills\/[^/]+$/);
+  if (profileMatch?.[1]) {
+    paths.add(`/u/${profileMatch[1]}`);
+  }
+
+  return Array.from(paths);
+}
+
 export function normalizeCommentBody(value: string): string {
   return value.replace(/\r\n/g, "\n").trim().slice(0, maxCommentBodyLength);
 }
