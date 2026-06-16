@@ -26,7 +26,6 @@ function createAuth() {
           github: {
             clientId: process.env.GITHUB_CLIENT_ID!,
             clientSecret: process.env.GITHUB_CLIENT_SECRET!,
-            scope: ["user:email"],
             mapProfileToUser(profile) {
               const login = typeof profile.login === "string" ? profile.login : undefined;
               const fallbackEmail = login ? `${login}@users.noreply.github.com` : undefined;

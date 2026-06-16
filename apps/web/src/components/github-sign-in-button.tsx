@@ -1,8 +1,6 @@
 "use client";
 
-import { useState } from "react";
 import { Github } from "lucide-react";
-import { authClient } from "@/lib/auth-client";
 
 interface GithubSignInButtonProps {
   callbackURL?: string;
@@ -17,23 +15,12 @@ export function GithubSignInButton({
   children = "Sign in with GitHub",
   showIcon = true,
 }: GithubSignInButtonProps) {
-  const [isPending, setIsPending] = useState(false);
-
-  async function signIn() {
-    setIsPending(true);
-    const result = await authClient.signIn.social({
-      provider: "github",
-      callbackURL,
-    });
-    if (result.error) {
-      setIsPending(false);
-    }
-  }
+  const href = `/auth/github?callbackURL=${encodeURIComponent(callbackURL)}`;
 
   return (
-    <button type="button" className={className} onClick={signIn} disabled={isPending}>
+    <a className={className} href={href}>
       {showIcon ? <Github className="size-4" aria-hidden /> : null}
-      {isPending ? "Opening GitHub..." : children}
-    </button>
+      {children}
+    </a>
   );
 }
