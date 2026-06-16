@@ -1,7 +1,10 @@
-import { SkillVisibility } from "@prisma/client";
+import { SkillRegistryKind, SkillVisibility } from "@prisma/client";
 import { getPrisma } from "./prisma";
 import { generatedRegistry } from "./generated-registry";
-import { serializeForkSummary, serializeSkillSummary } from "./skill-serializers";
+import {
+  serializeForkSummary,
+  serializeSkillSummary,
+} from "./skill-serializers";
 
 export interface CatalogSkill {
   id: string;
@@ -19,49 +22,104 @@ export interface CatalogSkill {
   markdown: string;
 }
 
-export async function getCatalogSkills(query = ""): Promise<CatalogSkill[]> {
+export interface CatalogFilters {
+  query?: string;
+  categories?: string[];
+  compatibility?: string[];
+  statuses?: string[];
+}
+
+export async function getCatalogSkills(
+  filters: string | CatalogFilters = "",
+): Promise<CatalogSkill[]> {
+  const normalizedFilters = normalizeFilters(filters);
+
   if (process.env.DATABASE_URL) {
     try {
       const prisma = getPrisma();
-      const q = query.trim();
+      const q = normalizedFilters.query;
+      const normalizedQuery = q.toLowerCase();
+      const skillSearchFilters = q
+        ? [
+            { name: { contains: q, mode: "insensitive" as const } },
+            { summary: { contains: q, mode: "insensitive" as const } },
+            { description: { contains: q, mode: "insensitive" as const } },
+            { tags: { has: normalizedQuery } },
+            { categories: { has: normalizedQuery } },
+            { compatibleWith: { has: normalizedQuery } },
+            ...(normalizedQuery === "global" ||
+            normalizedQuery === "curated" ||
+            normalizedQuery === "official"
+              ? [{ registryKind: "GLOBAL" as const }]
+              : []),
+          ]
+        : [];
+      const forkSearchFilters = q
+        ? [
+            { name: { contains: q, mode: "insensitive" as const } },
+            { summary: { contains: q, mode: "insensitive" as const } },
+            { description: { contains: q, mode: "insensitive" as const } },
+            { tags: { has: normalizedQuery } },
+            { categories: { has: normalizedQuery } },
+            { compatibleWith: { has: normalizedQuery } },
+            ...(normalizedQuery === "profile" || normalizedQuery === "profiles"
+              ? [{}]
+              : []),
+          ]
+        : [];
+      const shouldFetchSkills =
+        normalizedFilters.statuses.length === 0 ||
+        normalizedFilters.statuses.includes("global");
+      const shouldFetchForks =
+        normalizedFilters.statuses.length === 0 ||
+        normalizedFilters.statuses.includes("profile");
+      const skillWhere = {
+        visibility: SkillVisibility.PUBLIC,
+        ...(skillSearchFilters.length ? { OR: skillSearchFilters } : {}),
+        ...(normalizedFilters.categories.length
+          ? { categories: { hasSome: normalizedFilters.categories } }
+          : {}),
+        ...(normalizedFilters.compatibility.length
+          ? { compatibleWith: { hasSome: normalizedFilters.compatibility } }
+          : {}),
+        ...(normalizedFilters.statuses.includes("global")
+          ? { registryKind: SkillRegistryKind.GLOBAL }
+          : {}),
+      };
+      const forkWhere = {
+        visibility: SkillVisibility.PUBLIC,
+        archivedAt: null,
+        ...(forkSearchFilters.length ? { OR: forkSearchFilters } : {}),
+        ...(normalizedFilters.categories.length
+          ? { categories: { hasSome: normalizedFilters.categories } }
+          : {}),
+        ...(normalizedFilters.compatibility.length
+          ? { compatibleWith: { hasSome: normalizedFilters.compatibility } }
+          : {}),
+      };
       const [skills, forks] = await Promise.all([
-        prisma.skill.findMany({
-          where: {
-            visibility: SkillVisibility.PUBLIC,
-            ...(q ? {
-              OR: [
-                { name: { contains: q, mode: "insensitive" } },
-                { summary: { contains: q, mode: "insensitive" } },
-                { description: { contains: q, mode: "insensitive" } },
-              ],
-            } : {}),
-          },
-          include: {
-            files: true,
-            owner: { include: { profile: true } },
-          },
-          orderBy: [{ registryKind: "asc" }, { updatedAt: "desc" }],
-          take: 80,
-        }),
-        prisma.skillFork.findMany({
-          where: {
-            visibility: SkillVisibility.PUBLIC,
-            archivedAt: null,
-            ...(q ? {
-              OR: [
-                { name: { contains: q, mode: "insensitive" } },
-                { summary: { contains: q, mode: "insensitive" } },
-                { description: { contains: q, mode: "insensitive" } },
-              ],
-            } : {}),
-          },
-          include: {
-            files: true,
-            owner: { include: { profile: true } },
-          },
-          orderBy: { updatedAt: "desc" },
-          take: 80,
-        }),
+        shouldFetchSkills
+          ? prisma.skill.findMany({
+              where: skillWhere,
+              include: {
+                files: true,
+                owner: { include: { profile: true } },
+              },
+              orderBy: [{ registryKind: "asc" }, { updatedAt: "desc" }],
+              take: 80,
+            })
+          : [],
+        shouldFetchForks
+          ? prisma.skillFork.findMany({
+              where: forkWhere,
+              include: {
+                files: true,
+                owner: { include: { profile: true } },
+              },
+              orderBy: { updatedAt: "desc" },
+              take: 80,
+            })
+          : [],
       ]);
 
       return [
@@ -71,8 +129,12 @@ export async function getCatalogSkills(query = ""): Promise<CatalogSkill[]> {
             ...summary,
             description: skill.description,
             categories: skill.categories,
-            installCommand: `papiskill install official/${skill.slug}`,
-            markdown: skill.files.find((file) => file.path === "SKILL.md")?.content ?? "",
+            installCommand: `papiskill install ${
+              skill.registryKind === SkillRegistryKind.COMMUNITY ? "community" : "official"
+            }/${skill.slug}`,
+            markdown:
+              skill.files.find((file) => file.path === "SKILL.md")?.content ??
+              "",
           };
         }),
         ...forks.map((fork) => {
@@ -83,30 +145,88 @@ export async function getCatalogSkills(query = ""): Promise<CatalogSkill[]> {
             description: fork.description,
             categories: fork.categories,
             installCommand: `papiskill install ${handle}/${fork.slug}`,
-            markdown: fork.files.find((file) => file.path === "SKILL.md")?.content ?? "",
+            markdown:
+              fork.files.find((file) => file.path === "SKILL.md")?.content ??
+              "",
           };
         }),
       ];
     } catch {
-      return getFileCatalogSkills(query);
+      return getFileCatalogSkills(normalizedFilters);
     }
   }
 
-  return getFileCatalogSkills(query);
+  return getFileCatalogSkills(normalizedFilters);
 }
 
-async function getFileCatalogSkills(query = ""): Promise<CatalogSkill[]> {
-  const normalizedQuery = query.trim().toLowerCase();
-  return generatedRegistry
-    .filter((entry) => {
-      if (!normalizedQuery) return true;
-      const text = [
-        entry.name,
-        entry.summary,
-        entry.description,
-        ...entry.tags,
-        ...entry.categories,
-      ].join(" ").toLowerCase();
-      return text.includes(normalizedQuery);
-    });
+function normalizeFilters(
+  filters: string | CatalogFilters,
+): Required<CatalogFilters> {
+  if (typeof filters === "string") {
+    return {
+      query: filters.trim(),
+      categories: [],
+      compatibility: [],
+      statuses: [],
+    };
+  }
+
+  return {
+    query: filters.query?.trim() ?? "",
+    categories: uniqueNormalized(filters.categories ?? []),
+    compatibility: uniqueNormalized(filters.compatibility ?? []),
+    statuses: uniqueNormalized(filters.statuses ?? []).filter(
+      (status) => status === "global" || status === "profile",
+    ),
+  };
+}
+
+function uniqueNormalized(values: string[]) {
+  return Array.from(
+    new Set(values.map((value) => value.trim().toLowerCase()).filter(Boolean)),
+  );
+}
+
+async function getFileCatalogSkills(
+  filters: Required<CatalogFilters>,
+): Promise<CatalogSkill[]> {
+  const normalizedQuery = filters.query.toLowerCase();
+  return generatedRegistry.filter((entry) => {
+    if (
+      filters.statuses.length > 0 &&
+      !filters.statuses.includes(entry.registryKind)
+    ) {
+      return false;
+    }
+    if (
+      filters.categories.length > 0 &&
+      !entry.categories.some((category) =>
+        filters.categories.includes(category),
+      )
+    ) {
+      return false;
+    }
+    if (
+      filters.compatibility.length > 0 &&
+      !entry.compatibleWith.some((target) =>
+        filters.compatibility.includes(target),
+      )
+    ) {
+      return false;
+    }
+    if (!normalizedQuery) return true;
+    const text = [
+      entry.name,
+      entry.summary,
+      entry.description,
+      entry.registryKind,
+      entry.visibility,
+      ...entry.tags,
+      ...entry.categories,
+      ...entry.compatibleWith,
+    ]
+      .join(" ")
+      .toLowerCase();
+    return text.includes(normalizedQuery);
+  });
 }

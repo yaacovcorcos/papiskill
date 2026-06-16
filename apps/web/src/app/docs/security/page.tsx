@@ -1,7 +1,7 @@
 import { AppHeader } from "@/components/app-header";
 
 const sensitiveSurfaces = [
-  "private forks",
+  "private library skills",
   "API tokens",
   "GitHub OAuth account linkage",
   "skill downloads",
@@ -12,7 +12,7 @@ const sensitiveSurfaces = [
 const requirements = [
   "No secrets in source control.",
   "API tokens are hashed at rest.",
-  "Private fork access requires an owner session or owner token.",
+  "Private library access requires an owner session or owner token.",
   "Mutations derive the user ID from the server session.",
   "The web app does not execute skill scripts.",
   "Packages with scripts or risky instructions show validation warnings.",
