@@ -1,6 +1,7 @@
 import { errorResponse, publicCatalogCacheHeaders } from "@/lib/server/http";
 import { getFileRegistrySkill } from "@/lib/server/catalog";
 import { hasDatabaseUrl } from "@/lib/server/db-env";
+import { recordDownloadEvent } from "@/lib/server/download-events";
 import { buildSkillPackageZip, packageDownloadFilename } from "@/lib/server/package-archive";
 import { isPublicRegistryReference } from "@/lib/server/references";
 import { getSessionUser, getTokenUser } from "@/lib/server/request-auth";
@@ -25,6 +26,7 @@ export async function GET(
   const url = new URL(request.url);
   const format = url.searchParams.get("format") ?? "md";
   if (format === "zip") {
+    await recordDownloadEvent({ reference: joinedReference, request, actor });
     const zip = buildSkillPackageZip({
       slug: skill.slug,
       files: skill.files,
@@ -46,6 +48,7 @@ export async function GET(
     return errorResponse("Unsupported download format.", 400);
   }
 
+  await recordDownloadEvent({ reference: joinedReference, request, actor });
   return new Response(skill.markdown, {
     status: 200,
     headers: {

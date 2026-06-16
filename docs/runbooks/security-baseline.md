@@ -31,6 +31,10 @@ Server-side ownership checks are mandatory.
 - API tokens hashed at rest.
 - Private and unlisted library access requires owner session or owner token.
 - Mutations must derive user ID from server session.
+- Successful downloads are recorded best-effort in `DownloadEvent` when the
+  target exists in Postgres. Private/profile downloads are not cached; public
+  registry downloads keep cache headers, so public download analytics are not a
+  strict counter when served from CDN cache.
 - Registry detail and download fallbacks must preserve the requested namespace. A missing `community/<slug>` skill must not fall back to `official/<slug>`, and profile-looking references must not fall back to registry entries by slug alone.
 - Do not execute skill scripts in the web app.
 - Display warnings for packages containing scripts or risky instructions.
