@@ -33,9 +33,18 @@ export async function searchSkills(config: CliConfig, query: string): Promise<Ap
 }
 
 export async function getSkill(config: CliConfig, reference: string): Promise<ApiSkillDetail> {
-  const url = new URL(`/api/v1/skills/${encodeURIComponent(reference)}`, config.apiUrl);
+  const url = skillDetailUrl(config.apiUrl, reference);
   const data = await requestJson(config, url);
   return apiSkillDetailSchema.parse(data);
+}
+
+export function skillDetailUrl(apiUrl: string, reference: string): URL {
+  const encodedReference = reference
+    .split("/")
+    .filter(Boolean)
+    .map(encodeURIComponent)
+    .join("/");
+  return new URL(`/api/v1/skills/${encodedReference}`, apiUrl);
 }
 
 export async function getMe(config: CliConfig): Promise<{ handle: string; name: string | null }> {
