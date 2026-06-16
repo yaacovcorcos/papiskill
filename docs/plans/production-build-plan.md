@@ -34,7 +34,7 @@ Required:
 
 ### 1. Repository Foundation
 
-Status: in progress
+Status: complete
 
 Deliverables:
 
@@ -50,10 +50,11 @@ Evidence:
 - `package.json`
 - `AGENTS.md`
 - `docs/plans/*`
+- `.github/workflows/check.yml`
 
 ### 2. Skill Core
 
-Status: pending
+Status: implemented; keep extending with package-format changes
 
 Deliverables:
 
@@ -65,9 +66,18 @@ Deliverables:
 - registry filesystem loader
 - tests
 
+Evidence:
+
+- `packages/skill-core/src/schema.ts`
+- `packages/skill-core/src/validation.ts`
+- `packages/skill-core/src/install-targets.ts`
+- `packages/skill-core/src/registry-loader.ts`
+- `packages/skill-core/src/validate-registry.ts`
+- `packages/skill-core/src/*.test.ts`
+
 ### 3. Web Backend
 
-Status: pending
+Status: implemented; needs final readiness audit before goal completion
 
 Deliverables:
 
@@ -81,9 +91,19 @@ Deliverables:
 - ownership checks
 - tests
 
+Evidence:
+
+- `apps/web/prisma/schema.prisma`
+- `apps/web/prisma/migrations/*`
+- `apps/web/src/lib/server/*`
+- `apps/web/src/app/api/v1/*`
+- `apps/web/scripts/index-registry.ts`
+- `apps/web/src/app/skills/engagement-actions.ts`
+- `apps/web/src/lib/server/*.test.ts`
+
 ### 4. Web Frontend
 
-Status: pending
+Status: implemented; needs continued UX review on sidebar, editing, and performance
 
 Deliverables:
 
@@ -97,9 +117,19 @@ Deliverables:
 - contribution docs and GitHub handoff
 - responsive desktop/mobile design
 
+Evidence:
+
+- `apps/web/src/app/skills/*`
+- `apps/web/src/app/skills/[...reference]/page.tsx`
+- `apps/web/src/app/u/[handle]/*`
+- `apps/web/src/app/dashboard/*`
+- `apps/web/src/app/docs/*`
+- `apps/web/src/components/*`
+- `docs/reviews/ui-verification.md`
+
 ### 5. CLI
 
-Status: pending
+Status: implemented; npm publication still requires release credentials/process
 
 Deliverables:
 
@@ -114,9 +144,17 @@ Deliverables:
 - install target flexibility for Codex, Claude Code, Cursor, and custom paths
 - tests
 
+Evidence:
+
+- `packages/cli/src/index.ts`
+- `packages/cli/src/install.ts`
+- `packages/cli/src/api.ts`
+- `packages/cli/src/*.test.ts`
+- `docs/cli.md`
+
 ### 6. Docs
 
-Status: pending
+Status: current for implemented v1 surface; keep updated with behavior changes
 
 Deliverables:
 
@@ -132,9 +170,20 @@ Deliverables:
 - security baseline
 - operating docs for maintainers
 
+Evidence:
+
+- `README.md`
+- `docs/product/requirements.md`
+- `docs/architecture/*`
+- `docs/runbooks/*`
+- `docs/cli.md`
+- `docs/authoring-skills.md`
+- `docs/contributing.md`
+- `docs/plans/product-backlog.md`
+
 ### 7. Production Readiness
 
-Status: pending
+Status: in progress
 
 Deliverables:
 
@@ -149,6 +198,25 @@ Deliverables:
 - remote pushed
 - Vercel project configured
 - domain plan for `papiskill.com`
+
+Evidence:
+
+- `.github/workflows/check.yml`
+- `npm run check`
+- `npm audit`
+- `docs/reviews/initial-readiness.md`
+- `docs/reviews/ui-verification.md`
+- `docs/runbooks/release.md`
+- `docs/runbooks/deployment-access.md`
+- live production health: `https://papiskill.com/api/v1/health`
+
+Remaining before marking the overall goal complete:
+
+- Record a final requirement-by-requirement readiness audit in `docs/reviews/final-production-readiness.md`.
+- Re-test the authenticated editing/library/token flows against production or a production-like database.
+- Run an explicit accessibility and performance pass on the public registry and editor.
+- Decide the sidebar/filter redesign questions captured in `docs/plans/product-backlog.md`.
+- Confirm CLI publication/distribution expectations, or document that v1 CLI is repo/local install until npm credentials are available.
 
 ## Open Defaults
 

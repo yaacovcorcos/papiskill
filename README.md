@@ -43,7 +43,7 @@ npm run dev
 CLI development:
 
 ```bash
-npm --workspace @papiskill/cli run dev -- search review
+npm --workspace papiskill run dev -- search review
 ```
 
 ## Documentation Entry Points
@@ -53,6 +53,7 @@ npm --workspace @papiskill/cli run dev -- search review
 - [Architecture Overview](./docs/architecture/overview.md)
 - [Skill Package Specification](./docs/architecture/skill-package-spec.md)
 - [Database Architecture](./docs/runbooks/db-architecture.md)
+- [Registry Operations](./docs/runbooks/registry-operations.md)
 - [Security Baseline](./docs/runbooks/security-baseline.md)
 - [Release Runbook](./docs/runbooks/release.md)
 - [Active Plans](./docs/plans/README.md)

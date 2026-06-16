@@ -11,6 +11,10 @@ This directory tracks active and historical implementation plans.
 | [quality-review-plan](./quality-review-plan.md) | active | Codex | Self-review, test, performance, security, and release gates |
 | [product-backlog](./product-backlog.md) | active | Codex | Product ideas and follow-up decisions that should survive chat context |
 
+## Related Runbooks
+
+- [Registry operations](../runbooks/registry-operations.md)
+
 ## Plan Rules
 
 - Keep active plans current while working.

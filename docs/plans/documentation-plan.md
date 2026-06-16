@@ -8,20 +8,23 @@ Make PapiSkill unusually well documented for users, skill authors, contributors,
 
 | Document | Status | Purpose |
 |---|---|---|
-| `README.md` | started | top-level orientation |
-| `AGENTS.md` | started | agent and maintainer operating contract |
-| `docs/product/requirements.md` | pending | product definition and scope |
-| `docs/architecture/overview.md` | pending | system architecture |
-| `docs/architecture/skill-package-spec.md` | pending | package format |
-| `docs/architecture/decision-log.md` | pending | architecture decisions |
-| `docs/runbooks/db-architecture.md` | pending | DB schema and invariants |
-| `docs/runbooks/auth.md` | pending | Better Auth/GitHub OAuth setup |
-| `docs/runbooks/registry-operations.md` | pending | indexing and contribution operations |
-| `docs/runbooks/release.md` | pending | local and Vercel release process |
-| `docs/runbooks/security-baseline.md` | pending | threat model and security gates |
-| `docs/cli.md` | pending | CLI usage |
-| `docs/authoring-skills.md` | pending | skill author guide |
-| `docs/contributing.md` | pending | contributor workflow |
+| `README.md` | current | top-level orientation |
+| `AGENTS.md` | current | agent and maintainer operating contract |
+| `docs/product/requirements.md` | current | product definition and scope |
+| `docs/architecture/overview.md` | current | system architecture |
+| `docs/architecture/skill-package-spec.md` | current | package format |
+| `docs/architecture/decision-log.md` | current | architecture decisions |
+| `docs/runbooks/db-architecture.md` | current | DB schema and invariants |
+| `docs/runbooks/auth.md` | current | Better Auth/GitHub OAuth setup |
+| `docs/runbooks/registry-operations.md` | current | indexing and contribution operations |
+| `docs/runbooks/release.md` | current | local and Vercel release process |
+| `docs/runbooks/security-baseline.md` | current | threat model and security gates |
+| `docs/cli.md` | current | CLI usage |
+| `docs/authoring-skills.md` | current | skill author guide |
+| `docs/contributing.md` | current | contributor workflow |
+
+`current` means the document exists and matches the implemented v1 surface at the
+time of review. It does not mean the product itself is final.
 
 ## Documentation Rules
 
