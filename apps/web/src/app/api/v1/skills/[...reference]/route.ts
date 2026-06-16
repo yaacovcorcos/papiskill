@@ -1,20 +1,34 @@
-import { errorResponse, jsonResponse } from "@/lib/server/http";
+import {
+  errorResponse,
+  jsonResponse,
+  publicCatalogCacheHeaders,
+} from "@/lib/server/http";
 import { getCatalogSkills } from "@/lib/server/catalog";
 import { getSessionUser, getTokenUser } from "@/lib/server/request-auth";
 import { getSkillByReference } from "@/lib/server/skills";
+
+export const revalidate = 60;
 
 export async function GET(
   request: Request,
   context: { params: Promise<{ reference: string[] }> },
 ) {
   const { reference } = await context.params;
-  const actor = await getActor(request);
   const joinedReference = reference.join("/");
+  const isPublicRegistry = isPublicRegistryReference(joinedReference);
+  const actor = isPublicRegistry ? null : await getActor(request);
   const skill = await getDatabaseSkill(joinedReference, actor) ?? await getCatalogFallback(joinedReference);
   if (!skill) {
     return errorResponse("Skill not found.", 404);
   }
-  return jsonResponse(skill);
+  return jsonResponse(
+    skill,
+    isPublicRegistry
+      ? {
+          headers: publicCatalogCacheHeaders,
+        }
+      : undefined,
+  );
 }
 
 async function getActor(request: Request) {
@@ -37,7 +51,7 @@ async function getDatabaseSkill(reference: string, actor: Awaited<ReturnType<typ
 async function getCatalogFallback(reference: string) {
   const slug = reference.split("/").filter(Boolean).at(-1);
   if (!slug) return null;
-  const skill = (await getCatalogSkills()).find((item) => item.slug === slug);
+  const skill = (await getCatalogSkills("", { includeMarkdown: true })).find((item) => item.slug === slug);
   if (!skill) return null;
   return {
     ...skill,
@@ -49,4 +63,10 @@ async function getCatalogFallback(reference: string) {
     ],
     installTargets: {},
   };
+}
+
+function isPublicRegistryReference(reference: string) {
+  const parts = reference.split("/").filter(Boolean);
+  if (parts.length <= 1) return true;
+  return ["official", "global", "community"].includes(parts[0] ?? "");
 }

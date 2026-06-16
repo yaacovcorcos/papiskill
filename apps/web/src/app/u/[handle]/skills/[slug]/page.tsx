@@ -51,8 +51,10 @@ export default async function UserSkillPage({ params }: { params: Params }) {
   }
 
   const viewer = await getSessionUser().catch(() => null);
-  const profile = await getPrisma().profile.findUnique({ where: { handle } });
-  const skill = await getSkillByReference(`${handle}/${slug}`, viewer ? { id: viewer.id } : null);
+  const [profile, skill] = await Promise.all([
+    getPrisma().profile.findUnique({ where: { handle } }),
+    getSkillByReference(`${handle}/${slug}`, viewer ? { id: viewer.id } : null),
+  ]);
   if (!profile || !skill) notFound();
 
   const isOwner = viewer?.id === profile.userId;
@@ -95,11 +97,11 @@ export default async function UserSkillPage({ params }: { params: Params }) {
                 <span className="break-all">papiskill install {reference}</span>
               </code>
               <div className="mt-4 grid grid-cols-2 gap-2">
-                <Link href={`/download/${reference}`} className="inline-flex items-center justify-center gap-2 rounded-md border border-border px-3 py-2 text-sm font-semibold hover:bg-slate-50">
+                <Link href={`/download/${reference}`} prefetch={false} className="inline-flex items-center justify-center gap-2 rounded-md border border-border px-3 py-2 text-sm font-semibold hover:bg-slate-50">
                   <Download className="size-4" aria-hidden />
                   Download
                 </Link>
-                <Link href={`/dashboard/fork?skill=${reference}`} className="inline-flex items-center justify-center gap-2 rounded-md bg-slate-950 px-3 py-2 text-sm font-semibold text-white hover:bg-slate-800">
+                <Link href={`/dashboard/fork?skill=${reference}`} prefetch={false} className="inline-flex items-center justify-center gap-2 rounded-md bg-slate-950 px-3 py-2 text-sm font-semibold text-white hover:bg-slate-800">
                   <GitFork className="size-4" aria-hidden />
                   Copy to library
                 </Link>

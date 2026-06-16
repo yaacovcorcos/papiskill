@@ -1,7 +1,9 @@
-import { errorResponse } from "@/lib/server/http";
+import { errorResponse, publicCatalogCacheHeaders } from "@/lib/server/http";
 import { getCatalogSkills } from "@/lib/server/catalog";
 import { getSessionUser, getTokenUser } from "@/lib/server/request-auth";
 import { getSkillByReference } from "@/lib/server/skills";
+
+export const revalidate = 60;
 
 export async function GET(
   request: Request,
@@ -9,7 +11,8 @@ export async function GET(
 ) {
   const { reference } = await context.params;
   const joinedReference = reference.join("/");
-  const actor = await getActor(request);
+  const isPublicRegistry = isPublicRegistryReference(joinedReference);
+  const actor = isPublicRegistry ? null : await getActor(request);
   const skill = await getDatabaseSkill(joinedReference, actor) ?? await getCatalogFallback(joinedReference);
   if (!skill) {
     return errorResponse("Skill not found.", 404);
@@ -20,7 +23,9 @@ export async function GET(
     headers: {
       "Content-Type": "text/markdown; charset=utf-8",
       "Content-Disposition": `attachment; filename="${safeFilename(skill.slug)}.md"`,
-      "Cache-Control": "public, max-age=60, stale-while-revalidate=300",
+      ...(isPublicRegistry
+        ? publicCatalogCacheHeaders
+        : { "Cache-Control": "private, no-store" }),
     },
   });
 }
@@ -46,9 +51,15 @@ async function getDatabaseSkill(reference: string, actor: Awaited<ReturnType<typ
 async function getCatalogFallback(reference: string) {
   const slug = reference.split("/").filter(Boolean).at(-1);
   if (!slug) return null;
-  return (await getCatalogSkills()).find((item) => item.slug === slug) ?? null;
+  return (await getCatalogSkills("", { includeMarkdown: true })).find((item) => item.slug === slug) ?? null;
 }
 
 function safeFilename(slug: string) {
   return slug.replace(/[^a-z0-9_.-]/gi, "-") || "SKILL";
+}
+
+function isPublicRegistryReference(reference: string) {
+  const parts = reference.split("/").filter(Boolean);
+  if (parts.length <= 1) return true;
+  return ["official", "global", "community"].includes(parts[0] ?? "");
 }

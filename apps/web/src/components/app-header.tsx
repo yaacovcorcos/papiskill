@@ -5,7 +5,7 @@ const navItems = [
   { href: "/skills", label: "Skills" },
   { href: "/authors", label: "Authors" },
   { href: "/docs", label: "Docs" },
-  { href: "/dashboard", label: "Dashboard" },
+  { href: "/dashboard", label: "Dashboard", prefetch: false },
 ];
 
 export function AppHeader() {
@@ -23,6 +23,7 @@ export function AppHeader() {
             <Link
               key={item.href}
               href={item.href}
+              prefetch={item.prefetch}
               className="rounded-md px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100 hover:text-slate-950"
             >
               {item.label}

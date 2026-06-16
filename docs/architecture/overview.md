@@ -42,6 +42,15 @@ flowchart LR
 - API token management requires session authentication.
 - Global registry mutations do not happen directly through the app; they go through collaborator publishing and GitHub PRs.
 
+## Performance Strategy
+
+- Public registry list/detail/download responses are safe to cache briefly because they contain only public global/community metadata and files.
+- Profile-owned private library reads must stay `no-store` and must derive access from a server session or valid CLI token.
+- Public browsing pages should fetch summary rows first and load full `SKILL.md` content only for detail/download surfaces or the single selected preview.
+- Authenticated dashboard routes stay dynamic, but they should show route-level loading states while session and owner-scoped data loads.
+- Links to authenticated copy flows and download route handlers should not prefetch from public listing cards.
+- Mutations that change public profile or library visibility must revalidate `/skills`, `/authors`, `/api/v1/skills`, and the affected profile route.
+
 ## Deployment
 
 - Vercel hosts the Next.js app.

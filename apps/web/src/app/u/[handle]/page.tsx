@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { cache } from "react";
 import { Download, GitFork, UserRound } from "lucide-react";
 import { SkillVisibility } from "@prisma/client";
 import { AppHeader } from "@/components/app-header";
@@ -8,7 +9,7 @@ import { Badge } from "@/components/badge";
 import { getPrisma } from "@/lib/server/prisma";
 import { serializeForkSummary, serializeSkillSummary } from "@/lib/server/skill-serializers";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 60;
 
 export async function generateMetadata({
   params,
@@ -138,11 +139,11 @@ export default async function UserProfilePage({
                       </div>
                     </div>
                     <div className="flex shrink-0 gap-2">
-                      <Link href={`/download/${skill.reference}`} className="inline-flex items-center gap-2 rounded-md border border-border px-3 py-2 text-sm font-semibold hover:bg-slate-50">
+                      <Link href={`/download/${skill.reference}`} prefetch={false} className="inline-flex items-center gap-2 rounded-md border border-border px-3 py-2 text-sm font-semibold hover:bg-slate-50">
                         <Download className="size-4" aria-hidden />
                         Download
                       </Link>
-                      <Link href={`/dashboard/fork?skill=${skill.reference}`} className="inline-flex items-center gap-2 rounded-md border border-border px-3 py-2 text-sm font-semibold hover:bg-slate-50">
+                      <Link href={`/dashboard/fork?skill=${skill.reference}`} prefetch={false} className="inline-flex items-center gap-2 rounded-md border border-border px-3 py-2 text-sm font-semibold hover:bg-slate-50">
                         <GitFork className="size-4" aria-hidden />
                         Copy
                       </Link>
@@ -158,8 +159,16 @@ export default async function UserProfilePage({
   );
 }
 
-async function findProfile(handle: string) {
+const findProfile = cache(async function findProfile(handle: string) {
   return getPrisma().profile.findUnique({
     where: { handle },
+    select: {
+      id: true,
+      userId: true,
+      handle: true,
+      name: true,
+      bio: true,
+      avatarUrl: true,
+    },
   });
-}
+});

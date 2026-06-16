@@ -19,7 +19,7 @@ export interface CatalogSkill {
   tags: string[];
   categories: string[];
   installCommand: string;
-  markdown: string;
+  markdown?: string;
 }
 
 export interface CatalogFilters {
@@ -29,10 +29,16 @@ export interface CatalogFilters {
   statuses?: string[];
 }
 
+interface CatalogOptions {
+  includeMarkdown?: boolean;
+}
+
 export async function getCatalogSkills(
   filters: string | CatalogFilters = "",
+  options: CatalogOptions = {},
 ): Promise<CatalogSkill[]> {
   const normalizedFilters = normalizeFilters(filters);
+  const includeMarkdown = options.includeMarkdown ?? false;
 
   if (process.env.DATABASE_URL) {
     try {
@@ -102,7 +108,9 @@ export async function getCatalogSkills(
           ? prisma.skill.findMany({
               where: skillWhere,
               include: {
-                files: true,
+                files: includeMarkdown
+                  ? { where: { path: "SKILL.md" }, take: 1 }
+                  : false,
                 owner: { include: { profile: true } },
               },
               orderBy: [{ registryKind: "asc" }, { updatedAt: "desc" }],
@@ -113,7 +121,9 @@ export async function getCatalogSkills(
           ? prisma.skillFork.findMany({
               where: forkWhere,
               include: {
-                files: true,
+                files: includeMarkdown
+                  ? { where: { path: "SKILL.md" }, take: 1 }
+                  : false,
                 owner: { include: { profile: true } },
               },
               orderBy: { updatedAt: "desc" },
@@ -132,9 +142,9 @@ export async function getCatalogSkills(
             installCommand: `papiskill install ${
               skill.registryKind === SkillRegistryKind.COMMUNITY ? "community" : "official"
             }/${skill.slug}`,
-            markdown:
-              skill.files.find((file) => file.path === "SKILL.md")?.content ??
-              "",
+            ...(includeMarkdown
+              ? { markdown: skill.files.at(0)?.content ?? "" }
+              : {}),
           };
         }),
         ...forks.map((fork) => {
@@ -145,18 +155,18 @@ export async function getCatalogSkills(
             description: fork.description,
             categories: fork.categories,
             installCommand: `papiskill install ${handle}/${fork.slug}`,
-            markdown:
-              fork.files.find((file) => file.path === "SKILL.md")?.content ??
-              "",
+            ...(includeMarkdown
+              ? { markdown: fork.files.at(0)?.content ?? "" }
+              : {}),
           };
         }),
       ];
     } catch {
-      return getFileCatalogSkills(normalizedFilters);
+      return getFileCatalogSkills(normalizedFilters, includeMarkdown);
     }
   }
 
-  return getFileCatalogSkills(normalizedFilters);
+  return getFileCatalogSkills(normalizedFilters, includeMarkdown);
 }
 
 function normalizeFilters(
@@ -189,44 +199,49 @@ function uniqueNormalized(values: string[]) {
 
 async function getFileCatalogSkills(
   filters: Required<CatalogFilters>,
+  includeMarkdown: boolean,
 ): Promise<CatalogSkill[]> {
   const normalizedQuery = filters.query.toLowerCase();
-  return generatedRegistry.filter((entry) => {
-    if (
-      filters.statuses.length > 0 &&
-      !filters.statuses.includes(entry.registryKind)
-    ) {
-      return false;
-    }
-    if (
-      filters.categories.length > 0 &&
-      !entry.categories.some((category) =>
-        filters.categories.includes(category),
-      )
-    ) {
-      return false;
-    }
-    if (
-      filters.compatibility.length > 0 &&
-      !entry.compatibleWith.some((target) =>
-        filters.compatibility.includes(target),
-      )
-    ) {
-      return false;
-    }
-    if (!normalizedQuery) return true;
-    const text = [
-      entry.name,
-      entry.summary,
-      entry.description,
-      entry.registryKind,
-      entry.visibility,
-      ...entry.tags,
-      ...entry.categories,
-      ...entry.compatibleWith,
-    ]
-      .join(" ")
-      .toLowerCase();
-    return text.includes(normalizedQuery);
-  });
+  return generatedRegistry
+    .filter((entry) => {
+      if (
+        filters.statuses.length > 0 &&
+        !filters.statuses.includes(entry.registryKind)
+      ) {
+        return false;
+      }
+      if (
+        filters.categories.length > 0 &&
+        !entry.categories.some((category) =>
+          filters.categories.includes(category),
+        )
+      ) {
+        return false;
+      }
+      if (
+        filters.compatibility.length > 0 &&
+        !entry.compatibleWith.some((target) =>
+          filters.compatibility.includes(target),
+        )
+      ) {
+        return false;
+      }
+      if (!normalizedQuery) return true;
+      const text = [
+        entry.name,
+        entry.summary,
+        entry.description,
+        entry.registryKind,
+        entry.visibility,
+        ...entry.tags,
+        ...entry.categories,
+        ...entry.compatibleWith,
+      ]
+        .join(" ")
+        .toLowerCase();
+      return text.includes(normalizedQuery);
+    })
+    .map((entry) =>
+      includeMarkdown ? entry : { ...entry, markdown: undefined },
+    );
 }

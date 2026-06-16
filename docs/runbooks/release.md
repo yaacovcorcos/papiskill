@@ -52,6 +52,8 @@ vercel --prod
 
 - `/` loads
 - `/skills` loads
+- `/skills?category=coding&compatibility=codex` renders filtered results on desktop and mobile
 - GitHub login starts OAuth
 - public API health route responds
+- public skill API/detail/download routes return `Cache-Control: public, s-maxage=60, stale-while-revalidate=300`
 - CLI can search public registry against production API

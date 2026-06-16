@@ -18,9 +18,10 @@ import { AppHeader } from "@/components/app-header";
 import { Badge } from "@/components/badge";
 import { CopyButton } from "@/components/copy-button";
 import { getCatalogSkills, type CatalogSkill } from "@/lib/server/catalog";
+import { getSkillByReference } from "@/lib/server/skills";
 import { SkillsLayout } from "./skills-layout";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 60;
 
 const compatibilityLabels: Record<string, string> = {
   codex: "Codex",
@@ -125,11 +126,18 @@ export default async function SkillsPage({
     activeFilters.categories.length > 0 ||
     activeFilters.compatibility.length > 0 ||
     activeFilters.statuses.length > 0;
-  const baseSkills = await getCatalogSkills({ query: q });
-  const skills = hasStructuredFilters
-    ? await getCatalogSkills(activeFilters)
-    : baseSkills;
+  const baseSkillsPromise = getCatalogSkills({ query: q });
+  const skillsPromise = hasStructuredFilters
+    ? getCatalogSkills(activeFilters)
+    : baseSkillsPromise;
+  const [baseSkills, skills] = await Promise.all([
+    baseSkillsPromise,
+    skillsPromise,
+  ]);
   const selected = skills[0];
+  const selectedDetail = selected
+    ? await getSkillByReference(skillReference(selected))
+    : null;
   const activeFilterLabels = selectedFilterLabels(activeFilters);
 
   return (
@@ -226,7 +234,7 @@ export default async function SkillsPage({
                     </Link>
                   </div>
                   <pre className="max-h-[360px] overflow-hidden rounded-lg border border-border bg-slate-50 p-4 font-mono text-xs leading-6 text-slate-800">
-                    {selected.markdown.slice(0, 900)}
+                    {(selectedDetail?.markdown ?? "").slice(0, 900)}
                   </pre>
                 </div>
               </div>
@@ -441,6 +449,7 @@ export default async function SkillsPage({
                       </Link>
                       <Link
                         href={`/download/${reference}`}
+                        prefetch={false}
                         aria-label={`Download ${skill.name}`}
                         title="Download"
                         className="inline-grid size-10 place-items-center rounded-md border border-border text-slate-700 hover:bg-slate-50 hover:text-slate-950"
@@ -449,6 +458,7 @@ export default async function SkillsPage({
                       </Link>
                       <Link
                         href={`/dashboard/fork?skill=${reference}`}
+                        prefetch={false}
                         aria-label={`Copy ${skill.name} to library`}
                         title="Copy to library"
                         className="inline-grid size-10 place-items-center rounded-md border border-border text-slate-700 hover:bg-slate-50 hover:text-slate-950"

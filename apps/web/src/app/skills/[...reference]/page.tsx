@@ -4,9 +4,9 @@ import ReactMarkdown from "react-markdown";
 import { ArrowLeft, Download, GitFork, ShieldCheck, Terminal } from "lucide-react";
 import { AppHeader } from "@/components/app-header";
 import { Badge } from "@/components/badge";
-import { getCatalogSkills } from "@/lib/server/catalog";
+import { getSkillByReference } from "@/lib/server/skills";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 60;
 
 function skillReference(skill: { registryKind: string; slug: string; author: string | null }) {
   if (skill.registryKind === "profile" && skill.author) {
@@ -24,9 +24,8 @@ export default async function SkillDetailPage({
   params: Promise<{ reference: string[] }>;
 }) {
   const { reference } = await params;
-  const slug = reference.at(-1) ?? "";
-  const skills = await getCatalogSkills();
-  const skill = skills.find((item) => item.slug === slug);
+  const requestedReference = reference.join("/");
+  const skill = await getSkillByReference(requestedReference);
   if (!skill) notFound();
   const referenceId = skillReference(skill);
 
@@ -65,11 +64,11 @@ export default async function SkillDetailPage({
                   <span className="break-all">{`papiskill install ${referenceId}`}</span>
                 </code>
                 <div className="mt-4 grid grid-cols-2 gap-2">
-                  <Link href={`/download/${referenceId}`} className="inline-flex items-center justify-center gap-2 rounded-md border border-border px-3 py-2 text-sm font-semibold hover:bg-slate-50">
+                  <Link href={`/download/${referenceId}`} prefetch={false} className="inline-flex items-center justify-center gap-2 rounded-md border border-border px-3 py-2 text-sm font-semibold hover:bg-slate-50">
                     <Download className="size-4" aria-hidden />
                     Download
                   </Link>
-                  <Link href={`/dashboard/fork?skill=${referenceId}`} className="inline-flex items-center justify-center gap-2 rounded-md bg-slate-950 px-3 py-2 text-sm font-semibold text-white hover:bg-slate-800">
+                  <Link href={`/dashboard/fork?skill=${referenceId}`} prefetch={false} className="inline-flex items-center justify-center gap-2 rounded-md bg-slate-950 px-3 py-2 text-sm font-semibold text-white hover:bg-slate-800">
                     <GitFork className="size-4" aria-hidden />
                     Copy to library
                   </Link>

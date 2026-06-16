@@ -99,6 +99,9 @@ export async function updateProfileAction(
 
   revalidatePath("/dashboard");
   revalidatePath("/dashboard/profile");
+  revalidatePath("/authors");
+  revalidatePath("/skills");
+  revalidatePath("/api/v1/skills");
   revalidatePath(`/u/${profile.handle}`);
   revalidatePath(`/u/${handle}`);
   return { ok: true };
@@ -106,7 +109,7 @@ export async function updateProfileAction(
 
 export async function copySkillToLibraryAction(formData: FormData) {
   const user = await getRequiredUser();
-  await ensureProfile(user);
+  const profile = await ensureProfile(user);
   const reference = stringField(formData, "reference");
   const visibility = visibilityField(formData, "visibility");
   if (!reference) {
@@ -123,6 +126,9 @@ export async function copySkillToLibraryAction(formData: FormData) {
 
   revalidatePath("/dashboard");
   revalidatePath("/dashboard/library");
+  revalidatePath("/skills");
+  revalidatePath("/api/v1/skills");
+  revalidatePath(`/u/${profile.handle}`);
   redirect(`/dashboard/library/${forkId}/edit`);
 }
 
@@ -215,6 +221,16 @@ export async function saveForkAction(formData: FormData) {
   revalidatePath(`/dashboard/library/${fork.id}/edit`);
   revalidatePath("/dashboard");
   revalidatePath("/dashboard/library");
+  revalidatePath("/skills");
+  revalidatePath("/api/v1/skills");
+  const profile = await getPrisma().profile.findUnique({
+    where: { userId: user.id },
+    select: { handle: true },
+  });
+  if (profile) {
+    revalidatePath(`/u/${profile.handle}`);
+    revalidatePath(`/u/${profile.handle}/skills/${slug}`);
+  }
 }
 
 async function getRequiredUser() {

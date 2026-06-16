@@ -3,7 +3,7 @@ import { UserRound } from "lucide-react";
 import { AppHeader } from "@/components/app-header";
 import { getPrisma } from "@/lib/server/prisma";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 60;
 
 export default async function AuthorsPage() {
   const profiles = await getProfiles();
@@ -49,6 +49,12 @@ async function getProfiles() {
   if (!process.env.DATABASE_URL) return [];
   try {
     return await getPrisma().profile.findMany({
+      select: {
+        id: true,
+        handle: true,
+        name: true,
+        avatarUrl: true,
+      },
       orderBy: { updatedAt: "desc" },
       take: 50,
     });
