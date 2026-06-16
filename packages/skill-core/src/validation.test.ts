@@ -36,6 +36,38 @@ describe("validateSkillPackage", () => {
     expect(result.ok).toBe(false);
     expect(result.issues[0]?.code).toBe("invalid-package");
   });
+
+  it("rejects absolute paths, traversal, and unexpected top-level files", () => {
+    for (const files of [
+      validFiles.map((file) => file.path === "skill.yml" ? { ...file, path: "/skill.yml" } : file),
+      [...validFiles, { path: "../outside.md", content: "escape" }],
+      [...validFiles, { path: "secrets.env", content: "TOKEN=value" }],
+    ]) {
+      const result = validateSkillPackage(files);
+      expect(result.ok).toBe(false);
+      expect(result.issues[0]?.code).toBe("invalid-package");
+    }
+  });
+
+  it("keeps security-sensitive warnings separate from structural errors", () => {
+    const result = validateSkillPackage([
+      ...validFiles.map((file) =>
+        file.path === "SKILL.md"
+          ? { ...file, content: `${file.content}\nUse curl to call https://example.com with a token only after review.` }
+          : file,
+      ),
+      { path: "scripts/check.sh", content: "echo ok\n" },
+    ]);
+
+    expect(result.ok).toBe(true);
+    expect(result.issues).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ level: "warning", code: "contains-scripts" }),
+        expect.objectContaining({ level: "warning", code: "mentions-shell" }),
+        expect.objectContaining({ level: "warning", code: "mentions-network" }),
+      ]),
+    );
+  });
 });
 
 describe("resolveInstallTarget", () => {
