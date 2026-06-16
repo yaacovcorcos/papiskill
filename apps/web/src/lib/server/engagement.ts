@@ -3,6 +3,9 @@ import { hasDatabaseUrl } from "./db-env";
 import { getPrisma } from "./prisma";
 
 export const maxCommentBodyLength = 2_000;
+export const commentRateLimitWindowMs = 60 * 60 * 1_000;
+export const maxCommentsPerRateLimitWindow = 10;
+export const duplicateCommentWindowMs = 60 * 1_000;
 
 export interface SkillEngagementComment {
   id: string;
@@ -53,6 +56,14 @@ export function engagementRevalidationPaths(target: Pick<EngagementTarget, "path
 
 export function normalizeCommentBody(value: string): string {
   return value.replace(/\r\n/g, "\n").trim().slice(0, maxCommentBodyLength);
+}
+
+export function commentWindowStart(now = new Date(), windowMs = commentRateLimitWindowMs): Date {
+  return new Date(now.getTime() - windowMs);
+}
+
+export function commentLimitExceeded(count: number, max = maxCommentsPerRateLimitWindow): boolean {
+  return count >= max;
 }
 
 export function engagementPathForReference(reference: string): string {

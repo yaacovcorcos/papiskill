@@ -66,11 +66,12 @@ private/unlisted visibility. Before completion, run a browser pass while signed 
 
 ### Engagement
 
-Stars and comments exist, but public production needs moderation hardening before meaningful traffic:
+Stars and comments exist, and comment posting has persisted server-side limits. Public production still
+needs moderation hardening before meaningful traffic:
 
-- rate limits for comment creation and star toggles
 - curator/moderator controls for hiding comments
 - reporting or review queue if comments become public-facing at scale
+- a dedicated star-toggle action log if star abuse appears in practice
 
 ### Performance and caching
 
@@ -104,4 +105,3 @@ Before announcing CLI installation broadly, decide whether v1 means:
 - local repo install only
 - GitHub package/release artifact
 - npm publication under the `papiskill` package name
-

@@ -54,6 +54,7 @@ Required:
 - GitHub login for star/comment writes
 - public read access for visible comments and counts
 - owner-only comment deletion
+- server-side comment limits to reduce spam and duplicate accidental posts
 - profile and registry lists reflect current engagement counts
 
 ### Authenticate

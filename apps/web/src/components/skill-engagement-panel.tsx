@@ -2,10 +2,10 @@ import Link from "next/link";
 import { MessageSquare, Star, Trash2 } from "lucide-react";
 import type { SkillEngagement } from "@/lib/server/engagement";
 import {
-  createCommentAction,
   deleteCommentAction,
   toggleStarAction,
 } from "@/app/skills/engagement-actions";
+import { CommentForm } from "./skill-comment-form";
 
 export function SkillEngagementPanel({
   engagement,
@@ -28,29 +28,7 @@ export function SkillEngagementPanel({
 
       <div className="mt-6">
         {engagement.enabled && viewerSignedIn ? (
-          <form action={createCommentAction} className="rounded-lg border border-border bg-white p-4 shadow-sm">
-            <input type="hidden" name="reference" value={engagement.reference} />
-            <label className="block text-sm font-semibold" htmlFor="comment-body">
-              Add a comment
-            </label>
-            <textarea
-              id="comment-body"
-              name="body"
-              required
-              minLength={2}
-              maxLength={2000}
-              rows={4}
-              className="mt-3 w-full resize-y rounded-md border border-border px-3 py-2 text-sm leading-6 outline-none focus:border-accent"
-            />
-            <div className="mt-3 flex justify-end">
-              <button
-                type="submit"
-                className="rounded-md bg-slate-950 px-4 py-2 text-sm font-semibold text-white hover:bg-slate-800"
-              >
-                Comment
-              </button>
-            </div>
-          </form>
+          <CommentForm reference={engagement.reference} />
         ) : engagement.enabled ? (
           <div className="rounded-lg border border-border bg-surface-subtle p-4 text-sm text-muted">
             <Link href="/auth/sign-in" className="font-semibold text-slate-950 hover:underline">

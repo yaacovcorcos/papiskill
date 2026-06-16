@@ -13,11 +13,12 @@ Current state:
 - Signed-in users can comment on public registry skills and public profile skills.
 - Comment authors can soft-delete their own comments.
 - Lists and profile pages can show public star and comment counts.
+- Comment posting has persisted server-side limits for hourly volume and duplicate rapid posts.
 
 Follow-up ideas:
 
 - Add a curator/moderator view for hiding abusive or low-quality comments.
-- Add rate limits for starring and commenting.
+- Add stricter engagement abuse controls over time. Star toggles may need a dedicated action log if abuse appears.
 - Add comment reporting or moderation notes before the app has meaningful public traffic.
 - Consider comment editing, with edited timestamps, only if it improves trust rather than creating ambiguity.
 - Consider sorting and discovery signals that combine stars, comments, downloads, and freshness.
@@ -60,4 +61,3 @@ Follow-up ideas:
 - Hide or disable zero-count filters if they make the sidebar feel broken.
 - Consider replacing the persistent desktop sidebar with compact filter controls if the screen feels too split or sparse.
 - Add download/star/comment/popularity signals only after they are meaningful and not misleading.
-

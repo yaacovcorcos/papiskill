@@ -7,12 +7,21 @@ import { ensureProfile } from "@/lib/server/profiles";
 import { getSessionUser } from "@/lib/server/request-auth";
 import { getPrisma } from "@/lib/server/prisma";
 import {
+  commentLimitExceeded,
+  commentWindowStart,
+  duplicateCommentWindowMs,
   engagementPathForReference,
   engagementRevalidationPaths,
   engagementTargetWhere,
   getPublicEngagementTarget,
+  maxCommentsPerRateLimitWindow,
   normalizeCommentBody,
 } from "@/lib/server/engagement";
+
+export interface CommentActionState {
+  ok?: boolean;
+  error?: string;
+}
 
 export async function toggleStarAction(formData: FormData) {
   const user = await getRequiredUser();
@@ -45,7 +54,10 @@ export async function toggleStarAction(formData: FormData) {
   revalidateEngagementPaths(target);
 }
 
-export async function createCommentAction(formData: FormData) {
+export async function createCommentAction(
+  _previousState: CommentActionState,
+  formData: FormData,
+): Promise<CommentActionState> {
   const user = await getRequiredUser();
   await ensureProfile(user);
   const reference = stringField(formData, "reference");
@@ -56,18 +68,51 @@ export async function createCommentAction(formData: FormData) {
   }
   if (body.length < 2) {
     revalidatePath(target.path);
-    return;
+    return { error: "Comments need at least 2 characters." };
+  }
+
+  const targetWhere = engagementTargetWhere(target);
+  const now = new Date();
+  const [recentCommentCount, duplicateComment] = await Promise.all([
+    getPrisma().skillComment.count({
+      where: {
+        userId: user.id,
+        createdAt: { gte: commentWindowStart(now) },
+      },
+    }),
+    getPrisma().skillComment.findFirst({
+      where: {
+        userId: user.id,
+        body,
+        createdAt: { gte: commentWindowStart(now, duplicateCommentWindowMs) },
+        ...targetWhere,
+      },
+      select: { id: true },
+    }),
+  ]);
+
+  if (commentLimitExceeded(recentCommentCount)) {
+    revalidatePath(target.path);
+    return {
+      error: `You can post ${maxCommentsPerRateLimitWindow} comments per hour. Try again later.`,
+    };
+  }
+
+  if (duplicateComment) {
+    revalidatePath(target.path);
+    return { error: "That comment was just posted." };
   }
 
   await getPrisma().skillComment.create({
     data: {
       userId: user.id,
       body,
-      ...engagementTargetWhere(target),
+      ...targetWhere,
     },
   });
 
   revalidateEngagementPaths(target);
+  return { ok: true };
 }
 
 export async function deleteCommentAction(formData: FormData) {

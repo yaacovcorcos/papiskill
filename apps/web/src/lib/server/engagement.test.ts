@@ -3,7 +3,11 @@ import {
   engagementPathForReference,
   engagementRevalidationPaths,
   engagementTargetWhere,
+  commentLimitExceeded,
+  commentWindowStart,
+  duplicateCommentWindowMs,
   maxCommentBodyLength,
+  maxCommentsPerRateLimitWindow,
   normalizeCommentBody,
 } from "./engagement";
 
@@ -45,6 +49,18 @@ describe("normalizeCommentBody", () => {
 
   it("bounds comment length", () => {
     expect(normalizeCommentBody("x".repeat(maxCommentBodyLength + 10))).toHaveLength(maxCommentBodyLength);
+  });
+});
+
+describe("comment rate limits", () => {
+  it("calculates a stable rolling window start", () => {
+    const now = new Date("2026-06-17T12:00:00.000Z");
+    expect(commentWindowStart(now, duplicateCommentWindowMs).toISOString()).toBe("2026-06-17T11:59:00.000Z");
+  });
+
+  it("allows comments below the hourly cap and rejects at the cap", () => {
+    expect(commentLimitExceeded(maxCommentsPerRateLimitWindow - 1)).toBe(false);
+    expect(commentLimitExceeded(maxCommentsPerRateLimitWindow)).toBe(true);
   });
 });
 

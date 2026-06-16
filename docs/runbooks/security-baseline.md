@@ -39,6 +39,7 @@ Server-side ownership checks are mandatory.
 - Do not execute skill scripts in the web app.
 - Display warnings for packages containing scripts or risky instructions.
 - Global curated status can only come from collaborator-published registry source.
+- Comment writes are authenticated and bounded by persisted server-side limits. Client UI checks are not the enforcement boundary.
 - All routes send baseline browser hardening headers: `X-Content-Type-Options`,
   `X-Frame-Options`, `Referrer-Policy`, and `Permissions-Policy`.
 
