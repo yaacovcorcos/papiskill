@@ -9,6 +9,7 @@ This directory tracks active and historical implementation plans.
 | [production-build-plan](./production-build-plan.md) | active | Codex | End-to-end build plan for the production app, CLI, docs, tests, GitHub repo, and Vercel deployment |
 | [documentation-plan](./documentation-plan.md) | active | Codex | Documentation structure and completion checklist |
 | [quality-review-plan](./quality-review-plan.md) | active | Codex | Self-review, test, performance, security, and release gates |
+| [product-backlog](./product-backlog.md) | active | Codex | Product ideas and follow-up decisions that should survive chat context |
 
 ## Plan Rules
 
