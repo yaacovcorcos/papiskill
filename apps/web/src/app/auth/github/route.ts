@@ -3,6 +3,10 @@ import { getAuth } from "@/lib/auth";
 
 export async function GET(request: Request) {
   const requestUrl = new URL(request.url);
+  if (!process.env.DATABASE_URL && process.env.NODE_ENV === "development") {
+    return NextResponse.redirect(new URL("/auth/sign-in", requestUrl.origin));
+  }
+
   const callbackURL = localCallbackURL(requestUrl.searchParams.get("callbackURL"));
   const authUrl = new URL("/api/auth/sign-in/social", requestUrl.origin);
 

@@ -4,6 +4,10 @@ import { hashApiToken } from "@/lib/server/tokens";
 import { getPrisma } from "./prisma";
 
 export async function getSessionUser() {
+  if (!process.env.DATABASE_URL && process.env.NODE_ENV === "development") {
+    return null;
+  }
+
   const session = await getAuth().api.getSession({
     headers: await headers(),
   });
