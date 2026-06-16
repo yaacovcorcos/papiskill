@@ -1,8 +1,9 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
-import { Download, GitFork, Search, ShieldCheck, Star, Terminal } from "lucide-react";
+import { ArrowRight, Download, Eye, GitFork, Search, ShieldCheck, Star, Terminal } from "lucide-react";
 import { AppHeader } from "@/components/app-header";
 import { Badge } from "@/components/badge";
+import { CopyButton } from "@/components/copy-button";
 import { getCatalogSkills } from "@/lib/server/catalog";
 
 export const dynamic = "force-dynamic";
@@ -88,7 +89,7 @@ export default async function SkillsPage({
                 name="q"
                 defaultValue={q}
                 placeholder="Search skills, authors, tags..."
-                className="h-11 w-full rounded-lg border border-border bg-white pl-10 pr-4 text-sm outline-none ring-accent/20 transition focus:border-accent focus:ring-4"
+                className="h-11 w-full rounded-lg border border-border bg-white pl-10 pr-4 text-sm outline-none transition focus:border-accent"
               />
             </label>
           </form>
@@ -99,20 +100,21 @@ export default async function SkillsPage({
           </div>
 
           <div className="space-y-3">
-            {skills.map((skill, index) => (
+            {skills.map((skill, index) => {
+              const href = skillHref(skill);
+              const reference = skillReference(skill);
+              return (
               <article
                 key={`${skill.registryKind}/${skill.slug}`}
                 className={`rounded-lg border bg-white p-4 shadow-sm transition hover:border-slate-300 ${index === 0 ? "border-accent ring-1 ring-accent" : "border-border"}`}
               >
-                <div className="flex gap-4">
+                <Link href={href} className="group flex gap-4 rounded-md outline-none focus-visible:ring-4 focus-visible:ring-accent/20">
                   <div className="grid size-14 shrink-0 place-items-center rounded-lg bg-slate-950 font-mono text-lg font-semibold text-white">
                     {skill.name.split(/\s+/).map((part) => part[0]).join("").slice(0, 2)}
                   </div>
                   <div className="min-w-0 flex-1">
                     <div className="flex flex-wrap items-center gap-2">
-                      <Link href={skillHref(skill)} className="text-base font-semibold hover:underline">
-                        {skill.name}
-                      </Link>
+                      <h2 className="text-base font-semibold group-hover:underline">{skill.name}</h2>
                       <Badge variant={skill.registryKind === "global" ? "blue" : "neutral"}>
                         {skill.registryKind === "global" ? "Global" : "Profile"}
                       </Badge>
@@ -124,25 +126,34 @@ export default async function SkillsPage({
                       {skill.tags.map((tag) => <Badge key={tag}>{tag}</Badge>)}
                     </div>
                   </div>
-                </div>
+                  <ArrowRight className="mt-1 hidden size-4 shrink-0 text-slate-400 transition group-hover:translate-x-0.5 group-hover:text-slate-700 sm:block" aria-hidden />
+                </Link>
                 <div className="mt-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                  <code className="inline-flex min-w-0 items-center gap-2 rounded-md border border-border bg-slate-50 px-3 py-2 font-mono text-xs text-slate-800">
-                    <Terminal className="size-3.5 shrink-0" aria-hidden />
-                    <span className="truncate">{`papiskill install ${skillReference(skill)}`}</span>
-                  </code>
-                  <div className="flex gap-2">
-                    <Link href={`/download/${skillReference(skill)}`} className="inline-flex items-center gap-2 rounded-md border border-border px-3 py-2 text-sm font-semibold hover:bg-slate-50">
-                      <Download className="size-4" aria-hidden />
-                      Download
+                  <div className="flex min-w-0 items-center rounded-md border border-border bg-slate-50">
+                    <code className="inline-flex min-w-0 items-center gap-2 px-3 py-2 font-mono text-xs text-slate-800">
+                      <Terminal className="size-3.5 shrink-0" aria-hidden />
+                      <span className="truncate">{`papiskill install ${reference}`}</span>
+                    </code>
+                    <CopyButton
+                      value={`papiskill install ${reference}`}
+                      label={`Copy install command for ${skill.name}`}
+                      className="inline-grid size-9 shrink-0 place-items-center border-l border-border text-slate-500 hover:bg-white hover:text-slate-950"
+                    />
+                  </div>
+                  <div className="flex flex-wrap gap-2">
+                    <Link href={href} aria-label={`View ${skill.name}`} title="View" className="inline-grid size-10 place-items-center rounded-md border border-border text-slate-700 hover:bg-slate-50 hover:text-slate-950">
+                      <Eye className="size-4" aria-hidden />
                     </Link>
-                    <Link href={`/dashboard/fork?skill=${skillReference(skill)}`} className="inline-flex items-center gap-2 rounded-md border border-border px-3 py-2 text-sm font-semibold hover:bg-slate-50">
+                    <Link href={`/download/${reference}`} aria-label={`Download ${skill.name}`} title="Download" className="inline-grid size-10 place-items-center rounded-md border border-border text-slate-700 hover:bg-slate-50 hover:text-slate-950">
+                      <Download className="size-4" aria-hidden />
+                    </Link>
+                    <Link href={`/dashboard/fork?skill=${reference}`} aria-label={`Fork ${skill.name}`} title="Fork" className="inline-grid size-10 place-items-center rounded-md border border-border text-slate-700 hover:bg-slate-50 hover:text-slate-950">
                       <GitFork className="size-4" aria-hidden />
-                      Fork
                     </Link>
                   </div>
                 </div>
               </article>
-            ))}
+            );})}
           </div>
         </section>
 
