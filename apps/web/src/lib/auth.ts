@@ -3,6 +3,7 @@ import { prismaAdapter } from "better-auth/adapters/prisma";
 import { nextCookies } from "better-auth/next-js";
 import { getAppUrl } from "@/lib/server/app-url";
 import { getPrisma } from "@/lib/server/prisma";
+import { resolveBetterAuthSecret } from "./auth-secret";
 
 function createAuth() {
   const hasGitHubProvider = Boolean(
@@ -11,7 +12,7 @@ function createAuth() {
 
   return betterAuth({
     baseURL: process.env.BETTER_AUTH_URL || getAppUrl(),
-    secret: process.env.BETTER_AUTH_SECRET || "development-only-change-me",
+    secret: resolveBetterAuthSecret(),
     trustedOrigins: [
       "http://localhost:3000",
       "http://127.0.0.1:3000",

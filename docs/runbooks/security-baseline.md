@@ -27,6 +27,7 @@ Server-side ownership checks are mandatory.
 ## Requirements
 
 - No secrets in source control.
+- Production must fail fast if `BETTER_AUTH_SECRET` is missing.
 - API tokens hashed at rest.
 - Private and unlisted library access requires owner session or owner token.
 - Mutations must derive user ID from server session.
@@ -34,6 +35,8 @@ Server-side ownership checks are mandatory.
 - Do not execute skill scripts in the web app.
 - Display warnings for packages containing scripts or risky instructions.
 - Global curated status can only come from collaborator-published registry source.
+- All routes send baseline browser hardening headers: `X-Content-Type-Options`,
+  `X-Frame-Options`, `Referrer-Policy`, and `Permissions-Policy`.
 
 ## Dependency Audit
 

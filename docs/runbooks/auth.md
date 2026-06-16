@@ -23,6 +23,10 @@ Production `BETTER_AUTH_URL` should be:
 https://papiskill.com
 ```
 
+Production must set `BETTER_AUTH_SECRET`. The app intentionally fails fast in
+production when this value is missing instead of signing sessions with a
+development fallback.
+
 ## GitHub OAuth App
 
 Local callback:
