@@ -14,7 +14,7 @@ local/repo CLI, authenticated library editor, and engagement foundation.
 The remaining blockers for declaring the overall build complete are:
 
 - authenticated browser verification against production or a production-like database
-- explicit accessibility and authenticated editor performance passes
+- authenticated editor accessibility and performance passes
 - a final decision on the sidebar/filter layout after the user's review
 - CLI distribution decision: repo/local CLI is implemented, npm publication is not yet done
 
@@ -91,13 +91,16 @@ have a repeatable browser smoke:
 
 ### Accessibility
 
-The UI has semantic forms, labels, and icon button labels in core places, but still needs an explicit pass:
+Public pages now have a repeatable accessibility smoke. The authenticated editor still needs a signed-in browser pass:
 
 - shared header now provides a skip-to-content link on AppHeader-backed pages
 - public registry search, filters, sort links, cards, and icon actions now share a visible focus style
+- `npm run a11y:public -- --base-url https://papiskill.com` checks public route landmarks, `h1`s, skip link behavior, duplicate IDs, unlabeled controls, missing image alt text, and console noise
+- the first local baseline is recorded in `docs/reviews/accessibility-baseline.md`
+- rendered `SKILL.md` headings are demoted inside product pages so the page title remains the only `h1`
 - comment, token, profile, and library-skill save feedback now use explicit live-region roles
 - icon-only registry, dashboard, library, edit, comment, copy, and star controls now have explicit target-aware labels
-- broader screen-reader and editor traversal pass still needed before calling accessibility complete
+- authenticated screen-reader and editor traversal pass still needed before calling accessibility complete
 
 ### Sidebar and filters
 

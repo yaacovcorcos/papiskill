@@ -30,7 +30,8 @@ Use \`SKILL.md\` well.
     );
 
     expect(html).toContain('class="skill-markdown"');
-    expect(html).toContain("<h1>Sample Skill</h1>");
+    expect(html).toContain("<h2>Sample Skill</h2>");
+    expect(html).not.toContain("<h1>Sample Skill</h1>");
     expect(html).toContain("<table>");
     expect(html).toContain("<code>SKILL.md</code>");
     expect(html).not.toContain("description: Internal metadata");
@@ -47,7 +48,7 @@ describe("SkillMarkdownEditor", () => {
     expect(html).toContain("Write");
     expect(html).toContain("Preview");
     expect(html).toContain("Split");
-    expect(html).toContain("<h1>Editable Skill</h1>");
+    expect(html).toContain("<h2>Editable Skill</h2>");
   });
 });
 

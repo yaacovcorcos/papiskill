@@ -195,6 +195,7 @@ function SearchForm({
         <input
           name="q"
           defaultValue={activeFilters.query}
+          aria-label="Search skills"
           placeholder="Search skills, authors, tags..."
           className="focus-ring h-11 w-full rounded-lg border border-border bg-white pl-10 pr-4 text-sm transition focus:border-accent"
         />

@@ -15,6 +15,7 @@
     "typecheck": "npm run registry:generate && npm run db:generate && npm --workspace @papiskill/skill-core run typecheck && npm --workspace @papiskill/skill-core run build && npm --workspace papiskill run typecheck && npm --workspace @papiskill/web run typecheck",
     "test": "npm run test --workspaces --if-present",
     "check": "npm run typecheck && npm run lint && npm run test && npm run build",
+    "a11y:public": "tsx apps/web/scripts/public-accessibility.ts",
     "perf:public": "tsx apps/web/scripts/public-performance.ts",
     "db:generate": "npm --workspace @papiskill/web run db:generate",
     "db:migrate": "npm --workspace @papiskill/web run db:migrate",
