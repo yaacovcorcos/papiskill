@@ -19,7 +19,7 @@ export function SkillCard({ skill }: { skill: CatalogSkill }) {
     <article className="rounded-lg border border-border bg-white p-4 shadow-sm transition hover:border-slate-300">
       <Link
         href={href}
-        className="group flex gap-4 rounded-md outline-none focus-visible:ring-4 focus-visible:ring-accent/20"
+        className="focus-ring group flex gap-4 rounded-md"
       >
         <SkillMark name={skill.name} size="list" />
         <div className="min-w-0 flex-1">
@@ -74,7 +74,7 @@ export function SkillCard({ skill }: { skill: CatalogSkill }) {
             href={href}
             aria-label={`View ${skill.name}`}
             title="View"
-            className="inline-grid size-10 place-items-center rounded-md border border-border text-slate-700 hover:bg-slate-50 hover:text-slate-950"
+            className="focus-ring inline-grid size-10 place-items-center rounded-md border border-border text-slate-700 hover:bg-slate-50 hover:text-slate-950"
           >
             <Eye className="size-4" aria-hidden />
           </Link>
@@ -83,7 +83,7 @@ export function SkillCard({ skill }: { skill: CatalogSkill }) {
             prefetch={false}
             aria-label={`Download ${skill.name}`}
             title="Download"
-            className="inline-grid size-10 place-items-center rounded-md border border-border text-slate-700 hover:bg-slate-50 hover:text-slate-950"
+            className="focus-ring inline-grid size-10 place-items-center rounded-md border border-border text-slate-700 hover:bg-slate-50 hover:text-slate-950"
           >
             <Download className="size-4" aria-hidden />
           </Link>
@@ -92,7 +92,7 @@ export function SkillCard({ skill }: { skill: CatalogSkill }) {
             prefetch={false}
             aria-label={`Copy ${skill.name} to library`}
             title="Copy to library"
-            className="inline-grid size-10 place-items-center rounded-md border border-border text-slate-700 hover:bg-slate-50 hover:text-slate-950"
+            className="focus-ring inline-grid size-10 place-items-center rounded-md border border-border text-slate-700 hover:bg-slate-50 hover:text-slate-950"
           >
             <GitFork className="size-4" aria-hidden />
           </Link>

@@ -89,8 +89,8 @@ Public pages are already small and fast enough for the seed catalog, but the app
 
 The UI has semantic forms, labels, and icon button labels in core places, but still needs an explicit pass:
 
-- keyboard traversal for registry filters, cards, detail links, and editor controls
-- focus style consistency after the focus-ring simplification
+- shared header now provides a skip-to-content link on AppHeader-backed pages
+- public registry search, filters, sort links, cards, and icon actions now share a visible focus style
 - screen reader labels for all icon-only controls
 - form error announcement on save/comment/token actions
 

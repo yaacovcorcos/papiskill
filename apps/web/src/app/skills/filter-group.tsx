@@ -30,7 +30,7 @@ export function FilterGroup({
             <Link
               key={value}
               href={toggleFilterHref(filters, group.key, value)}
-              className={`flex items-center justify-between gap-3 rounded-md px-2 py-1.5 text-sm ${isActive ? "bg-white font-semibold text-slate-950 shadow-sm" : "text-slate-700 hover:bg-white"}`}
+              className={`focus-ring flex items-center justify-between gap-3 rounded-md px-2 py-1.5 text-sm ${isActive ? "bg-white font-semibold text-slate-950 shadow-sm" : "text-slate-700 hover:bg-white"}`}
               aria-pressed={isActive}
             >
               <span className="flex min-w-0 items-center gap-2">

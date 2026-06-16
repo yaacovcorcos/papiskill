@@ -28,7 +28,7 @@ export function CopyButton({
       onClick={copyValue}
       aria-label={copied ? "Copied" : label}
       title={copied ? "Copied" : label}
-      className={className || "inline-grid size-10 shrink-0 place-items-center rounded-md border border-border bg-white text-slate-700 hover:bg-slate-50 hover:text-slate-950"}
+      className={`focus-ring ${className || "inline-grid size-10 shrink-0 place-items-center rounded-md border border-border bg-white text-slate-700 hover:bg-slate-50 hover:text-slate-950"}`}
     >
       {copied ? <Check className="size-4 text-emerald-600" aria-hidden /> : <Copy className="size-4" aria-hidden />}
     </button>

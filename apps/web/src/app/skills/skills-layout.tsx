@@ -34,7 +34,7 @@ export function SkillsLayout({
             title={label}
             aria-expanded={!collapsed}
             onClick={() => setCollapsed((value) => !value)}
-            className="inline-grid size-7 place-items-center rounded-md text-slate-500 transition hover:bg-white hover:text-slate-950 focus-visible:bg-white focus-visible:text-slate-950 focus-visible:outline-none"
+            className="focus-ring inline-grid size-7 place-items-center rounded-md text-slate-500 transition hover:bg-white hover:text-slate-950 focus-visible:bg-white focus-visible:text-slate-950"
           >
             {collapsed ? <ChevronRight className="size-4" aria-hidden /> : <ChevronLeft className="size-4" aria-hidden />}
           </button>

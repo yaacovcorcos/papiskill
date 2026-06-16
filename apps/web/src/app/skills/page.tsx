@@ -77,7 +77,7 @@ export default async function SkillsPage({
             </div>
             <Link
               href="/docs/authoring"
-              className="hidden items-center justify-center rounded-md border border-border bg-white px-3 py-2 text-sm font-semibold hover:bg-slate-50 min-[900px]:inline-flex"
+              className="focus-ring hidden items-center justify-center rounded-md border border-border bg-white px-3 py-2 text-sm font-semibold hover:bg-slate-50 min-[900px]:inline-flex"
             >
               Publish a skill
             </Link>
@@ -102,7 +102,7 @@ export default async function SkillsPage({
                     filter.key,
                     filter.value,
                   )}
-                  className="inline-flex h-8 items-center gap-1 rounded-md border border-border bg-slate-50 px-2.5 text-sm font-medium text-slate-700 hover:bg-white"
+                  className="focus-ring inline-flex h-8 items-center gap-1 rounded-md border border-border bg-slate-50 px-2.5 text-sm font-medium text-slate-700 hover:bg-white"
                 >
                   {filter.label}
                   <X className="size-3.5" aria-hidden />
@@ -115,7 +115,7 @@ export default async function SkillsPage({
                   compatibility: [],
                   statuses: [],
                 })}
-                className="text-sm font-semibold text-slate-600 hover:text-slate-950"
+                className="focus-ring rounded-sm text-sm font-semibold text-slate-600 hover:text-slate-950"
               >
                 Clear filters
               </Link>
@@ -162,7 +162,7 @@ function RegistrySidebarFilters({
         <div className="mb-6 flex justify-end">
           <Link
             href="/skills"
-            className="text-xs font-medium text-slate-500 hover:text-slate-950"
+            className="focus-ring rounded-sm text-xs font-medium text-slate-500 hover:text-slate-950"
           >
             Clear
           </Link>
@@ -196,7 +196,7 @@ function SearchForm({
           name="q"
           defaultValue={activeFilters.query}
           placeholder="Search skills, authors, tags..."
-          className="h-11 w-full rounded-lg border border-border bg-white pl-10 pr-4 text-sm outline-none transition focus:border-accent"
+          className="focus-ring h-11 w-full rounded-lg border border-border bg-white pl-10 pr-4 text-sm transition focus:border-accent"
         />
         {activeFilters.categories.map((value) => (
           <input
@@ -259,7 +259,7 @@ function SortLinks({
             <Link
               key={option.value}
               href={skillsHref({ ...activeFilters, sort: option.value })}
-              className="rounded-md px-2 py-1 font-medium text-slate-600 hover:bg-slate-100 hover:text-slate-950"
+              className="focus-ring rounded-md px-2 py-1 font-medium text-slate-600 hover:bg-slate-100 hover:text-slate-950"
             >
               {option.label}
             </Link>
@@ -284,7 +284,7 @@ function MobileFilterBar({
   return (
     <div className="mb-5 flex items-center gap-2 min-[900px]:hidden">
       <details className="group">
-        <summary className="inline-flex h-10 cursor-pointer list-none items-center gap-2 rounded-md border border-border bg-white px-3 text-sm font-semibold shadow-sm hover:bg-slate-50">
+        <summary className="focus-ring inline-flex h-10 cursor-pointer list-none items-center gap-2 rounded-md border border-border bg-white px-3 text-sm font-semibold shadow-sm hover:bg-slate-50">
           <Filter className="size-4" aria-hidden />
           <span>Filters</span>
           <span className="text-xs font-medium text-muted">
@@ -309,7 +309,7 @@ function MobileFilterBar({
                 compatibility: [],
                 statuses: [],
               })}
-              className="text-sm font-semibold text-slate-600 hover:text-slate-950 sm:col-span-3"
+              className="focus-ring rounded-sm text-sm font-semibold text-slate-600 hover:text-slate-950 sm:col-span-3"
             >
               Clear filters
             </Link>
@@ -318,7 +318,7 @@ function MobileFilterBar({
       </details>
       <Link
         href="/docs/authoring"
-        className="inline-flex h-10 items-center gap-2 rounded-md border border-border bg-white px-3 text-sm font-semibold shadow-sm hover:bg-slate-50"
+        className="focus-ring inline-flex h-10 items-center gap-2 rounded-md border border-border bg-white px-3 text-sm font-semibold shadow-sm hover:bg-slate-50"
       >
         <Plus className="size-4" aria-hidden />
         Publish
@@ -336,7 +336,7 @@ function EmptySkillResults() {
       </p>
       <Link
         href="/skills"
-        className="mt-4 inline-flex h-10 items-center justify-center rounded-md border border-border bg-white px-3 text-sm font-semibold hover:bg-slate-50"
+        className="focus-ring mt-4 inline-flex h-10 items-center justify-center rounded-md border border-border bg-white px-3 text-sm font-semibold hover:bg-slate-50"
       >
         Clear filters
       </Link>
