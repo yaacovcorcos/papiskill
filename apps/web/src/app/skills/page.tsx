@@ -100,13 +100,13 @@ export default async function SkillsPage({
           </div>
 
           <div className="space-y-3">
-            {skills.map((skill, index) => {
+            {skills.map((skill) => {
               const href = skillHref(skill);
               const reference = skillReference(skill);
               return (
               <article
                 key={`${skill.registryKind}/${skill.slug}`}
-                className={`rounded-lg border bg-white p-4 shadow-sm transition hover:border-slate-300 ${index === 0 ? "border-accent ring-1 ring-accent" : "border-border"}`}
+                className="rounded-lg border border-border bg-white p-4 shadow-sm transition hover:border-slate-300"
               >
                 <Link href={href} className="group flex gap-4 rounded-md outline-none focus-visible:ring-4 focus-visible:ring-accent/20">
                   <div className="grid size-14 shrink-0 place-items-center rounded-lg bg-slate-950 font-mono text-lg font-semibold text-white">
