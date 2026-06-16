@@ -67,7 +67,7 @@ export default async function SkillsPage({
           />
         }
       >
-        <section className="min-w-0 border-r border-border px-5 py-6">
+        <section className="mx-auto w-full max-w-5xl min-w-0 px-5 py-6 xl:max-w-none xl:border-r xl:border-border">
           <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <div>
               <h1 className="text-2xl font-semibold tracking-tight">Skills</h1>
@@ -77,7 +77,7 @@ export default async function SkillsPage({
             </div>
             <Link
               href="/docs/authoring"
-              className="focus-ring hidden items-center justify-center rounded-md border border-border bg-white px-3 py-2 text-sm font-semibold hover:bg-slate-50 min-[900px]:inline-flex"
+              className="focus-ring hidden items-center justify-center rounded-md border border-border bg-white px-3 py-2 text-sm font-semibold hover:bg-slate-50 xl:inline-flex"
             >
               Publish a skill
             </Link>
@@ -282,7 +282,7 @@ function MobileFilterBar({
   countSource: Awaited<ReturnType<typeof getCatalogSkills>>;
 }) {
   return (
-    <div className="mb-5 flex items-center gap-2 min-[900px]:hidden">
+    <div className="mb-5 flex items-center gap-2 xl:hidden">
       <details className="group">
         <summary className="focus-ring inline-flex h-10 cursor-pointer list-none items-center gap-2 rounded-md border border-border bg-white px-3 text-sm font-semibold shadow-sm hover:bg-slate-50">
           <Filter className="size-4" aria-hidden />

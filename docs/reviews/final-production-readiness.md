@@ -98,9 +98,10 @@ The UI has semantic forms, labels, and icon button labels in core places, but st
 
 ### Sidebar and filters
 
-Current filters are data-backed and functional, but the layout can feel too split at some desktop widths.
-Do not add more filter categories until there is real data. The next design decision is whether to keep
-the persistent sidebar, collapse it by default, or move filters into compact controls above the list.
+Current filters are data-backed and functional. The registry now keeps filters in compact controls until
+the viewport is wide enough to show filters, the skill list, and the preview panel together. Do not add
+more filter categories until there is real data. The next design decision is whether the extra-wide
+sidebar should remain, collapse by default, or move permanently into compact controls above the list.
 
 ### CLI distribution
 

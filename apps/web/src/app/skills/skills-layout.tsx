@@ -16,14 +16,14 @@ export function SkillsLayout({
   const [collapsed, setCollapsed] = useState(false);
   const label = collapsed ? "Expand filters" : "Collapse filters";
   const gridColumns = collapsed
-    ? "min-[900px]:grid-cols-[56px_minmax(0,1fr)] xl:grid-cols-[56px_minmax(0,1fr)_430px]"
-    : "min-[900px]:grid-cols-[270px_minmax(0,1fr)] xl:grid-cols-[270px_minmax(0,1fr)_430px]";
+    ? "xl:grid-cols-[56px_minmax(0,1fr)_430px]"
+    : "xl:grid-cols-[250px_minmax(0,1fr)_430px]";
 
   return (
     <main
       className={`mx-auto grid w-full max-w-[1500px] flex-1 grid-cols-1 transition-[grid-template-columns] duration-200 ${gridColumns}`}
     >
-      <aside className={`hidden border-r border-border bg-surface-subtle py-6 transition-all duration-200 min-[900px]:block ${collapsed ? "px-2" : "px-5"}`}>
+      <aside className={`hidden border-r border-border bg-surface-subtle py-6 transition-all duration-200 xl:block ${collapsed ? "px-2" : "px-5"}`}>
         <div className={`mb-6 flex items-center ${collapsed ? "justify-center" : "justify-between"}`}>
           {collapsed ? null : (
             <h2 className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-700">Filters</h2>
