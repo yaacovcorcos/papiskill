@@ -2,6 +2,7 @@ import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 import { SkillMarkdown } from "./skill-markdown";
 import { SkillMarkdownEditor } from "./skill-markdown-editor";
+import { SkillSourceBlock } from "./skill-source-block";
 
 describe("SkillMarkdown", () => {
   it("renders designed markdown without YAML frontmatter", () => {
@@ -42,5 +43,18 @@ describe("SkillMarkdownEditor", () => {
     expect(html).toContain("Preview");
     expect(html).toContain("Split");
     expect(html).toContain("<h1>Editable Skill</h1>");
+  });
+});
+
+describe("SkillSourceBlock", () => {
+  it("renders the exact raw SKILL.md source with a copy affordance", () => {
+    const html = renderToStaticMarkup(
+      <SkillSourceBlock markdown={"---\nname: sample\n---\n\n# Sample"} />,
+    );
+
+    expect(html).toContain("Raw SKILL.md");
+    expect(html).toContain("Copy Raw SKILL.md");
+    expect(html).toContain("name: sample");
+    expect(html).toContain("# Sample");
   });
 });

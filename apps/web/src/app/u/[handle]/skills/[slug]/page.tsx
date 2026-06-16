@@ -7,11 +7,13 @@ import { AppHeader } from "@/components/app-header";
 import { Badge } from "@/components/badge";
 import { SkillMarkdown } from "@/components/skill-markdown";
 import { SkillEngagementPanel } from "@/components/skill-engagement-panel";
+import { SkillSourceBlock } from "@/components/skill-source-block";
 import { hasDatabaseUrl } from "@/lib/server/db-env";
 import { getSessionUser } from "@/lib/server/request-auth";
 import { getPrisma } from "@/lib/server/prisma";
 import { getSkillEngagement } from "@/lib/server/engagement";
 import { getSkillByReference } from "@/lib/server/skills";
+import { compatibilityLabels } from "@/app/skills/skill-filters";
 
 export const dynamic = "force-dynamic";
 
@@ -90,6 +92,7 @@ export default async function UserSkillPage({ params }: { params: Params }) {
             </div>
 
             <SkillMarkdown markdown={skill.markdown ?? ""} className="mt-8" />
+            <SkillSourceBlock markdown={skill.markdown ?? ""} />
             {showEngagement ? (
               <SkillEngagementPanel engagement={engagement} viewerSignedIn={Boolean(viewer)} />
             ) : null}
@@ -122,6 +125,18 @@ export default async function UserSkillPage({ params }: { params: Params }) {
                 <Meta label="Categories" value={skill.categories.join(", ")} />
                 <Meta label="Tags" value={skill.tags.join(", ")} />
               </dl>
+              <div className="mt-4 border-t border-border pt-4">
+                <h3 className="text-xs font-semibold uppercase tracking-[0.14em] text-muted">
+                  Compatibility
+                </h3>
+                <div className="mt-3 flex flex-wrap gap-2">
+                  {skill.compatibleWith.map((target) => (
+                    <Badge key={target}>
+                      {compatibilityLabels[target] ?? target}
+                    </Badge>
+                  ))}
+                </div>
+              </div>
             </div>
 
             <div className="mt-4 rounded-lg border border-emerald-200 bg-emerald-50 p-5 text-sm text-emerald-900">
