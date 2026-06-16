@@ -21,6 +21,15 @@ function createAuth() {
     database: prismaAdapter(getPrisma(), {
       provider: "postgresql",
     }),
+    advanced: {
+      ipAddress: {
+        ipAddressHeaders: [
+          "x-forwarded-for",
+          "x-real-ip",
+          "cf-connecting-ip",
+        ],
+      },
+    },
     socialProviders: hasGitHubProvider
       ? {
           github: {
