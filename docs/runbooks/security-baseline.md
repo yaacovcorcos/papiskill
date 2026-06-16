@@ -34,6 +34,12 @@ Server-side ownership checks are mandatory.
 - Display warnings for packages containing scripts or risky instructions.
 - Global curated status can only come from collaborator-published registry source.
 
+## Dependency Audit
+
+CI runs `npm audit --audit-level=high` after install. High and critical advisories block the check workflow.
+
+Moderate advisories are reviewed before release but are not a hard CI blocker while the only available npm fixes require an unsafe framework or ORM downgrade. As of June 16, 2026, the known moderate advisories are transitive issues in stable Next.js and Prisma packages; keep them on the release checklist until compatible patched stable releases are available.
+
 ## Report Quality Bar
 
 Security findings should include:

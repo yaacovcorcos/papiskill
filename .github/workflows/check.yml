@@ -23,11 +23,19 @@ jobs:
       - name: Install
         run: npm install
 
+      - name: Audit high severity dependencies
+        run: npm audit --audit-level=high
+
       - name: Generate Prisma client
         run: npm run db:generate
 
       - name: Validate registry
         run: npm run registry:validate
+
+      - name: Check generated registry freshness
+        run: |
+          npm run registry:generate
+          git diff --exit-code -- apps/web/src/lib/server/generated-registry.ts
 
       - name: Typecheck
         run: npm run typecheck
