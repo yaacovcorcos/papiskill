@@ -1,6 +1,6 @@
 import { createHash } from "node:crypto";
 import { Prisma, SkillRegistryKind, SkillVisibility, ValidationLevel, type SkillFork, type User } from "@prisma/client";
-import { validateSkillPackage } from "@papiskill/skill-core";
+import { validateSkillPackage, type SkillValidationResult } from "@papiskill/skill-core";
 import { getPrisma } from "./prisma";
 import { readableForkVisibilityWhere } from "./visibility";
 
@@ -27,6 +27,29 @@ interface LibrarySource {
   compatibleWith: string[];
   installTargets: Prisma.JsonValue;
   files: Array<{ path: string; content: string }>;
+}
+
+export interface ForkDraftPackageInput {
+  slug: string;
+  name: string;
+  summary: string;
+  description: string;
+  visibility: string;
+  version: string;
+  license: string;
+  categories: string[];
+  tags: string[];
+  compatibleWith: string[];
+  installTargets: Record<string, string>;
+  skillMarkdown: string;
+  existingFiles: Array<{ path: string; content: string }>;
+}
+
+export interface ForkDraftPackageValidation {
+  skillYml: string;
+  files: Array<{ path: string; content: string }>;
+  validation: SkillValidationResult;
+  hasBlockingErrors: boolean;
 }
 
 export async function createLibraryCopy(input: LibraryCopyInput): Promise<SkillFork> {
@@ -172,6 +195,35 @@ export async function persistForkValidation(forkId: string, files: Array<{ path:
   ]);
 
   return validation;
+}
+
+export function validateForkDraftPackage(input: ForkDraftPackageInput): ForkDraftPackageValidation {
+  const skillYml = buildSkillYml({
+    id: input.slug,
+    name: input.name,
+    summary: input.summary,
+    description: input.description,
+    visibility: input.visibility,
+    version: input.version,
+    license: input.license,
+    categories: input.categories,
+    tags: input.tags,
+    compatibleWith: input.compatibleWith,
+    installTargets: input.installTargets,
+  });
+  const files = [
+    ...input.existingFiles.filter((file) => file.path !== "skill.yml" && file.path !== "SKILL.md"),
+    { path: "skill.yml", content: skillYml },
+    { path: "SKILL.md", content: input.skillMarkdown },
+  ].sort((a, b) => a.path.localeCompare(b.path));
+  const validation = validateSkillPackage(files);
+
+  return {
+    skillYml,
+    files,
+    validation,
+    hasBlockingErrors: validation.issues.some((issue) => issue.level === "error"),
+  };
 }
 
 export async function uniqueLibrarySlug(userId: string, rawBaseSlug: string): Promise<string> {

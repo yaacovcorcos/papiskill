@@ -8,12 +8,12 @@ import { ensureProfile, normalizeHandle, validateHandle } from "@/lib/server/pro
 import { getPrisma } from "@/lib/server/prisma";
 import { createApiToken } from "@/lib/server/tokens";
 import {
-  buildSkillYml,
   createLibraryCopy,
   normalizeSlug,
   persistForkValidation,
   recordFromJson,
   uniqueLibrarySlug,
+  validateForkDraftPackage,
 } from "@/lib/server/library";
 
 export interface TokenActionState {
@@ -24,6 +24,19 @@ export interface TokenActionState {
 export interface ProfileActionState {
   ok?: boolean;
   error?: string;
+}
+
+export interface SaveForkActionIssue {
+  level: "error" | "warning";
+  code: string;
+  message: string;
+  path?: string;
+}
+
+export interface SaveForkActionState {
+  ok?: boolean;
+  error?: string;
+  issues?: SaveForkActionIssue[];
 }
 
 export async function createTokenAction(
@@ -136,7 +149,10 @@ export async function forkSkillAction(formData: FormData) {
   return copySkillToLibraryAction(formData);
 }
 
-export async function saveForkAction(formData: FormData) {
+export async function saveForkAction(
+  _previousState: SaveForkActionState,
+  formData: FormData,
+): Promise<SaveForkActionState> {
   const user = await getRequiredUser();
   const forkId = stringField(formData, "forkId");
   const requestedSlug = normalizeSlug(stringField(formData, "slug"));
@@ -155,8 +171,8 @@ export async function saveForkAction(formData: FormData) {
   }
 
   const slug = requestedSlug === fork.slug ? fork.slug : await uniqueLibrarySlug(user.id, requestedSlug);
-  const skillYml = buildSkillYml({
-    id: slug,
+  const draft = validateForkDraftPackage({
+    slug,
     name,
     summary,
     description,
@@ -167,7 +183,15 @@ export async function saveForkAction(formData: FormData) {
     tags: fork.tags,
     compatibleWith: fork.compatibleWith,
     installTargets: recordFromJson(fork.installTargets),
+    skillMarkdown,
+    existingFiles: fork.files,
   });
+  if (draft.hasBlockingErrors) {
+    return {
+      error: "Fix validation errors before saving this skill.",
+      issues: draft.validation.issues,
+    };
+  }
 
   await getPrisma().$transaction([
     getPrisma().skillFork.update({
@@ -186,12 +210,12 @@ export async function saveForkAction(formData: FormData) {
       create: {
         forkId: fork.id,
         path: "skill.yml",
-        content: skillYml,
-        sizeBytes: Buffer.byteLength(skillYml),
+        content: draft.skillYml,
+        sizeBytes: Buffer.byteLength(draft.skillYml),
       },
       update: {
-        content: skillYml,
-        sizeBytes: Buffer.byteLength(skillYml),
+        content: draft.skillYml,
+        sizeBytes: Buffer.byteLength(draft.skillYml),
       },
     }),
     getPrisma().skillForkFile.upsert({
@@ -209,14 +233,7 @@ export async function saveForkAction(formData: FormData) {
     }),
   ]);
 
-  const files = await getPrisma().skillForkFile.findMany({
-    where: { forkId: fork.id },
-    orderBy: { path: "asc" },
-  });
-  await persistForkValidation(fork.id, files.map((file) => ({
-    path: file.path,
-    content: file.content,
-  })));
+  await persistForkValidation(fork.id, draft.files);
 
   revalidatePath(`/dashboard/library/${fork.id}/edit`);
   revalidatePath("/dashboard");
@@ -231,6 +248,11 @@ export async function saveForkAction(formData: FormData) {
     revalidatePath(`/u/${profile.handle}`);
     revalidatePath(`/u/${profile.handle}/skills/${slug}`);
   }
+
+  return {
+    ok: true,
+    issues: draft.validation.issues,
+  };
 }
 
 async function getRequiredUser() {
