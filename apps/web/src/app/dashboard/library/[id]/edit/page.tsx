@@ -5,6 +5,7 @@ import { SkillVisibility } from "@prisma/client";
 import { AppHeader } from "@/components/app-header";
 import { Badge } from "@/components/badge";
 import { CopyButton } from "@/components/copy-button";
+import { SkillMarkdownEditor } from "@/components/skill-markdown-editor";
 import { ensureProfile } from "@/lib/server/profiles";
 import { getPrisma } from "@/lib/server/prisma";
 import { getSessionUser } from "@/lib/server/request-auth";
@@ -129,18 +130,7 @@ export default async function EditLibrarySkillPage({
             </section>
           </aside>
 
-          <section className="rounded-lg border border-border bg-white p-5 shadow-sm">
-            <label className="block text-sm font-semibold">
-              SKILL.md
-              <textarea
-                name="skillMarkdown"
-                defaultValue={markdown}
-                rows={32}
-                spellCheck={false}
-                className="mt-3 w-full resize-y rounded-md border border-border bg-slate-50 px-4 py-3 font-mono text-sm leading-6 outline-none focus:border-accent"
-              />
-            </label>
-          </section>
+          <SkillMarkdownEditor name="skillMarkdown" defaultValue={markdown} />
         </form>
       </main>
     </>

@@ -47,3 +47,214 @@ textarea,
 select {
   font: inherit;
 }
+
+.skill-markdown {
+  color: #1f2a44;
+  font-size: 0.975rem;
+  line-height: 1.75;
+}
+
+.skill-markdown > *:first-child {
+  margin-top: 0;
+}
+
+.skill-markdown > *:last-child {
+  margin-bottom: 0;
+}
+
+.skill-markdown h1,
+.skill-markdown h2,
+.skill-markdown h3,
+.skill-markdown h4 {
+  color: #101828;
+  font-weight: 650;
+  letter-spacing: 0;
+  line-height: 1.2;
+}
+
+.skill-markdown h1 {
+  margin: 0 0 1rem;
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 0.9rem;
+  font-size: 2rem;
+}
+
+.skill-markdown h2 {
+  margin: 2.35rem 0 0.85rem;
+  border-top: 1px solid #edf0f5;
+  padding-top: 1.2rem;
+  font-size: 1.35rem;
+}
+
+.skill-markdown h3 {
+  margin: 1.75rem 0 0.65rem;
+  font-size: 1.05rem;
+}
+
+.skill-markdown h4 {
+  margin: 1.4rem 0 0.45rem;
+  font-size: 0.95rem;
+}
+
+.skill-markdown p {
+  margin: 0.85rem 0;
+}
+
+.skill-markdown a {
+  color: var(--accent);
+  font-weight: 550;
+  text-decoration-line: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
+}
+
+.skill-markdown a:hover {
+  color: #0f46c7;
+}
+
+.skill-markdown strong {
+  color: #111318;
+  font-weight: 650;
+}
+
+.skill-markdown em {
+  color: #344054;
+}
+
+.skill-markdown ul,
+.skill-markdown ol {
+  margin: 0.85rem 0 1.15rem;
+  padding-left: 1.4rem;
+}
+
+.skill-markdown li {
+  margin: 0.35rem 0;
+  padding-left: 0.15rem;
+}
+
+.skill-markdown li::marker {
+  color: #64748b;
+}
+
+.skill-markdown li > p {
+  margin: 0.35rem 0;
+}
+
+.skill-markdown blockquote {
+  margin: 1.25rem 0;
+  border-left: 3px solid #9ec5ff;
+  border-radius: 0 0.45rem 0.45rem 0;
+  background: #f5f9ff;
+  padding: 0.85rem 1rem;
+  color: #24466f;
+}
+
+.skill-markdown blockquote p {
+  margin: 0.4rem 0;
+}
+
+.skill-markdown hr {
+  margin: 2rem 0;
+  border: 0;
+  border-top: 1px solid var(--border);
+}
+
+.skill-markdown code {
+  border: 1px solid #d9e2ef;
+  border-radius: 0.35rem;
+  background: #f8fafc;
+  padding: 0.1rem 0.32rem;
+  color: #102033;
+  font-family: "Geist Mono", "Geist Mono Fallback", ui-monospace, monospace;
+  font-size: 0.88em;
+}
+
+.skill-markdown pre {
+  margin: 1.15rem 0;
+  overflow-x: auto;
+  border: 1px solid #d8e0ea;
+  border-radius: 0.65rem;
+  background: #0f172a;
+  padding: 1rem;
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.04);
+}
+
+.skill-markdown pre code {
+  display: block;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  padding: 0;
+  color: #e5edf7;
+  font-size: 0.82rem;
+  line-height: 1.7;
+  white-space: pre;
+}
+
+.skill-markdown table {
+  display: block;
+  width: 100%;
+  margin: 1.2rem 0;
+  overflow-x: auto;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+
+.skill-markdown th,
+.skill-markdown td {
+  border: 1px solid #dbe3ef;
+  padding: 0.62rem 0.75rem;
+  text-align: left;
+  vertical-align: top;
+}
+
+.skill-markdown th {
+  background: #f8fafc;
+  color: #111318;
+  font-weight: 650;
+}
+
+.skill-markdown tr:nth-child(even) td {
+  background: #fbfdff;
+}
+
+.skill-markdown input[type="checkbox"] {
+  margin-right: 0.5rem;
+  transform: translateY(1px);
+}
+
+.skill-markdown img {
+  max-width: 100%;
+  border-radius: 0.65rem;
+  border: 1px solid var(--border);
+}
+
+.skill-markdown kbd {
+  border: 1px solid #cfd8e3;
+  border-bottom-width: 2px;
+  border-radius: 0.35rem;
+  background: #ffffff;
+  padding: 0.05rem 0.35rem;
+  color: #344054;
+  font-family: "Geist Mono", "Geist Mono Fallback", ui-monospace, monospace;
+  font-size: 0.82em;
+}
+
+.skill-markdown--compact {
+  font-size: 0.9rem;
+  line-height: 1.65;
+}
+
+.skill-markdown--compact h1 {
+  font-size: 1.45rem;
+}
+
+.skill-markdown--compact h2 {
+  margin-top: 1.6rem;
+  font-size: 1.1rem;
+}
+
+.skill-markdown--compact h3 {
+  margin-top: 1.25rem;
+  font-size: 0.98rem;
+}

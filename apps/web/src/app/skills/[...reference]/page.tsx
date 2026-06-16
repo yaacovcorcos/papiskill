@@ -1,15 +1,14 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import ReactMarkdown from "react-markdown";
 import { ArrowLeft, Download, GitFork, ShieldCheck, Terminal } from "lucide-react";
 import { AppHeader } from "@/components/app-header";
 import { Badge } from "@/components/badge";
+import { SkillMarkdown } from "@/components/skill-markdown";
 import { SkillEngagementPanel } from "@/components/skill-engagement-panel";
 import { hasDatabaseUrl } from "@/lib/server/db-env";
 import { getSkillEngagement } from "@/lib/server/engagement";
 import { getSessionUser } from "@/lib/server/request-auth";
 import { getSkillByReference } from "@/lib/server/skills";
-import { stripSkillFrontmatter } from "@/lib/skill-markdown";
 
 export const revalidate = 60;
 
@@ -33,7 +32,6 @@ export default async function SkillDetailPage({
   const skill = await getSkillByReference(requestedReference);
   if (!skill) notFound();
   const referenceId = skillReference(skill);
-  const displayMarkdown = stripSkillFrontmatter(skill.markdown ?? "");
   const viewer = hasDatabaseUrl() ? await getSessionUser().catch(() => null) : null;
   const engagement = await getSkillEngagement(referenceId, viewer ? { id: viewer.id } : null);
 
@@ -59,9 +57,7 @@ export default async function SkillDetailPage({
                 <p className="mt-3 max-w-2xl text-lg leading-8 text-muted">{skill.summary}</p>
               </div>
 
-              <section className="prose prose-slate mt-8 max-w-none prose-headings:tracking-tight prose-pre:rounded-lg prose-pre:border prose-pre:border-border prose-pre:bg-slate-50 prose-pre:text-slate-800">
-                <ReactMarkdown>{displayMarkdown}</ReactMarkdown>
-              </section>
+              <SkillMarkdown markdown={skill.markdown ?? ""} className="mt-8" />
               <SkillEngagementPanel engagement={engagement} viewerSignedIn={Boolean(viewer)} />
             </article>
 

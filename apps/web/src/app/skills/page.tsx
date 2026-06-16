@@ -19,9 +19,9 @@ import { AppHeader } from "@/components/app-header";
 import { Badge } from "@/components/badge";
 import { CopyButton } from "@/components/copy-button";
 import { EngagementCounts } from "@/components/skill-engagement-panel";
+import { SkillMarkdown } from "@/components/skill-markdown";
 import { getCatalogSkills, type CatalogSkill } from "@/lib/server/catalog";
 import { getSkillByReference } from "@/lib/server/skills";
-import { stripSkillFrontmatter } from "@/lib/skill-markdown";
 import { SkillsLayout } from "./skills-layout";
 
 export const revalidate = 60;
@@ -241,9 +241,12 @@ export default async function SkillsPage({
                       Full view
                     </Link>
                   </div>
-                  <pre className="max-h-[360px] overflow-hidden rounded-lg border border-border bg-slate-50 p-4 font-mono text-xs leading-6 text-slate-800">
-                    {stripSkillFrontmatter(selectedDetail?.markdown ?? "").slice(0, 900)}
-                  </pre>
+                  <div className="max-h-[380px] overflow-hidden rounded-lg border border-border bg-white p-4">
+                    <SkillMarkdown
+                      markdown={selectedDetail?.markdown ?? ""}
+                      className="skill-markdown--compact"
+                    />
+                  </div>
                 </div>
               </div>
             ) : null}

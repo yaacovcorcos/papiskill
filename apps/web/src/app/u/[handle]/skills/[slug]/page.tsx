@@ -1,18 +1,17 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import ReactMarkdown from "react-markdown";
 import { ArrowLeft, Download, GitFork, ShieldCheck, Terminal } from "lucide-react";
 import { SkillVisibility } from "@prisma/client";
 import { AppHeader } from "@/components/app-header";
 import { Badge } from "@/components/badge";
+import { SkillMarkdown } from "@/components/skill-markdown";
 import { SkillEngagementPanel } from "@/components/skill-engagement-panel";
 import { hasDatabaseUrl } from "@/lib/server/db-env";
 import { getSessionUser } from "@/lib/server/request-auth";
 import { getPrisma } from "@/lib/server/prisma";
 import { getSkillEngagement } from "@/lib/server/engagement";
 import { getSkillByReference } from "@/lib/server/skills";
-import { stripSkillFrontmatter } from "@/lib/skill-markdown";
 
 export const dynamic = "force-dynamic";
 
@@ -67,7 +66,6 @@ export default async function UserSkillPage({ params }: { params: Params }) {
   }
 
   const reference = `${handle}/${slug}`;
-  const displayMarkdown = stripSkillFrontmatter(skill.markdown ?? "");
   const engagement = await getSkillEngagement(reference, viewer ? { id: viewer.id } : null);
   const showEngagement = skill.visibility === SkillVisibility.PUBLIC.toLowerCase();
 
@@ -91,9 +89,7 @@ export default async function UserSkillPage({ params }: { params: Params }) {
               <p className="mt-3 max-w-2xl text-lg leading-8 text-muted">{skill.summary}</p>
             </div>
 
-            <section className="prose prose-slate mt-8 max-w-none prose-headings:tracking-tight prose-pre:rounded-lg prose-pre:border prose-pre:border-border prose-pre:bg-slate-50 prose-pre:text-slate-800">
-              <ReactMarkdown>{displayMarkdown}</ReactMarkdown>
-            </section>
+            <SkillMarkdown markdown={skill.markdown ?? ""} className="mt-8" />
             {showEngagement ? (
               <SkillEngagementPanel engagement={engagement} viewerSignedIn={Boolean(viewer)} />
             ) : null}
