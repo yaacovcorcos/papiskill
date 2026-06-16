@@ -83,6 +83,7 @@ Public pages are already small and fast enough for the seed catalog, but the app
 - record baseline Lighthouse or Playwright trace for `/skills`, skill detail, and editor
 - public API, public registry downloads, and health responses now use explicit shared cache headers
 - private library/download/token/user responses remain `no-store` or `private, no-store`
+- shared header navigation disables automatic route prefetching to avoid unrelated page data and avatar preloads
 - preload detail routes only after checking that it improves the current layout
 
 ### Accessibility

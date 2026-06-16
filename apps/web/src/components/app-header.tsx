@@ -5,7 +5,7 @@ const navItems = [
   { href: "/skills", label: "Skills" },
   { href: "/authors", label: "Authors" },
   { href: "/docs", label: "Docs" },
-  { href: "/dashboard", label: "Dashboard", prefetch: false },
+  { href: "/dashboard", label: "Dashboard" },
 ];
 
 export function AppHeader() {
@@ -16,7 +16,7 @@ export function AppHeader() {
       </a>
       <header className="sticky top-0 z-20 border-b border-border bg-white/95 backdrop-blur">
         <div className="mx-auto flex h-16 max-w-[1500px] items-center gap-8 px-5">
-          <Link href="/skills" className="focus-ring flex items-center gap-3 rounded-md" aria-label="PapiSkill home">
+          <Link href="/skills" prefetch={false} className="focus-ring flex items-center gap-3 rounded-md" aria-label="PapiSkill home">
             <span className="grid size-9 place-items-center rounded-lg bg-[#111318] font-mono text-sm font-semibold text-white">
               PS
             </span>
@@ -27,7 +27,7 @@ export function AppHeader() {
               <Link
                 key={item.href}
                 href={item.href}
-                prefetch={item.prefetch}
+                prefetch={false}
                 className="focus-ring rounded-md px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100 hover:text-slate-950"
               >
                 {item.label}
@@ -37,6 +37,7 @@ export function AppHeader() {
           <div className="ml-auto flex items-center gap-3">
             <Link
               href="/docs/cli"
+              prefetch={false}
               className="focus-ring hidden rounded-md border border-border px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50 sm:block"
             >
               CLI
