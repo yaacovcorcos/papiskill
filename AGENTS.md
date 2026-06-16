@@ -50,6 +50,8 @@ Run from repo root unless a command says otherwise.
 | Full check | `npm run check` |
 | Prisma generate | `npm run db:generate` |
 | Prisma migrate dev | `npm run db:migrate` |
+| Prisma migration status | `npm run db:status` |
+| Prisma migrate production | `npm run db:deploy` |
 | Validate registry | `npm run registry:validate` |
 
 ## Quality Bar

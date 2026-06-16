@@ -39,10 +39,23 @@
 1. Update `apps/web/prisma/schema.prisma`.
 2. Add a migration.
 3. Update this document when table meaning, ownership, or invariants change.
-4. Run:
+4. Regenerate the Prisma client before typecheck or build:
 
 ```bash
 npm run db:generate
-npm run typecheck
-npm run test
+npm run check
+```
+
+5. Before deploying code that depends on a new table, enum, column, index, or constraint, apply production migrations with the production direct database URL:
+
+```bash
+npm run db:status
+npm run db:deploy
+```
+
+6. After migration, verify the production app route that uses the new schema and check Vercel runtime logs for fresh Prisma errors:
+
+```bash
+curl -sS https://papiskill.com/api/v1/health
+vercel logs --environment production --level error --since 5m --no-branch
 ```

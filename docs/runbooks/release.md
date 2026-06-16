@@ -11,14 +11,22 @@ npm run check
 
 ## Database
 
-Before production deploy:
+Before any production deploy, check migration status:
 
 ```bash
 npm run db:generate
-npm --workspace @papiskill/web exec prisma migrate status
+npm run db:status
 ```
 
-Apply production migrations through the deploy pipeline or a deliberate operator command using production `DIRECT_URL`.
+If the release includes Prisma migrations, apply them before `vercel --prod`:
+
+```bash
+npm run db:deploy
+```
+
+This command must run with the production direct database URL available through `DIRECT_URL` or `DATABASE_URL`. Vercel production deploys do not run Prisma migrations automatically.
+
+If local env pull returns blank database values but Vercel runtime is connected, apply the checked-in SQL through the Supabase project `papiskill` and verify the migration appears in the Supabase migration list before deploying schema-dependent code.
 
 ## Vercel
 
@@ -57,3 +65,8 @@ vercel --prod
 - public API health route responds
 - public skill API/detail/download routes return `CDN-Cache-Control: public, max-age=60, stale-while-revalidate=300`
 - CLI can search public registry against production API
+- Vercel error logs show no fresh Prisma schema errors after loading changed routes:
+
+```bash
+vercel logs --environment production --level error --since 5m --no-branch
+```
