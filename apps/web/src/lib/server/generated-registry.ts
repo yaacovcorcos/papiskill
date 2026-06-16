@@ -2,76 +2,122 @@ import type { CatalogSkill } from "./catalog";
 
 export const generatedRegistry: CatalogSkill[] = [
   {
-    id: "code-review",
-    slug: "code-review",
-    name: "Code Review",
-    summary: "Review code changes for bugs, regressions, missing tests, and risky assumptions.",
-    description: "A portable code-review skill for AI agents. It focuses review output on concrete findings, file references, severity, test gaps, and residual risk.",
-    registryKind: "global",
-    visibility: "public",
-    author: "yaacovcorcos",
-    compatibleWith: ["codex", "claude-code", "cursor", "generic-agent"],
-    tags: ["review", "testing", "reliability"],
-    categories: ["coding"],
-    installCommand: "papiskill install official/code-review",
-    starCount: 0,
-    commentCount: 0,
-    markdown: `# Code Review
-
-Use this skill when asked to review a code change, pull request, patch, or branch.
-
-## Review stance
-
-Lead with findings. Prioritize bugs, behavioral regressions, security issues, data loss risks, missing authorization, concurrency problems, migration hazards, and missing tests.
-
-Do not summarize the change before findings unless there are no findings.
-
-## Required output shape
-
-For each finding, include:
-
-- severity: \`P0\`, \`P1\`, \`P2\`, or \`P3\`
-- exact file path and line when available
-- concrete problem
-- why it matters
-- smallest safe fix
-
-If there are no findings, say that clearly and name any test gaps or residual risk.
-`,
+    "id": "code-review",
+    "slug": "code-review",
+    "name": "Code Review",
+    "summary": "Review code changes for bugs, regressions, missing tests, and risky assumptions.",
+    "description": "A portable code-review skill for AI agents. It focuses review output on concrete findings, file references, severity, test gaps, and residual risk.",
+    "registryKind": "global",
+    "visibility": "public",
+    "author": "yaacovcorcos",
+    "compatibleWith": [
+      "codex",
+      "claude-code",
+      "cursor",
+      "generic-agent"
+    ],
+    "tags": [
+      "review",
+      "testing",
+      "reliability"
+    ],
+    "categories": [
+      "coding"
+    ],
+    "installCommand": "papiskill install official/code-review",
+    "starCount": 0,
+    "commentCount": 0,
+    "markdown": "# Code Review\n\nUse this skill when asked to review a code change, pull request, patch, or branch.\n\n## Review stance\n\nLead with findings. Prioritize bugs, behavioral regressions, security issues, data loss risks, missing authorization, concurrency problems, migration hazards, and missing tests.\n\nDo not summarize the change before findings unless there are no findings.\n\n## Required output shape\n\nFor each finding, include:\n\n- severity: `P0`, `P1`, `P2`, or `P3`\n- exact file path and line when available\n- concrete problem\n- why it matters\n- smallest safe fix\n\nIf there are no findings, say that clearly and name any test gaps or residual risk.\n\n## Review rules\n\n- Treat existing user changes as intentional unless proven otherwise.\n- Do not request broad refactors when a small fix addresses the risk.\n- Do not rely on aliases, comments, or naming alone as proof of behavior.\n- Check tests when the change touches shared behavior.\n- Check authorization when the change touches user data, private data, admin controls, tokens, files, billing, or external integrations.\n- Check migrations and deploy ordering when schema changes are involved.\n\n## Good finding example\n\n`P1` `apps/web/src/app/api/private/route.ts:42`\n\nThe route reads `userId` from the request body and uses it to fetch private records. An authenticated user can send another user's ID and read their data. Derive the user ID from the server session instead and add a regression test for cross-user access.\n"
   },
   {
-    id: "skill-authoring",
-    slug: "skill-authoring",
-    name: "Skill Authoring",
-    summary: "Draft portable SKILL.md packages with clear scope, metadata, examples, and safety boundaries.",
-    description: "A skill for creating high-quality agent skills that are portable across tools, easy to inspect, and safe to install.",
-    registryKind: "global",
-    visibility: "public",
-    author: "yaacovcorcos",
-    compatibleWith: ["codex", "claude-code", "cursor", "generic-agent"],
-    tags: ["skills", "authoring", "documentation"],
-    categories: ["documentation"],
-    installCommand: "papiskill install official/skill-authoring",
-    starCount: 0,
-    commentCount: 0,
-    markdown: `# Skill Authoring
-
-Use this skill to create or improve a portable \`SKILL.md\` package.
-
-## Goals
-
-A good skill is:
-
-- specific enough to trigger at the right time
-- portable across agent setups unless it declares a specific runtime
-- honest about required tools and permissions
-- clear about inputs, outputs, and safety boundaries
-- short enough to inspect
-- detailed enough to reproduce the workflow
-
-## Package checklist
-
-Every package should include \`skill.yml\`, \`SKILL.md\`, examples when needed, and scripts only when necessary.
-`,
+    "id": "company-documentation-system",
+    "slug": "company-documentation-system",
+    "name": "Company Documentation System",
+    "summary": "Build and maintain clear company handbooks, knowledge bases, processes, and onboarding docs.",
+    "description": "A portable documentation skill for creating practical company documentation systems: handbooks, operating principles, team pages, process docs, decision records, onboarding paths, and maintenance rules.",
+    "registryKind": "global",
+    "visibility": "public",
+    "author": "yaacovcorcos",
+    "compatibleWith": [
+      "codex",
+      "claude-code",
+      "cursor",
+      "generic-agent"
+    ],
+    "tags": [
+      "company-docs",
+      "handbook",
+      "knowledge-base",
+      "onboarding",
+      "operations"
+    ],
+    "categories": [
+      "documentation"
+    ],
+    "installCommand": "papiskill install official/company-documentation-system",
+    "starCount": 0,
+    "commentCount": 0,
+    "markdown": "---\nname: company-documentation-system\ndescription: Build and maintain clear company handbooks, knowledge bases, process docs, decision records, and onboarding docs. Use when creating, improving, auditing, or organizing internal company documentation, team operating knowledge, policies, or company wiki systems.\n---\n\n# Company Documentation System\n\nUse this skill when the user wants to create, improve, audit, or maintain internal company documentation: a company handbook, team knowledge base, operating manual, onboarding guide, process library, policy hub, decision log, or cross-team source of truth.\n\nThis skill is for company and team knowledge. For codebase architecture, setup, deployment, testing, or API documentation, prefer a software documentation skill.\n\n## Core Judgment\n\nMake documentation useful before making it complete.\n\nDo not try to document everything. Build the smallest system that lets people answer real work questions faster, update the right page when something changes, and trust what they find.\n\nAsk questions only when the missing answer changes the structure, audience, privacy boundary, or publishing target. Otherwise, make a reasonable first pass and call out assumptions.\n\n## What Good Looks Like\n\nA good company documentation system is:\n\n- easy to search and browse\n- owned by clear teams or people\n- current enough to be trusted\n- explicit about what is public, internal, confidential, or restricted\n- written in plain language\n- organized around how people actually work\n- easy for teammates to update\n- honest about gaps, drafts, and uncertain information\n\n## First Pass\n\nBefore writing or changing docs, quickly identify:\n\n- audience: employees, leadership, candidates, contractors, customers, partners, or a specific team\n- scope: company-wide handbook, one team, one workflow, onboarding, policy, or cleanup\n- destination: Markdown repo, wiki, Notion, Confluence, Google Docs, GitHub, or another tool\n- visibility: public, internal, confidential, restricted, or mixed\n- source material: existing docs, tickets, meeting notes, repo files, policies, chat summaries, or user-provided notes\n- owner model: named owner, team owner, approver, or \"needs owner\"\n- freshness model: review date, source-of-truth link, change log, or no maintenance expectation\n\nIf any of those are unknown but not blocking, proceed with placeholders such as `Owner: TBD` or `Review cadence: TBD`.\n\n## Information Architecture\n\nPrefer this top-level shape unless the existing system already has a better one:\n\n```text\ncompany-docs/\n|-- index.md\n|-- docs-system.md\n|-- handbook/\n|   |-- index.md\n|   |-- mission-and-principles.md\n|   |-- ways-of-working.md\n|   `-- communication.md\n|-- teams/\n|   |-- index.md\n|   `-- <team>.md\n|-- processes/\n|   |-- index.md\n|   `-- <process>.md\n|-- onboarding/\n|   |-- index.md\n|   `-- <role-or-team>.md\n|-- decisions/\n|   |-- index.md\n|   `-- YYYY-MM-DD-short-title.md\n|-- policies/\n|   |-- index.md\n|   `-- <policy>.md\n|-- glossary.md\n`-- maintenance.md\n```\n\nAdapt the structure to the company. Skip sections that do not have real content. Add sections only when they match how the organization works.\n\n## Page Patterns\n\nUse the right pattern for the job.\n\n### Handbook Page\n\nUse for stable company expectations, principles, or operating norms.\n\nInclude:\n\n- purpose\n- who it applies to\n- the current rule or practice\n- examples or edge cases\n- owner\n- last reviewed date\n- related pages\n\n### Team Page\n\nUse for a team, function, pod, working group, or department.\n\nInclude:\n\n- what the team owns\n- who the team serves\n- key responsibilities\n- decision rights\n- recurring rituals\n- current systems or tools\n- how to request help\n- owner or maintainer\n- related teams and pages\n\n### Process Page\n\nUse for repeatable work someone needs to do correctly.\n\nInclude:\n\n- when to use the process\n- when not to use it\n- prerequisites\n- roles and responsibilities\n- steps\n- expected output\n- common failures\n- escalation path\n- owner\n- review cadence\n\n### Onboarding Page\n\nUse for a role, team, location, or company-wide onboarding path.\n\nInclude:\n\n- first-day essentials\n- first-week goals\n- first-month goals\n- accounts and access needed, by name only\n- people to meet\n- documents to read\n- first useful tasks\n- success signals\n- who to ask for help\n\n### Decision Record\n\nUse for decisions that people will need to understand later.\n\nInclude:\n\n- date\n- status: proposed, accepted, superseded, or retired\n- decision\n- context\n- options considered\n- consequences\n- owner\n- links to related work\n\n## Source Handling\n\nTreat company documentation as a trust surface.\n\n- Prefer existing source-of-truth material over memory or guesses.\n- If source material conflicts, preserve the conflict and ask for resolution instead of silently choosing one.\n- Do not include private personal details, compensation details, medical details, legal claims, customer secrets, credentials, or sensitive HR information unless the user explicitly asks and the destination is appropriate.\n- For policies, compliance, legal, finance, security, HR, or benefits docs, mark drafts as needing review by the appropriate owner.\n- Use source links or citations when the destination supports them.\n- When converting informal notes into docs, separate facts, decisions, open questions, and opinions.\n\n## Maintenance Rules\n\nEvery durable page should have enough metadata for future readers to trust it:\n\n```markdown\nOwner: Team or person\nStatus: Draft | Active | Needs review | Archived\nLast reviewed: YYYY-MM-DD\nNext review: YYYY-MM-DD or TBD\nSource of truth: Link, file path, or \"This page\"\n```\n\nDo not overdo metadata for throwaway drafts. Use it for pages people will rely on.\n\n## Quality Bar\n\nBefore finishing, check:\n\n- the page has a clear audience and purpose\n- a reader can tell whether the page is current\n- ownership is named or explicitly missing\n- the title matches likely search terms\n- acronyms and company jargon are explained\n- steps are actionable\n- related pages are linked\n- private or sensitive details were not exposed accidentally\n- drafts that require review are labeled\n- there is no fake certainty where the source is weak\n\n## Final Response\n\nWhen reporting back, include:\n\n- what was created or changed\n- where the docs live\n- key assumptions\n- owners or reviewers still needed\n- sensitive areas deliberately avoided\n- the next highest-leverage documentation gap\n"
   },
+  {
+    "id": "skill-authoring",
+    "slug": "skill-authoring",
+    "name": "Skill Authoring",
+    "summary": "Create portable agent skills with strong trigger metadata, focused instructions, resources, safety boundaries, and validation.",
+    "description": "Create or improve portable agent skills with clear trigger metadata, focused instructions, bundled resources, safety boundaries, and real validation. Use when writing, reviewing, refactoring, packaging, or publishing a SKILL.md skill for PapiSkill, Codex, Claude Code, Factory, GitHub Copilot, Cursor, VS Code, or another agent runtime.",
+    "registryKind": "global",
+    "visibility": "public",
+    "author": "yaacovcorcos",
+    "compatibleWith": [
+      "codex",
+      "claude-code",
+      "cursor",
+      "generic-agent"
+    ],
+    "tags": [
+      "skills",
+      "authoring",
+      "documentation",
+      "agent-skills",
+      "validation"
+    ],
+    "categories": [
+      "documentation"
+    ],
+    "installCommand": "papiskill install official/skill-authoring",
+    "starCount": 0,
+    "commentCount": 0,
+    "markdown": "---\nname: skill-authoring\ndescription: Create or improve portable agent skills with clear trigger metadata, focused instructions, bundled resources, safety boundaries, and real validation. Use when writing, reviewing, refactoring, packaging, or publishing a SKILL.md skill for PapiSkill, Codex, Claude Code, Factory, GitHub Copilot, Cursor, VS Code, or another agent runtime.\n---\n\n# Skill Authoring\n\nUse this skill to create, improve, review, or package an agent skill.\n\nA good skill gives a capable agent the missing procedural knowledge it needs to do a repeatable job well. It should not micromanage obvious reasoning, restate generic best practices, or bury the agent in ceremony.\n\n## Core Judgment\n\nWrite for an intelligent agent with limited context.\n\nThe skill should answer:\n\n- what reusable capability this adds\n- when the agent should load it\n- what source material or tools it needs\n- what workflow or judgment it should follow\n- what outputs or evidence prove the work is complete\n- what actions are unsafe without explicit user approval\n\nIf a section would not change agent behavior, remove it.\n\n## PapiSkill Package Policy\n\nA PapiSkill package contains:\n\n```text\nskill-name/\n|-- skill.yml\n`-- SKILL.md\n```\n\nOptional directories:\n\n```text\ndocs/\nexamples/\nscripts/\nassets/\n```\n\nUse `skill.yml` as PapiSkill's canonical registry metadata. Use `SKILL.md` as the portable runtime entry point.\n\nOfficial PapiSkill skills should include minimal `SKILL.md` frontmatter for cross-runtime compatibility:\n\n```markdown\n---\nname: skill-name\ndescription: What the skill does. Use when the user asks for specific trigger cases, file types, tools, or workflows.\n---\n```\n\nKeep `SKILL.md` frontmatter minimal and portable. Put richer registry fields such as license, categories, tags, compatibility, install targets, source URL, and maintainers in `skill.yml`.\n\n## Start With Real Use\n\nBefore writing, understand the skill from concrete examples.\n\nCollect enough to know:\n\n- typical user requests that should trigger the skill\n- near-miss requests that should not trigger it\n- expected output or artifact\n- required tools, files, data, accounts, or runtime permissions\n- likely failure modes\n- whether the skill is broad reusable expertise, a precise workflow, or both\n\nAsk the user only for answers that change scope, safety, output, or required resources. If the missing detail is minor, make a reasonable assumption and label it.\n\n## Decide Whether This Should Be A Skill\n\nCreate a skill when the workflow is repeatable and benefits from reusable instructions, resources, or safety boundaries.\n\nGood skill candidates:\n\n- repeated workflows users keep pasting into chat\n- team or project conventions that should be followed consistently\n- domain knowledge an agent would not reliably infer\n- workflows involving bundled templates, scripts, schemas, or references\n- tasks where validation or safety gates matter\n\nPoor skill candidates:\n\n- one-off tasks\n- generic advice the model already knows\n- broad personality instructions\n- raw product docs with no workflow\n- tool access that belongs in MCP, OAuth, an API integration, or a plugin\n\nUse skills to teach how work should be done. Use MCP/tools to connect to external systems. Use app or agent configuration to control model, permissions, or global behavior.\n\n## Write The Trigger Contract\n\nThe description is the most important part of the skill. Many runtimes load only the skill name and description before deciding whether to read the full body.\n\nA strong description:\n\n- starts with the capability\n- includes concrete trigger words and contexts\n- names important exclusions when confusion is likely\n- front-loads the key terms in case the runtime truncates long descriptions\n- avoids summarizing process steps the agent might follow instead of loading the skill\n\nGood:\n\n```yaml\ndescription: Review local code changes for bugs, regressions, missing tests, and risky assumptions. Use when asked to review a diff, pull request, patch, branch, or uncommitted workspace changes before promotion.\n```\n\nWeak:\n\n```yaml\ndescription: Helps with code.\n```\n\nFor PapiSkill, keep `skill.yml.summary` human-facing and concise. Put the full trigger contract in both `skill.yml.description` and `SKILL.md` frontmatter `description`.\n\n## Set The Right Degree Of Freedom\n\nDo not make every skill a rigid checklist.\n\nChoose the level of control based on fragility:\n\n- high freedom: judgment-heavy writing, research, design, planning, review\n- medium freedom: preferred workflows with room for local adaptation\n- low freedom: fragile, repetitive, deterministic, or dangerous operations\n\nUse prose for judgment. Use checklists for workflows where steps are easy to skip. Use scripts for deterministic work.\n\n## Structure SKILL.md\n\nPrefer this shape, adapting headings when another structure reads better:\n\n```markdown\n# Skill Name\n\nUse this skill when...\n\n## Core Judgment\n\nWhat matters most.\n\n## Workflow\n\nThe main process.\n\n## Resources\n\nWhen to read or run supporting files.\n\n## Safety\n\nActions that require care or approval.\n\n## Verification\n\nEvidence that the skill worked.\n```\n\nInclude \"when not to use\" only when the boundary is likely to be confused.\n\nDo not add sections just because a template has them.\n\n## Progressive Disclosure\n\nKeep the main `SKILL.md` focused. Move detailed or conditional material into supporting files when it would distract from the core workflow.\n\nUse one-level-deep references from `SKILL.md`:\n\n```markdown\nFor provider-specific setup, read [docs/aws.md](docs/aws.md) or [docs/gcp.md](docs/gcp.md) only when that provider is relevant.\n```\n\nGood reasons to split files:\n\n- long reference material\n- multiple domains or providers\n- rarely used advanced behavior\n- templates or examples\n- scripts the agent should run rather than rewrite\n\nBad reasons to split files:\n\n- copying a boilerplate directory shape\n- hiding essential instructions\n- creating README, changelog, install guide, or extra docs that do not affect agent behavior\n\nEvery supporting file must be discoverable from `SKILL.md` with a clear \"read this when...\" condition.\n\n## Bundled Resources\n\nUse resources intentionally.\n\n### `docs/`\n\nUse for source reviews, policy notes, schemas, detailed references, or long examples that should be read only when relevant.\n\n### `examples/`\n\nUse when output shape, trigger behavior, or edge cases are easy to misunderstand.\n\nInclude compact examples of:\n\n- user request\n- what the skill should do\n- expected output shape\n- mistakes to avoid\n\n### `scripts/`\n\nUse scripts when the operation is deterministic, repetitive, fragile, or easier to verify in code.\n\nScripts must be inspectable and tested. Do not include scripts that contact external services, mutate production, or handle credentials unless the skill clearly documents the risk and requires user approval.\n\n### `assets/`\n\nUse for templates, sample files, images, starter projects, or other files the agent should copy or transform. Assets are not instructions; explain in `SKILL.md` when to use them.\n\n## Safety Policy\n\nBefore publishing, classify the skill's risk.\n\nLook for:\n\n- shell commands or scripts\n- file writes outside the current project\n- network calls or downloads\n- credentials, tokens, secrets, SSH keys, private URLs, or API keys\n- private company, customer, medical, legal, financial, or personal data\n- production deploys, deletes, migrations, billing, messages, or notifications\n- dependency installation or supply-chain risk\n\nIf the skill can cause side effects, state what requires explicit user approval.\n\nIf the skill includes scripts or external resources, treat it like installable software. Users should be able to inspect what it does before running it.\n\n## Portability Review\n\nA portable skill should not assume one agent runtime unless it declares that dependency.\n\nCheck compatibility with:\n\n- PapiSkill package contract: `skill.yml` plus `SKILL.md`\n- common skill frontmatter: `name` and `description`\n- lowercase hyphenated skill name matching the directory\n- relative links to bundled files\n- no hard dependency on Codex, Claude Code, Factory, Copilot, Cursor, VS Code, or another runtime unless stated\n- graceful behavior when optional tools are missing\n\nRuntime-specific features such as invocation controls, subagent execution, pre-approved tools, or dynamic context can be mentioned as optional notes, not required for the portable core.\n\n## Validation And Forward Testing\n\nDo not trust a skill because it looks good.\n\nMinimum validation:\n\n- package parses\n- `skill.yml` matches directory and `SKILL.md` frontmatter\n- required files exist\n- links to bundled files resolve\n- scripts, if any, run on representative input\n- no placeholder text remains\n- safety risks are documented\n\nForward-test important skills with realistic prompts:\n\n1. Give a fresh agent the skill and a realistic task.\n2. Do not leak the intended answer or your critique.\n3. Review whether the skill triggered, what it read, what it skipped, and what output it produced.\n4. Update the skill based on real failure modes.\n\nFor high-risk or public official skills, test at least:\n\n- a normal request\n- a near-miss request that should not trigger\n- an edge case that stresses safety or output quality\n\n## Review Checklist\n\nBefore publishing, verify:\n\n- the skill solves a repeatable real problem\n- `name` is short, lowercase, and hyphenated\n- description includes both capability and trigger conditions\n- `skill.yml` and `SKILL.md` frontmatter agree\n- `SKILL.md` is focused enough to inspect quickly\n- supporting files are referenced directly from `SKILL.md`\n- examples exist when behavior is easy to misunderstand\n- scripts exist only when they improve reliability\n- safety risks and approval gates are explicit\n- the skill avoids secrets, private URLs, and organization-only assumptions unless scoped as private\n- validation and forward-testing results are recorded or summarized\n\n## Final Response\n\nWhen creating or improving a skill, report:\n\n- skill name and path\n- what changed\n- source or policy decisions used\n- validation run\n- forward-testing performed or deliberately skipped\n- remaining risks or open questions\n"
+  },
+  {
+    "id": "software-development-documentation",
+    "slug": "software-development-documentation",
+    "name": "Software Development Documentation",
+    "summary": "Create source-backed engineering docs for codebases, architecture, setup, testing, releases, and operations.",
+    "description": "A portable documentation skill for generating and maintaining practical software development documentation from repository evidence, including architecture, setup, testing, debugging, deployment, security, APIs, and contributor workflows.",
+    "registryKind": "global",
+    "visibility": "public",
+    "author": "yaacovcorcos",
+    "compatibleWith": [
+      "codex",
+      "claude-code",
+      "cursor",
+      "generic-agent"
+    ],
+    "tags": [
+      "software-docs",
+      "repo-wiki",
+      "architecture",
+      "onboarding",
+      "api-docs"
+    ],
+    "categories": [
+      "documentation",
+      "coding"
+    ],
+    "installCommand": "papiskill install official/software-development-documentation",
+    "starCount": 0,
+    "commentCount": 0,
+    "markdown": "---\nname: software-development-documentation\ndescription: Create source-backed software documentation for codebases, architecture, setup, testing, debugging, deployment, APIs, security, and operations. Use when documenting, auditing, updating, or organizing engineering docs for a software project or repository.\n---\n\n# Software Development Documentation\n\nUse this skill when the user wants to create, update, audit, or organize documentation for a software project: repository wiki, architecture docs, setup guide, contributor guide, testing docs, debugging guide, deployment runbook, API overview, security notes, operational docs, or developer onboarding.\n\nThis skill is for software development documentation. For company handbooks, policies, people operations, team rituals, or non-code operating knowledge, prefer a company documentation skill.\n\n## Core Judgment\n\nWrite docs that help a developer or agent safely understand, change, run, test, and operate the system.\n\nDo not turn the work into template theater. Use the structure below as a map, not a cage. Skip sections that are not supported by source evidence. Add sections when the repo makes them necessary.\n\nAsk questions only when a missing answer changes the output location, audience, privacy boundary, or write permission. Otherwise, inspect the repository, make reasonable assumptions, and label uncertainty.\n\n## Non-Negotiables\n\n- Base factual claims on source evidence.\n- Prefer repo-root-relative file paths for code claims.\n- Do not invent architecture, commands, environment variables, endpoints, or deployment steps.\n- Do not include secret values, private data, customer data, raw logs, or credentials.\n- Do not publish, upload, commit, stage, push, or sync generated docs unless the user explicitly asks.\n- Keep docs portable across agent setups and developer tools.\n- Make it clear when a page is draft, stale, incomplete, or based on weak evidence.\n\n## First Pass\n\nBefore writing, inspect the repository enough to understand:\n\n- product purpose\n- languages and frameworks\n- apps, packages, services, or modules\n- entry points\n- install, run, build, lint, test, and typecheck commands\n- configuration and environment variable names\n- data models and storage\n- API surfaces\n- auth and permission boundaries\n- deployment and release paths\n- monitoring or support surfaces\n- existing documentation style\n- repo instructions such as `AGENTS.md`, `CLAUDE.md`, `.cursorrules`, `.github/`, `.factory/`, `.codex/`, or equivalent files\n\nUse fast source discovery first. Then read the files that actually establish behavior.\n\n## Output Shape\n\nIf the user did not name an output location, prefer a local documentation directory that does not disrupt existing docs:\n\n```text\nrepo-wiki/\n|-- index.md\n|-- overview.md\n|-- architecture.md\n|-- getting-started.md\n|-- development-workflow.md\n|-- testing.md\n|-- debugging.md\n|-- configuration.md\n|-- data-models.md\n|-- dependencies.md\n|-- decisions.md\n|-- maintainers.md\n`-- .wiki-meta.json\n```\n\nAdd these only when the repository supports them:\n\n```text\napi/\ndeployment.md\nsecurity.md\noperations.md\nobservability.md\nbackground.md\ntroubleshooting.md\ncleanup-opportunities.md\n```\n\nIf the repo already has `docs/`, a GitHub wiki, a MkDocs/Docusaurus site, a README-driven structure, or a company standard, adapt to that structure instead of creating a parallel one.\n\n## Page Guidance\n\n### `index.md`\n\nWrite the entry point for humans and agents:\n\n- what the project is\n- who uses it\n- most important links\n- safest first commands\n- main source areas\n- current doc status and known gaps\n\n### `overview.md`\n\nExplain the system in 3-8 paragraphs:\n\n- product or library purpose\n- user-facing or developer-facing capabilities\n- important runtime surfaces\n- what is out of scope\n- links to deeper pages\n\n### `architecture.md`\n\nExplain how the system is put together:\n\n- major components\n- how data or control flows between them\n- process boundaries\n- storage and external services\n- important abstractions\n- source paths for each claim\n- diagrams only when they clarify the structure\n\n### `getting-started.md`\n\nHelp a new developer reach a working local state:\n\n- prerequisites\n- install commands\n- required environment variable names with placeholder values only\n- local run commands\n- first verification commands\n- common first-run failures\n\nDo not claim a command works unless you ran it or clearly mark it as inferred.\n\n### `development-workflow.md`\n\nDocument how changes normally move:\n\n- branch or PR expectations\n- where to edit common areas\n- validation commands\n- review expectations\n- generated files\n- release or merge notes\n\n### `testing.md`\n\nDocument the test system:\n\n- test frameworks\n- commands\n- fixture and mock patterns\n- important coverage areas\n- known gaps\n- how to add a test for common change types\n\n### `debugging.md`\n\nDocument how to investigate failures:\n\n- logs and local diagnostics\n- common error modes\n- useful search commands\n- database or service inspection paths\n- safe reset steps\n\nGate destructive reset steps behind explicit user approval.\n\n### `configuration.md`\n\nDocument configuration sources:\n\n- environment variable names, never values\n- config files\n- defaults\n- where each config is read\n- production versus local differences\n\n### `data-models.md`\n\nDocument data shapes:\n\n- database schemas and migrations\n- ORM models\n- serialized API shapes\n- important domain types\n- ownership and privacy rules\n\n### `api/`\n\nCreate API docs when the repo exposes REST, GraphQL, RPC, WebSocket, CLI, package, plugin, or webhook interfaces.\n\nFor each API surface, include:\n\n- purpose\n- authentication and authorization expectations\n- endpoint, command, function, or event shape\n- request and response examples if source-backed\n- error behavior\n- versioning or compatibility notes\n- source paths\n\nFor full HTTP API reference work, prefer OpenAPI-compatible structure when possible. If no OpenAPI description exists, do not pretend one does; document the observed source-backed contract and suggest creating one.\n\n### `deployment.md`\n\nCreate deployment docs only when source evidence exists:\n\n- hosting platform\n- build commands\n- migration order\n- environment variable names\n- release steps\n- rollback notes\n- smoke checks\n\n### `security.md`\n\nCreate security docs when the repo has auth, permissions, tokens, secrets, payments, file access, network calls, personal data, customer data, healthcare data, or other trust boundaries.\n\nInclude:\n\n- trust boundaries\n- sensitive data types\n- auth and authorization checks\n- secret handling by name only\n- dangerous operations\n- review checklist for risky changes\n\n## Freshness and Metadata\n\nFor generated documentation sets, write metadata that lets the next maintainer know what happened:\n\n```json\n{\n  \"generatedAt\": \"YYYY-MM-DDTHH:mm:ss.sssZ\",\n  \"generator\": \"software-development-documentation skill\",\n  \"commitHash\": \"FULL_GIT_SHA or unknown\",\n  \"branch\": \"BRANCH or unknown\",\n  \"mode\": \"full | incremental | audit\",\n  \"sourceRoots\": [],\n  \"pageCount\": 0,\n  \"warnings\": []\n}\n```\n\nWhen updating existing docs, prefer incremental changes. Read the existing pages first, preserve useful human-authored context, and update only what changed.\n\n## Quality Review\n\nBefore finishing, check:\n\n- every important claim has a source path, command output, or explicit uncertainty label\n- commands are marked as verified or inferred\n- secret values are absent\n- private/runtime/generated paths are not accidentally documented as source truth\n- internal links resolve when practical to check\n- docs match existing project terminology\n- API, deployment, security, and operations sections are included only when source-backed\n- the result helps a new developer or agent do real work\n- remaining gaps are named plainly\n\n## Final Response\n\nReport:\n\n- output path or files changed\n- mode: create, update, audit, or plan\n- most important pages created or improved\n- verification performed\n- unverified assumptions\n- sensitive areas avoided\n- next documentation gap worth fixing\n"
+  }
 ];

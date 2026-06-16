@@ -52,6 +52,7 @@ Run from repo root unless a command says otherwise.
 | Prisma migrate dev | `npm run db:migrate` |
 | Prisma migration status | `npm run db:status` |
 | Prisma migrate production | `npm run db:deploy` |
+| Generate web registry | `npm run registry:generate` |
 | Validate registry | `npm run registry:validate` |
 
 ## Quality Bar

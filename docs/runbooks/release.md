@@ -6,6 +6,7 @@ Run from repo root:
 
 ```bash
 npm install
+npm run registry:generate
 npm run check
 ```
 
