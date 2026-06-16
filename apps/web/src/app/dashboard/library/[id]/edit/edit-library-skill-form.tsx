@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useActionState } from "react";
 import { Download, ExternalLink, Save } from "lucide-react";
 import { CopyButton } from "@/components/copy-button";
+import { FormFeedback } from "@/components/form-feedback";
 import { SkillMarkdownEditor } from "@/components/skill-markdown-editor";
 import { saveForkAction, type SaveForkActionIssue, type SaveForkActionState } from "../../../actions";
 
@@ -42,6 +43,7 @@ export function EditLibrarySkillForm({
 }: EditLibrarySkillFormProps) {
   const [state, action, pending] = useActionState(saveForkAction, initialState);
   const issues = state.issues ?? initialIssues;
+  const feedbackId = state.error || state.ok ? "library-skill-feedback" : undefined;
 
   return (
     <>
@@ -66,19 +68,19 @@ export function EditLibrarySkillForm({
         </div>
       </div>
 
-      <form action={action} className="grid gap-6 lg:grid-cols-[360px_1fr]">
+      <form action={action} aria-describedby={feedbackId} className="grid gap-6 lg:grid-cols-[360px_1fr]">
         <input type="hidden" name="forkId" value={fork.id} />
         <aside className="space-y-5">
           <section className="space-y-4 rounded-lg border border-border bg-white p-5 shadow-sm">
             {state.error ? (
-              <div className="rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm font-medium text-red-800">
+              <FormFeedback id="library-skill-feedback" kind="error" className="rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm font-medium">
                 {state.error}
-              </div>
+              </FormFeedback>
             ) : null}
             {state.ok ? (
-              <div className="rounded-md border border-emerald-200 bg-emerald-50 px-3 py-2 text-sm font-medium text-emerald-800">
+              <FormFeedback id="library-skill-feedback" kind="success" className="rounded-md border border-emerald-200 bg-emerald-50 px-3 py-2 text-sm font-medium">
                 Saved and validated.
-              </div>
+              </FormFeedback>
             ) : null}
 
             <Field label="Name" name="name" defaultValue={fork.name} required />

@@ -92,8 +92,9 @@ The UI has semantic forms, labels, and icon button labels in core places, but st
 
 - shared header now provides a skip-to-content link on AppHeader-backed pages
 - public registry search, filters, sort links, cards, and icon actions now share a visible focus style
+- comment, token, profile, and library-skill save feedback now use explicit live-region roles
 - screen reader labels for all icon-only controls
-- form error announcement on save/comment/token actions
+- broader screen-reader and editor traversal pass still needed before calling accessibility complete
 
 ### Sidebar and filters
 

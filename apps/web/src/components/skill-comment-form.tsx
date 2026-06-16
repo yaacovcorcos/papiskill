@@ -5,6 +5,7 @@ import {
   createCommentAction,
   type CommentActionState,
 } from "@/app/skills/engagement-actions";
+import { FormFeedback } from "@/components/form-feedback";
 
 const initialState: CommentActionState = {};
 
@@ -27,14 +28,14 @@ export function CommentForm({ reference }: { reference: string }) {
         className="mt-3 w-full resize-y rounded-md border border-border px-3 py-2 text-sm leading-6 outline-none focus:border-accent"
       />
       {state.error ? (
-        <p className="mt-2 text-sm font-medium text-red-700" role="alert">
+        <FormFeedback id="comment-feedback" kind="error">
           {state.error}
-        </p>
+        </FormFeedback>
       ) : null}
       {state.ok ? (
-        <p className="mt-2 text-sm font-medium text-emerald-700" role="status">
+        <FormFeedback id="comment-feedback" kind="success">
           Comment posted.
-        </p>
+        </FormFeedback>
       ) : null}
       <div className="mt-3 flex justify-end">
         <button

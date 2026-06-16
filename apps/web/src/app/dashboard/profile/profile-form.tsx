@@ -1,6 +1,7 @@
 "use client";
 
 import { useActionState } from "react";
+import { FormFeedback } from "@/components/form-feedback";
 import { updateProfileAction, type ProfileActionState } from "../actions";
 
 interface ProfileFormProps {
@@ -17,9 +18,10 @@ const initialState: ProfileActionState = {};
 
 export function ProfileForm({ profile }: ProfileFormProps) {
   const [state, action, pending] = useActionState(updateProfileAction, initialState);
+  const feedbackId = state.ok || state.error ? "profile-feedback" : undefined;
 
   return (
-    <form action={action} className="grid gap-6 lg:grid-cols-[360px_1fr]">
+    <form action={action} aria-describedby={feedbackId} className="grid gap-6 lg:grid-cols-[360px_1fr]">
       <section className="rounded-lg border border-border bg-white p-5 shadow-sm">
         <h2 className="text-lg font-semibold">Identity</h2>
         <p className="mt-2 text-sm leading-6 text-muted">Your handle is used in public skill URLs and CLI install references.</p>
@@ -45,8 +47,16 @@ export function ProfileForm({ profile }: ProfileFormProps) {
           <button disabled={pending} type="submit" className="rounded-md bg-slate-950 px-4 py-2 text-sm font-semibold text-white hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-60">
             {pending ? "Saving..." : "Save profile"}
           </button>
-          {state.ok ? <span className="text-sm font-medium text-emerald-700">Saved.</span> : null}
-          {state.error ? <span className="text-sm font-medium text-red-700">{state.error}</span> : null}
+          {state.ok ? (
+            <FormFeedback id="profile-feedback" kind="success" className="text-sm font-medium">
+              Saved.
+            </FormFeedback>
+          ) : null}
+          {state.error ? (
+            <FormFeedback id="profile-feedback" kind="error" className="text-sm font-medium">
+              {state.error}
+            </FormFeedback>
+          ) : null}
         </div>
 
         <div className="mt-8 rounded-md border border-border bg-surface-subtle p-4">
