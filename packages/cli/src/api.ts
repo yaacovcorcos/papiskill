@@ -23,6 +23,13 @@ const apiSkillDetailSchema = apiSkillSummarySchema.extend({
 export type ApiSkillSummary = z.infer<typeof apiSkillSummarySchema>;
 export type ApiSkillDetail = z.infer<typeof apiSkillDetailSchema>;
 
+export function installReferenceForSkill(skill: ApiSkillSummary): string {
+  if (skill.registryKind === "global") return `official/${skill.slug}`;
+  if (skill.registryKind === "community") return `community/${skill.slug}`;
+  if (skill.registryKind === "profile" && skill.author) return `${skill.author}/${skill.slug}`;
+  return `${skill.registryKind}/${skill.slug}`;
+}
+
 export async function searchSkills(config: CliConfig, query: string): Promise<ApiSkillSummary[]> {
   const url = new URL("/api/v1/skills", config.apiUrl);
   if (query) {

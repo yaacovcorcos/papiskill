@@ -2,7 +2,7 @@
 import { readFile } from "node:fs/promises";
 import { Command } from "commander";
 import { readSkillPackageFromDirectory, validateSkillPackage, type AgentTarget } from "@papiskill/skill-core";
-import { getSkill, getMe, searchSkills } from "./api.js";
+import { getSkill, getMe, installReferenceForSkill, searchSkills } from "./api.js";
 import { clearConfig, defaultApiUrl, readConfig, writeConfig } from "./config.js";
 import { installSkill } from "./install.js";
 import { getInstalledSkill, getInstalledSkills, recordInstall } from "./manifest.js";
@@ -22,7 +22,7 @@ program.command("search")
     const config = await commandConfig();
     const skills = await searchSkills(config, query);
     for (const skill of skills) {
-      console.log(`${skill.registryKind}/${skill.slug}\t${skill.name}\t${skill.summary}`);
+      console.log(`${installReferenceForSkill(skill)}\t${skill.name}\t${skill.summary}`);
     }
   });
 
@@ -32,7 +32,7 @@ program.command("info")
   .action(async (reference: string) => {
     const config = await commandConfig();
     const skill = await getSkill(config, reference);
-    console.log(`${skill.registryKind}/${skill.slug}`);
+    console.log(installReferenceForSkill(skill));
     console.log(skill.name);
     console.log(skill.summary);
     console.log(`Compatible with: ${skill.compatibleWith.join(", ")}`);
@@ -60,7 +60,7 @@ program.command("install")
       files: skill.files.map((file) => file.path),
       installedAt: new Date().toISOString(),
     });
-    console.log(`Installed ${skill.registryKind}/${skill.slug} to ${directory}`);
+    console.log(`Installed ${installReferenceForSkill(skill)} to ${directory}`);
   });
 
 program.command("installed")
