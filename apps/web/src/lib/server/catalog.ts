@@ -1,4 +1,4 @@
-import { SkillRegistryKind, SkillVisibility } from "@prisma/client";
+import { SkillCommentStatus, SkillRegistryKind, SkillVisibility } from "@prisma/client";
 import { getPrisma } from "./prisma";
 import { generatedRegistry } from "./generated-registry";
 import {
@@ -20,6 +20,8 @@ export interface CatalogSkill {
   categories: string[];
   installCommand: string;
   markdown?: string;
+  starCount: number;
+  commentCount: number;
 }
 
 export interface CatalogFilters {
@@ -112,6 +114,12 @@ export async function getCatalogSkills(
                   ? { where: { path: "SKILL.md" }, take: 1 }
                   : false,
                 owner: { include: { profile: true } },
+                _count: {
+                  select: {
+                    stars: true,
+                    comments: { where: { status: SkillCommentStatus.VISIBLE } },
+                  },
+                },
               },
               orderBy: [{ registryKind: "asc" }, { updatedAt: "desc" }],
               take: 80,
@@ -125,6 +133,12 @@ export async function getCatalogSkills(
                   ? { where: { path: "SKILL.md" }, take: 1 }
                   : false,
                 owner: { include: { profile: true } },
+                _count: {
+                  select: {
+                    stars: true,
+                    comments: { where: { status: SkillCommentStatus.VISIBLE } },
+                  },
+                },
               },
               orderBy: { updatedAt: "desc" },
               take: 80,
@@ -145,6 +159,8 @@ export async function getCatalogSkills(
             ...(includeMarkdown
               ? { markdown: skill.files.at(0)?.content ?? "" }
               : {}),
+            starCount: skill._count.stars,
+            commentCount: skill._count.comments,
           };
         }),
         ...forks.map((fork) => {
@@ -158,6 +174,8 @@ export async function getCatalogSkills(
             ...(includeMarkdown
               ? { markdown: fork.files.at(0)?.content ?? "" }
               : {}),
+            starCount: fork._count.stars,
+            commentCount: fork._count.comments,
           };
         }),
       ];

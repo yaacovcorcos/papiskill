@@ -27,23 +27,30 @@ enum DownloadSubjectType {
   FORK
 }
 
+enum SkillCommentStatus {
+  VISIBLE
+  HIDDEN
+  DELETED
+}
+
 model User {
-  id              String      @id @default(cuid())
-  name            String
-  email           String      @unique
-  emailVerified   Boolean     @default(false)
-  image           String?
-  isCurator       Boolean     @default(false)
-  createdAt       DateTime    @default(now())
-  updatedAt       DateTime    @updatedAt
-  sessions        Session[]
-  accounts        Account[]
-  profile         Profile?
-  ownedSkills     Skill[]     @relation("SkillOwner")
-  forks           SkillFork[]
-  stars           SkillStar[]
-  apiTokens       ApiToken[]
-  downloads       DownloadEvent[]
+  id            String          @id @default(cuid())
+  name          String
+  email         String          @unique
+  emailVerified Boolean         @default(false)
+  image         String?
+  isCurator     Boolean         @default(false)
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
+  sessions      Session[]
+  accounts      Account[]
+  profile       Profile?
+  ownedSkills   Skill[]         @relation("SkillOwner")
+  forks         SkillFork[]
+  stars         SkillStar[]
+  comments      SkillComment[]
+  apiTokens     ApiToken[]
+  downloads     DownloadEvent[]
 
   @@index([createdAt])
   @@index([isCurator, createdAt])
@@ -142,6 +149,7 @@ model Skill {
   files          SkillFile[]
   validations    SkillValidation[]
   stars          SkillStar[]
+  comments       SkillComment[]
   downloads      DownloadEvent[]
   forks          SkillFork[]
 
@@ -190,36 +198,38 @@ model SkillValidation {
 }
 
 model SkillFork {
-  id             String          @id @default(cuid())
-  ownerId        String
-  sourceSkillId  String?
-  sourceForkId   String?
-  sourceReference String?
-  sourceVersion  String?
+  id                String                @id @default(cuid())
+  ownerId           String
+  sourceSkillId     String?
+  sourceForkId      String?
+  sourceReference   String?
+  sourceVersion     String?
   sourcePackageHash String?
-  slug           String
-  name           String
-  summary        String
-  description    String
-  visibility     SkillVisibility @default(PRIVATE)
-  version        String          @default("0.1.0")
-  license        String          @default("MIT")
-  categories     String[]
-  tags           String[]
-  compatibleWith String[]
-  installTargets Json            @default("{}")
-  createdAt      DateTime        @default(now())
-  updatedAt      DateTime        @updatedAt
-  lastValidatedAt DateTime?
-  archivedAt     DateTime?
-  publishedAt    DateTime?
-  owner          User            @relation(fields: [ownerId], references: [id], onDelete: Cascade)
-  sourceSkill    Skill?          @relation(fields: [sourceSkillId], references: [id], onDelete: SetNull)
-  sourceFork     SkillFork?      @relation("ForkSource", fields: [sourceForkId], references: [id], onDelete: SetNull)
-  derivedForks   SkillFork[]     @relation("ForkSource")
-  files          SkillForkFile[]
-  validations    SkillForkValidation[]
-  downloads      DownloadEvent[]
+  slug              String
+  name              String
+  summary           String
+  description       String
+  visibility        SkillVisibility       @default(PRIVATE)
+  version           String                @default("0.1.0")
+  license           String                @default("MIT")
+  categories        String[]
+  tags              String[]
+  compatibleWith    String[]
+  installTargets    Json                  @default("{}")
+  createdAt         DateTime              @default(now())
+  updatedAt         DateTime              @updatedAt
+  lastValidatedAt   DateTime?
+  archivedAt        DateTime?
+  publishedAt       DateTime?
+  owner             User                  @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  sourceSkill       Skill?                @relation(fields: [sourceSkillId], references: [id], onDelete: SetNull)
+  sourceFork        SkillFork?            @relation("ForkSource", fields: [sourceForkId], references: [id], onDelete: SetNull)
+  derivedForks      SkillFork[]           @relation("ForkSource")
+  files             SkillForkFile[]
+  validations       SkillForkValidation[]
+  stars             SkillStar[]
+  comments          SkillComment[]
+  downloads         DownloadEvent[]
 
   @@unique([ownerId, slug])
   @@index([ownerId, archivedAt, updatedAt])
@@ -255,15 +265,37 @@ model SkillForkValidation {
 }
 
 model SkillStar {
-  id        String   @id @default(cuid())
+  id        String     @id @default(cuid())
   userId    String
-  skillId   String
-  createdAt DateTime @default(now())
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  skill     Skill    @relation(fields: [skillId], references: [id], onDelete: Cascade)
+  skillId   String?
+  forkId    String?
+  createdAt DateTime   @default(now())
+  user      User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  skill     Skill?     @relation(fields: [skillId], references: [id], onDelete: Cascade)
+  fork      SkillFork? @relation(fields: [forkId], references: [id], onDelete: Cascade)
 
   @@unique([userId, skillId])
+  @@unique([userId, forkId])
   @@index([skillId, createdAt])
+  @@index([forkId, createdAt])
+}
+
+model SkillComment {
+  id        String             @id @default(cuid())
+  userId    String
+  skillId   String?
+  forkId    String?
+  body      String
+  status    SkillCommentStatus @default(VISIBLE)
+  createdAt DateTime           @default(now())
+  updatedAt DateTime           @updatedAt
+  user      User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  skill     Skill?             @relation(fields: [skillId], references: [id], onDelete: Cascade)
+  fork      SkillFork?         @relation(fields: [forkId], references: [id], onDelete: Cascade)
+
+  @@index([skillId, status, createdAt])
+  @@index([forkId, status, createdAt])
+  @@index([userId, createdAt])
 }
 
 model DownloadEvent {

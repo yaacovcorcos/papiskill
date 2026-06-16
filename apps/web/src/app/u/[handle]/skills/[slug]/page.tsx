@@ -6,8 +6,10 @@ import { ArrowLeft, Download, GitFork, ShieldCheck, Terminal } from "lucide-reac
 import { SkillVisibility } from "@prisma/client";
 import { AppHeader } from "@/components/app-header";
 import { Badge } from "@/components/badge";
+import { SkillEngagementPanel } from "@/components/skill-engagement-panel";
 import { getSessionUser } from "@/lib/server/request-auth";
 import { getPrisma } from "@/lib/server/prisma";
+import { getSkillEngagement } from "@/lib/server/engagement";
 import { getSkillByReference } from "@/lib/server/skills";
 
 export const dynamic = "force-dynamic";
@@ -63,6 +65,8 @@ export default async function UserSkillPage({ params }: { params: Params }) {
   }
 
   const reference = `${handle}/${slug}`;
+  const engagement = await getSkillEngagement(reference, viewer ? { id: viewer.id } : null);
+  const showEngagement = skill.visibility === SkillVisibility.PUBLIC.toLowerCase();
 
   return (
     <>
@@ -87,6 +91,9 @@ export default async function UserSkillPage({ params }: { params: Params }) {
             <section className="prose prose-slate mt-8 max-w-none prose-headings:tracking-tight prose-pre:rounded-lg prose-pre:border prose-pre:border-border prose-pre:bg-slate-50 prose-pre:text-slate-800">
               <ReactMarkdown>{skill.markdown}</ReactMarkdown>
             </section>
+            {showEngagement ? (
+              <SkillEngagementPanel engagement={engagement} viewerSignedIn={Boolean(viewer)} />
+            ) : null}
           </article>
 
           <aside className="lg:sticky lg:top-24 lg:self-start">

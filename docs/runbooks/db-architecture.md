@@ -18,7 +18,7 @@
 | Profiles | `Profile` |
 | Registry | `Skill`, `SkillVersion`, `SkillFile`, `SkillValidation` |
 | User library | `SkillFork`, `SkillForkFile`, `SkillForkValidation` |
-| Engagement | `SkillStar`, `DownloadEvent` |
+| Engagement | `SkillStar`, `SkillComment`, `DownloadEvent` |
 | CLI | `ApiToken` |
 
 ## Invariants
@@ -31,6 +31,8 @@
 - API tokens are stored hashed.
 - Download events must not expose private skill metadata to other users.
 - Skill IDs are lowercase slugs.
+- Stars and comments target exactly one public registry skill or one public profile library skill.
+- Comments are public when `VISIBLE`; deleted comments are retained as rows with `DELETED` status for audit continuity.
 
 ## Schema Change Rules
 

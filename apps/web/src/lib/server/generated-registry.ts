@@ -14,6 +14,8 @@ export const generatedRegistry: CatalogSkill[] = [
     tags: ["review", "testing", "reliability"],
     categories: ["coding"],
     installCommand: "papiskill install official/code-review",
+    starCount: 0,
+    commentCount: 0,
     markdown: `# Code Review
 
 Use this skill when asked to review a code change, pull request, patch, or branch.
@@ -50,6 +52,8 @@ If there are no findings, say that clearly and name any test gaps or residual ri
     tags: ["skills", "authoring", "documentation"],
     categories: ["documentation"],
     installCommand: "papiskill install official/skill-authoring",
+    starCount: 0,
+    commentCount: 0,
     markdown: `# Skill Authoring
 
 Use this skill to create or improve a portable \`SKILL.md\` package.

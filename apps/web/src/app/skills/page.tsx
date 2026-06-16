@@ -7,6 +7,7 @@ import {
   Eye,
   Filter,
   GitFork,
+  MessageSquare,
   Plus,
   Search,
   ShieldCheck,
@@ -17,6 +18,7 @@ import {
 import { AppHeader } from "@/components/app-header";
 import { Badge } from "@/components/badge";
 import { CopyButton } from "@/components/copy-button";
+import { EngagementCounts } from "@/components/skill-engagement-panel";
 import { getCatalogSkills, type CatalogSkill } from "@/lib/server/catalog";
 import { getSkillByReference } from "@/lib/server/skills";
 import { SkillsLayout } from "./skills-layout";
@@ -209,8 +211,13 @@ export default async function SkillsPage({
                   <DetailRow label="License" value="MIT" />
                   <DetailRow
                     label="Stars"
-                    value="Ready for community signals"
+                    value={String(selected.starCount)}
                     icon={<Star className="size-4 text-slate-500" />}
+                  />
+                  <DetailRow
+                    label="Comments"
+                    value={String(selected.commentCount)}
+                    icon={<MessageSquare className="size-4 text-slate-500" />}
                   />
                 </dl>
                 <div className="mt-5">
@@ -419,6 +426,9 @@ export default async function SkillsPage({
                         {skill.tags.map((tag) => (
                           <Badge key={tag}>{tag}</Badge>
                         ))}
+                      </div>
+                      <div className="mt-3">
+                        <EngagementCounts stars={skill.starCount} comments={skill.commentCount} />
                       </div>
                     </div>
                     <ArrowRight

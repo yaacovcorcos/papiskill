@@ -4,6 +4,9 @@ import ReactMarkdown from "react-markdown";
 import { ArrowLeft, Download, GitFork, ShieldCheck, Terminal } from "lucide-react";
 import { AppHeader } from "@/components/app-header";
 import { Badge } from "@/components/badge";
+import { SkillEngagementPanel } from "@/components/skill-engagement-panel";
+import { getSkillEngagement } from "@/lib/server/engagement";
+import { getSessionUser } from "@/lib/server/request-auth";
 import { getSkillByReference } from "@/lib/server/skills";
 
 export const revalidate = 60;
@@ -28,6 +31,8 @@ export default async function SkillDetailPage({
   const skill = await getSkillByReference(requestedReference);
   if (!skill) notFound();
   const referenceId = skillReference(skill);
+  const viewer = process.env.DATABASE_URL ? await getSessionUser().catch(() => null) : null;
+  const engagement = await getSkillEngagement(referenceId, viewer ? { id: viewer.id } : null);
 
   return (
     <>
@@ -54,6 +59,7 @@ export default async function SkillDetailPage({
               <section className="prose prose-slate mt-8 max-w-none prose-headings:tracking-tight prose-pre:rounded-lg prose-pre:border prose-pre:border-border prose-pre:bg-slate-50 prose-pre:text-slate-800">
                 <ReactMarkdown>{skill.markdown}</ReactMarkdown>
               </section>
+              <SkillEngagementPanel engagement={engagement} viewerSignedIn={Boolean(viewer)} />
             </article>
 
             <aside className="lg:sticky lg:top-24 lg:self-start">
