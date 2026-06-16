@@ -2,6 +2,8 @@
 
 Date: 2026-06-16
 
+Superseded by: `docs/reviews/final-production-readiness.md`
+
 ## Gates run
 
 ```bash
@@ -27,11 +29,12 @@ Result: pass with warnings for expected safety-sensitive wording in seed skills.
 
 ## Current warnings
 
-The production build passes but emits one Turbopack trace warning related to the filesystem fallback registry loader used when no `DATABASE_URL` is configured. Production should normally use the database-backed catalog path after migrations and registry indexing. This warning should be revisited before final production completion.
+This document is historical. The current production readiness status is tracked in
+`docs/reviews/final-production-readiness.md`.
 
 ## Not complete yet
 
-This is not final production readiness. Remaining major work:
+At the time this review was written, this was not final production readiness. Remaining major work was:
 
 - create and configure Supabase project/database or apply migrations to selected Supabase project; Supabase connector requires a user organization/cost confirmation before creating a new project
 - run registry indexer against production DB
