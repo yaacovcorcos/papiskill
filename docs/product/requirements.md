@@ -55,10 +55,11 @@ Required:
 
 ### Library
 
-Authenticated users can copy any visible skill into their personal library.
+Authenticated users can create original skills or copy any visible skill into their personal library.
 
 Required:
 
+- new private draft from scratch
 - public/private visibility choice
 - original skill attribution
 - editable package files

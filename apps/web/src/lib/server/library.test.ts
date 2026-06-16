@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import YAML from "yaml";
-import { validateForkDraftPackage } from "./library";
+import { buildBlankLibraryDraft, validateForkDraftPackage } from "./library";
 
 const baseDraft = {
   slug: "code-review",
@@ -80,6 +80,30 @@ describe("validateForkDraftPackage", () => {
         level: "error",
         code: "invalid-package",
       }),
+    ]);
+  });
+});
+
+describe("buildBlankLibraryDraft", () => {
+  it("creates a valid private starter package for original skills", () => {
+    const result = buildBlankLibraryDraft("new-review-flow");
+    const manifest = YAML.parse(result.files.find((file) => file.path === "skill.yml")?.content ?? "");
+
+    expect(result.validation.ok).toBe(true);
+    expect(result.validation.issues).toEqual([]);
+    expect(result.slug).toBe("new-review-flow");
+    expect(manifest).toMatchObject({
+      id: "new-review-flow",
+      name: "New Review Flow",
+      visibility: "private",
+      compatible_with: ["generic-agent"],
+      install_targets: {
+        "generic-agent": "~/.agents/skills/new-review-flow",
+      },
+    });
+    expect(result.files).toEqual([
+      expect.objectContaining({ path: "SKILL.md" }),
+      expect.objectContaining({ path: "skill.yml" }),
     ]);
   });
 });

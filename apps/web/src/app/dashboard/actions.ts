@@ -8,6 +8,7 @@ import { ensureProfile, normalizeHandle, validateHandle } from "@/lib/server/pro
 import { getPrisma } from "@/lib/server/prisma";
 import { createApiToken } from "@/lib/server/tokens";
 import {
+  createBlankLibrarySkill,
   createLibraryCopy,
   normalizeSlug,
   persistForkValidation,
@@ -143,6 +144,19 @@ export async function copySkillToLibraryAction(formData: FormData) {
   revalidatePath("/api/v1/skills");
   revalidatePath(`/u/${profile.handle}`);
   redirect(`/dashboard/library/${forkId}/edit`);
+}
+
+export async function createBlankSkillAction() {
+  const user = await getRequiredUser();
+  const profile = await ensureProfile(user);
+  const fork = await createBlankLibrarySkill({ user });
+
+  revalidatePath("/dashboard");
+  revalidatePath("/dashboard/library");
+  revalidatePath("/skills");
+  revalidatePath("/api/v1/skills");
+  revalidatePath(`/u/${profile.handle}`);
+  redirect(`/dashboard/library/${fork.id}/edit`);
 }
 
 export async function forkSkillAction(formData: FormData) {

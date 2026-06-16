@@ -11,6 +11,10 @@ export interface LibraryCopyInput {
   visibility: SkillVisibility;
 }
 
+export interface BlankLibrarySkillInput {
+  user: Pick<User, "id">;
+}
+
 interface LibrarySource {
   sourceSkillId?: string;
   sourceForkId?: string;
@@ -53,6 +57,21 @@ export interface ForkDraftPackageValidation {
   hasBlockingErrors: boolean;
 }
 
+interface BlankLibraryDraft {
+  slug: string;
+  name: string;
+  summary: string;
+  description: string;
+  version: string;
+  license: string;
+  categories: string[];
+  tags: string[];
+  compatibleWith: string[];
+  installTargets: Record<string, string>;
+  files: Array<{ path: string; content: string }>;
+  validation: SkillValidationResult;
+}
+
 export async function createLibraryCopy(input: LibraryCopyInput): Promise<SkillFork> {
   const source = await getVisibleLibrarySource(input.reference, input.user.id);
   if (!source) {
@@ -93,6 +112,45 @@ export async function createLibraryCopy(input: LibraryCopyInput): Promise<SkillF
       },
       validations: {
         create: validation.issues.map((issue) => ({
+          level: issue.level === "error" ? ValidationLevel.ERROR : ValidationLevel.WARNING,
+          code: issue.code,
+          message: issue.message,
+          path: issue.path,
+        })),
+      },
+    },
+  });
+}
+
+export async function createBlankLibrarySkill(input: BlankLibrarySkillInput): Promise<SkillFork> {
+  const slug = await uniqueLibrarySlug(input.user.id, "untitled-skill");
+  const draft = buildBlankLibraryDraft(slug);
+  const now = new Date();
+
+  return getPrisma().skillFork.create({
+    data: {
+      ownerId: input.user.id,
+      slug: draft.slug,
+      name: draft.name,
+      summary: draft.summary,
+      description: draft.description,
+      visibility: SkillVisibility.PRIVATE,
+      version: draft.version,
+      license: draft.license,
+      categories: draft.categories,
+      tags: draft.tags,
+      compatibleWith: draft.compatibleWith,
+      installTargets: draft.installTargets,
+      lastValidatedAt: now,
+      files: {
+        create: draft.files.map((file) => ({
+          path: file.path,
+          content: file.content,
+          sizeBytes: Buffer.byteLength(file.content),
+        })),
+      },
+      validations: {
+        create: draft.validation.issues.map((issue) => ({
           level: issue.level === "error" ? ValidationLevel.ERROR : ValidationLevel.WARNING,
           code: issue.code,
           message: issue.message,
@@ -243,12 +301,89 @@ export async function uniqueLibrarySlug(userId: string, rawBaseSlug: string): Pr
   return `${baseSlug}-${Date.now()}`;
 }
 
+export function buildBlankLibraryDraft(slug: string): BlankLibraryDraft {
+  const normalizedSlug = normalizeSlug(slug);
+  const name = titleFromSlug(normalizedSlug);
+  const summary = "Draft a portable agent skill for a focused workflow.";
+  const description = "A private starter package for writing, validating, and publishing a portable agent skill.";
+  const version = "0.1.0";
+  const license = "MIT";
+  const categories = ["productivity"];
+  const tags = ["draft"];
+  const compatibleWith = ["generic-agent"];
+  const installTargets = { "generic-agent": `~/.agents/skills/${normalizedSlug}` };
+  const skillMarkdown = [
+    "---",
+    `name: ${normalizedSlug}`,
+    `description: ${summary} Use when you need a reusable workflow that works across agent setups.`,
+    "---",
+    "",
+    `# ${name}`,
+    "",
+    "Use this skill when the user needs a repeatable workflow for a specific task.",
+    "",
+    "## Inputs",
+    "",
+    "- Describe the files, context, links, or decisions the skill expects before it starts.",
+    "",
+    "## Workflow",
+    "",
+    "1. Confirm the task scope and any constraints that affect the outcome.",
+    "2. Inspect the available context before changing or generating anything.",
+    "3. Produce the requested result with clear evidence, boundaries, and next steps.",
+    "",
+    "## Output",
+    "",
+    "- State the completed result and any important caveats.",
+  ].join("\n");
+  const skillYml = buildSkillYml({
+    id: normalizedSlug,
+    name,
+    summary,
+    description,
+    visibility: "private",
+    version,
+    license,
+    categories,
+    tags,
+    compatibleWith,
+    installTargets,
+  });
+  const files = [
+    { path: "SKILL.md", content: skillMarkdown },
+    { path: "skill.yml", content: skillYml },
+  ];
+
+  return {
+    slug: normalizedSlug,
+    name,
+    summary,
+    description,
+    version,
+    license,
+    categories,
+    tags,
+    compatibleWith,
+    installTargets,
+    files,
+    validation: validateSkillPackage(files),
+  };
+}
+
 export function normalizeSlug(value: string): string {
   return value
     .toLowerCase()
     .replace(/[^a-z0-9-]+/g, "-")
     .replace(/^-+|-+$/g, "")
     .slice(0, 64) || "skill";
+}
+
+function titleFromSlug(slug: string) {
+  return slug
+    .split("-")
+    .filter(Boolean)
+    .map((part) => `${part.slice(0, 1).toUpperCase()}${part.slice(1)}`)
+    .join(" ") || "Untitled Skill";
 }
 
 export function buildSkillYml(input: {

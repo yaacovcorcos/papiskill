@@ -69,6 +69,10 @@ Avoid:
 - assuming one agent runtime unless declared
 - broad motivational prose
 
+## In-app drafts
+
+Signed-in users can create a new private skill from the dashboard library. The app creates a starter `skill.yml` and `SKILL.md`, opens the editor, and validates the package before it can be saved as a public profile skill.
+
 ## Publishing
 
 Users can publish skills to their own profile as public, private, or unlisted.

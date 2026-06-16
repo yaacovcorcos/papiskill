@@ -1,12 +1,13 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { Download, ExternalLink, Library, Pencil, Terminal } from "lucide-react";
+import { Download, ExternalLink, Library, Pencil, Plus, Terminal } from "lucide-react";
 import { AppHeader } from "@/components/app-header";
 import { Badge } from "@/components/badge";
 import { CopyButton } from "@/components/copy-button";
 import { ensureProfile } from "@/lib/server/profiles";
 import { getPrisma } from "@/lib/server/prisma";
 import { getSessionUser } from "@/lib/server/request-auth";
+import { createBlankSkillAction } from "../actions";
 
 export const dynamic = "force-dynamic";
 
@@ -45,20 +46,36 @@ export default async function LibraryPage() {
             <h1 className="text-3xl font-semibold tracking-tight">Your skill library</h1>
             <p className="mt-2 max-w-2xl text-muted">Private, unlisted, and public profile-owned copies of skills you can edit or install.</p>
           </div>
-          <Link href="/skills" className="inline-flex items-center justify-center rounded-md bg-slate-950 px-4 py-2 text-sm font-semibold text-white hover:bg-slate-800">
-            Copy a skill
-          </Link>
+          <div className="flex flex-wrap gap-2">
+            <form action={createBlankSkillAction}>
+              <button type="submit" className="inline-flex items-center justify-center gap-2 rounded-md bg-slate-950 px-4 py-2 text-sm font-semibold text-white hover:bg-slate-800">
+                <Plus className="size-4" aria-hidden />
+                New skill
+              </button>
+            </form>
+            <Link href="/skills" className="inline-flex items-center justify-center rounded-md border border-border px-4 py-2 text-sm font-semibold hover:bg-slate-50">
+              Copy a skill
+            </Link>
+          </div>
         </div>
 
         {items.length === 0 ? (
           <section className="rounded-lg border border-border bg-white p-8 shadow-sm">
             <h2 className="text-lg font-semibold">No saved skills yet</h2>
             <p className="mt-2 max-w-2xl text-sm leading-6 text-muted">
-              Open any official, community, or public profile skill and copy it into your library. Your copy can start private and become public later.
+              Start a new private skill draft, or open any official, community, or public profile skill and copy it into your library.
             </p>
-            <Link href="/skills" className="mt-5 inline-flex rounded-md border border-border px-3 py-2 text-sm font-semibold hover:bg-slate-50">
-              Browse skills
-            </Link>
+            <div className="mt-5 flex flex-wrap gap-2">
+              <form action={createBlankSkillAction}>
+                <button type="submit" className="inline-flex items-center gap-2 rounded-md bg-slate-950 px-3 py-2 text-sm font-semibold text-white hover:bg-slate-800">
+                  <Plus className="size-4" aria-hidden />
+                  New skill
+                </button>
+              </form>
+              <Link href="/skills" className="inline-flex rounded-md border border-border px-3 py-2 text-sm font-semibold hover:bg-slate-50">
+                Browse skills
+              </Link>
+            </div>
           </section>
         ) : (
           <div className="grid gap-3">

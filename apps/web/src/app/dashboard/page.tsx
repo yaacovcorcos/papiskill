@@ -1,12 +1,12 @@
 import Link from "next/link";
-import { BookOpen, ExternalLink, Library, UserRound } from "lucide-react";
+import { BookOpen, ExternalLink, Library, Plus, UserRound } from "lucide-react";
 import { SkillVisibility } from "@prisma/client";
 import { AppHeader } from "@/components/app-header";
 import { GithubSignInButton } from "@/components/github-sign-in-button";
 import { getPrisma } from "@/lib/server/prisma";
 import { ensureProfile } from "@/lib/server/profiles";
 import { getSessionUser } from "@/lib/server/request-auth";
-import { revokeTokenAction } from "./actions";
+import { createBlankSkillAction, revokeTokenAction } from "./actions";
 import { TokenForm } from "./token-form";
 
 export const dynamic = "force-dynamic";
@@ -58,9 +58,17 @@ export default async function DashboardPage() {
                   <h2 className="text-lg font-semibold">Library</h2>
                   <p className="mt-1 text-sm text-muted">Profile-owned skill copies you can keep private, publish, edit, download, or install.</p>
                 </div>
-                <Link href="/dashboard/library" className="inline-flex items-center justify-center rounded-md border border-border px-3 py-2 text-sm font-semibold hover:bg-slate-50">
-                  Open library
-                </Link>
+                <div className="flex flex-wrap gap-2">
+                  <form action={createBlankSkillAction}>
+                    <button type="submit" className="inline-flex items-center justify-center gap-2 rounded-md bg-slate-950 px-3 py-2 text-sm font-semibold text-white hover:bg-slate-800">
+                      <Plus className="size-4" aria-hidden />
+                      New skill
+                    </button>
+                  </form>
+                  <Link href="/dashboard/library" className="inline-flex items-center justify-center rounded-md border border-border px-3 py-2 text-sm font-semibold hover:bg-slate-50">
+                    Open library
+                  </Link>
+                </div>
               </div>
 
               <div className="mt-5 grid gap-3 sm:grid-cols-3">
@@ -71,7 +79,7 @@ export default async function DashboardPage() {
 
               <div className="mt-5 divide-y divide-border">
                 {libraryItems.length === 0 ? (
-                  <p className="py-8 text-sm text-muted">No library items yet. Open any skill and choose Copy to library.</p>
+                  <p className="py-8 text-sm text-muted">No library items yet. Start a new skill or open any skill and choose Copy to library.</p>
                 ) : libraryItems.map((item) => (
                   <div key={item.id} className="flex items-center justify-between gap-4 py-4">
                     <div className="min-w-0">
