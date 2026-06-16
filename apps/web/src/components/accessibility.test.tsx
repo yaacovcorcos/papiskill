@@ -1,5 +1,12 @@
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
+import {
+  copyInstallCommandLabel,
+  downloadSkillLabel,
+  openProfileSkillLabel,
+  signInToStarLabel,
+  starCountLabel,
+} from "./action-labels";
 import { AppHeader } from "./app-header";
 import { CopyButton } from "./copy-button";
 import { FormFeedback } from "./form-feedback";
@@ -38,5 +45,16 @@ describe("shared accessibility affordances", () => {
     expect(errorHtml).toContain('aria-live="assertive"');
     expect(successHtml).toContain('role="status"');
     expect(successHtml).toContain('aria-live="polite"');
+  });
+
+  it("builds target-aware labels for compact icon actions", () => {
+    expect(starCountLabel(1)).toBe("1 star");
+    expect(starCountLabel(2)).toBe("2 stars");
+    expect(signInToStarLabel(0)).toBe("Sign in to star skill. 0 stars.");
+    expect(copyInstallCommandLabel("Code Review")).toBe(
+      "Copy install command for Code Review",
+    );
+    expect(downloadSkillLabel("Code Review")).toBe("Download Code Review");
+    expect(openProfileSkillLabel("Code Review")).toBe("Open Code Review profile page");
   });
 });

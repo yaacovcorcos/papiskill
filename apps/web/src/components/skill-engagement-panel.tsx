@@ -5,6 +5,7 @@ import {
   deleteCommentAction,
   toggleStarAction,
 } from "@/app/skills/engagement-actions";
+import { signInToStarLabel, starCountLabel } from "./action-labels";
 import { CommentForm } from "./skill-comment-form";
 
 export function SkillEngagementPanel({
@@ -98,11 +99,14 @@ function StarControl({
   viewerSignedIn: boolean;
 }) {
   const label = engagement.viewerHasStarred ? "Unstar skill" : "Star skill";
+  const countLabel = starCountLabel(engagement.starCount);
   if (!engagement.enabled) {
     return (
       <button
         type="button"
         disabled
+        aria-label={countLabel}
+        title={countLabel}
         className="inline-flex h-10 items-center gap-2 rounded-md border border-border px-3 text-sm font-semibold text-muted"
       >
         <Star className="size-4" aria-hidden />
@@ -115,6 +119,8 @@ function StarControl({
     return (
       <Link
         href="/auth/sign-in"
+        aria-label={signInToStarLabel(engagement.starCount)}
+        title="Sign in to star skill"
         className="inline-flex h-10 items-center gap-2 rounded-md border border-border bg-white px-3 text-sm font-semibold hover:bg-slate-50"
       >
         <Star className="size-4" aria-hidden />

@@ -3,6 +3,11 @@
 import Link from "next/link";
 import { useActionState } from "react";
 import { Download, ExternalLink, Save } from "lucide-react";
+import {
+  copyInstallCommandLabel,
+  downloadSkillLabel,
+  openProfileSkillLabel,
+} from "@/components/action-labels";
 import { CopyButton } from "@/components/copy-button";
 import { FormFeedback } from "@/components/form-feedback";
 import { SkillMarkdownEditor } from "@/components/skill-markdown-editor";
@@ -56,12 +61,12 @@ export function EditLibrarySkillForm({
           <p className="mt-2 text-muted">Save metadata, validate the package, and keep this copy private or publish it to your profile.</p>
         </div>
         <div className="flex flex-wrap gap-2">
-          <CopyButton value={installCommand} label="Copy install command" />
-          <Link href={`/download/${reference}?format=zip`} aria-label="Download" title="Download package" className="inline-grid size-10 place-items-center rounded-md border border-border text-slate-700 hover:bg-slate-50 hover:text-slate-950">
+          <CopyButton value={installCommand} label={copyInstallCommandLabel(fork.name)} />
+          <Link href={`/download/${reference}?format=zip`} aria-label={downloadSkillLabel(fork.name)} title="Download package" className="inline-grid size-10 place-items-center rounded-md border border-border text-slate-700 hover:bg-slate-50 hover:text-slate-950">
             <Download className="size-4" aria-hidden />
           </Link>
           {showPublicLink ? (
-            <Link href={publicHref} aria-label="Open profile page" title="Open profile page" className="inline-grid size-10 place-items-center rounded-md border border-border text-slate-700 hover:bg-slate-50 hover:text-slate-950">
+            <Link href={publicHref} aria-label={openProfileSkillLabel(fork.name)} title="Open profile page" className="inline-grid size-10 place-items-center rounded-md border border-border text-slate-700 hover:bg-slate-50 hover:text-slate-950">
               <ExternalLink className="size-4" aria-hidden />
             </Link>
           ) : null}

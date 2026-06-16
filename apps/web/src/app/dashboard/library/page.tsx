@@ -2,6 +2,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { Download, ExternalLink, Library, Pencil, Plus, Terminal } from "lucide-react";
 import { AppHeader } from "@/components/app-header";
+import { copyInstallCommandLabel } from "@/components/action-labels";
 import { Badge } from "@/components/badge";
 import { CopyButton } from "@/components/copy-button";
 import { ensureProfile } from "@/lib/server/profiles";
@@ -105,7 +106,7 @@ export default async function LibraryPage() {
                       </p>
                     </div>
                     <div className="flex shrink-0 flex-wrap gap-2">
-                      <CopyButton value={installCommand} label="Copy install command" />
+                      <CopyButton value={installCommand} label={copyInstallCommandLabel(item.name)} />
                       <Link href={`/download/${reference}?format=zip`} aria-label={`Download ${item.name}`} title="Download package" className="inline-grid size-10 place-items-center rounded-md border border-border text-slate-700 hover:bg-slate-50 hover:text-slate-950">
                         <Download className="size-4" aria-hidden />
                       </Link>
