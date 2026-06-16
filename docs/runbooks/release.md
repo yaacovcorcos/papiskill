@@ -9,6 +9,8 @@ npm install
 npm run check
 ```
 
+`npm run check` includes registry validation, typecheck, lint, tests, and build.
+
 ## Database
 
 Before production deploy:
@@ -55,3 +57,4 @@ vercel --prod
 - GitHub login starts OAuth
 - public API health route responds
 - CLI can search public registry against production API
+- profile/private skill references do not resolve through public registry fallback

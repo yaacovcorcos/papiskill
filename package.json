@@ -14,7 +14,7 @@
     "lint": "npm run lint --workspaces --if-present",
     "typecheck": "npm --workspace @papiskill/skill-core run typecheck && npm --workspace @papiskill/skill-core run build && npm --workspace papiskill run typecheck && npm --workspace @papiskill/web run typecheck",
     "test": "npm run test --workspaces --if-present",
-    "check": "npm run typecheck && npm run lint && npm run test && npm run build",
+    "check": "npm run registry:validate && npm run typecheck && npm run lint && npm run test && npm run build",
     "db:generate": "npm --workspace @papiskill/web run db:generate",
     "db:migrate": "npm --workspace @papiskill/web run db:migrate",
     "db:studio": "npm --workspace @papiskill/web run db:studio",

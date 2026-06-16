@@ -3,6 +3,7 @@ import { AppHeader } from "@/components/app-header";
 import { getSessionUser } from "@/lib/server/request-auth";
 import { ensureProfile } from "@/lib/server/profiles";
 import { getPrisma } from "@/lib/server/prisma";
+import { GithubSignInButton } from "@/components/github-sign-in-button";
 import { revokeTokenAction } from "./actions";
 import { TokenForm } from "./token-form";
 
@@ -37,9 +38,7 @@ export default async function DashboardPage() {
             </p>
           </div>
           {!user ? (
-            <Link href="/api/auth/sign-in/github" className="inline-flex justify-center rounded-md bg-slate-950 px-4 py-2.5 text-sm font-semibold text-white hover:bg-slate-800">
-              Sign in with GitHub
-            </Link>
+            <GithubSignInButton className="inline-flex justify-center rounded-md bg-slate-950 px-4 py-2.5 text-sm font-semibold text-white hover:bg-slate-800" showIcon={false} />
           ) : null}
         </div>
         {user ? (

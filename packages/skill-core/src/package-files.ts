@@ -14,10 +14,14 @@ const allowedTopLevel = new Set([
 ]);
 
 export function normalizePackagePath(input: string): string {
-  const normalized = input.replaceAll("\\", "/").replace(/^\/+/, "");
-  if (!normalized || normalized.includes("\0")) {
+  const slashNormalized = input.replaceAll("\\", "/");
+  if (!slashNormalized || slashNormalized.includes("\0")) {
     throw new Error("Invalid package path.");
   }
+  if (slashNormalized.startsWith("/") || /^[A-Za-z]:\//.test(slashNormalized)) {
+    throw new Error(`Package path must be relative: ${input}`);
+  }
+  const normalized = slashNormalized.replace(/^\.\//, "");
   const parts = normalized.split("/");
   if (parts.includes("..") || path.isAbsolute(normalized)) {
     throw new Error(`Package path escapes the package root: ${input}`);
@@ -36,6 +40,11 @@ export function parseSkillPackage(files: PackageFile[]): SkillPackage {
     path: normalizePackagePath(file.path),
     content: file.content,
   }));
+  for (const file of normalizedFiles) {
+    if (!isAllowedPackagePath(file.path)) {
+      throw new Error(`Package file is not in an allowed location: ${file.path}`);
+    }
+  }
   const manifestFile = normalizedFiles.find((file) => file.path === "skill.yml");
   const skillFile = normalizedFiles.find((file) => file.path === "SKILL.md");
 

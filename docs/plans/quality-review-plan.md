@@ -16,11 +16,12 @@ Prove PapiSkill is production-ready before declaring the goal complete.
 
 ### Tests
 
-- Unit tests for skill parsing and validation.
-- Unit tests for install target resolution.
-- Unit tests for CLI command helpers.
-- Service/API tests for ownership and visibility where practical.
-- Build must pass.
+- Unit tests for skill parsing, path safety, validation warnings, and install target resolution.
+- Unit tests for CLI command helpers and API schema parsing.
+- Route/API tests for public list/detail/download contracts, CLI response shapes, auth routes, and registry fallback behavior.
+- Ownership and visibility tests for profile forks, private forks, and API tokens.
+- Browser smoke for public browsing, skill detail/download, GitHub OAuth start, and editor flows when rendered UI behavior changes.
+- `npm run check` must pass and include registry validation.
 
 ### Security
 

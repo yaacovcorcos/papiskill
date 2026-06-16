@@ -1,5 +1,5 @@
 import { errorResponse, jsonResponse } from "@/lib/server/http";
-import { getCatalogSkills } from "@/lib/server/catalog";
+import { getCatalogSkills, getFileRegistrySkill } from "@/lib/server/catalog";
 import { getTokenUser } from "@/lib/server/request-auth";
 import { getSkillByReference } from "@/lib/server/skills";
 
@@ -27,7 +27,16 @@ async function getDatabaseSkill(reference: string, actor: Awaited<ReturnType<typ
 }
 
 async function getCatalogFallback(reference: string) {
-  const slug = reference.split("/").filter(Boolean).at(-1);
+  const fileSkill = await getFileRegistrySkill(reference);
+  if (fileSkill) return fileSkill;
+
+  const parts = reference.split("/").filter(Boolean);
+  const namespace = parts.length > 1 ? parts[0] : "official";
+  if (namespace && !["official", "global", "community"].includes(namespace)) {
+    return null;
+  }
+
+  const slug = parts.at(-1);
   if (!slug) return null;
   const skill = (await getCatalogSkills()).find((item) => item.slug === slug);
   if (!skill) return null;

@@ -62,6 +62,28 @@ Run from repo root unless a command says otherwise.
 - The CLI is part of v1, not an afterthought.
 - Docs are product surface. Keep them accurate when behavior changes.
 
+## Testing Policy
+
+- Test the real risk changed, not only the easiest function to call.
+- Use the smallest truthful layer: pure unit tests for parsing and formatting, route/API tests for HTTP contracts, server tests for auth and ownership, CLI tests for install/download behavior, and browser smoke tests for rendered critical paths.
+- Every bug fix needs a regression test or a written reason in the PR explaining why it cannot be automated yet.
+- Mock only hard process boundaries such as auth providers, network fetches, Vercel/Supabase services, and filesystem temp roots. Do not mock local validation, serialization, permission, or install-target logic just to make a test easier.
+- Tests must reset changed environment variables, current working directory, timers, temp directories, and module mocks.
+- Database fallback behavior is not a substitute for privacy tests. Public file-registry fallback may cover global skills only; profile, private, token, and ownership behavior must be tested on the DB/server path.
+- Package builds must not emit `*.test.*` files into published artifacts, and test runners must ignore generated `dist` output.
+
+## Route-To-Test Map
+
+| Changed area | Required test evidence |
+|---|---|
+| `packages/skill-core/**` | validation/schema tests plus `npm run registry:validate` when registry packages are affected |
+| `packages/cli/**` | CLI unit tests and API contract coverage for consumed response shapes |
+| `apps/web/src/app/api/**` | route contract tests for status codes, response shape, auth, and fallback behavior |
+| `apps/web/src/lib/server/skills.ts`, profile, fork, token, or auth code | ownership/privacy regression tests, including negative cases |
+| `apps/web/prisma/**` | Prisma generate/typecheck and migration/runbook updates |
+| public registry package files | registry validation and package contract docs when format expectations change |
+| rendered auth, dashboard, skill browsing, editor, or download flows | component/route tests plus a browser smoke check when UI behavior changes |
+
 ## Auth and Data
 
 - Better Auth is the identity authority.
@@ -83,7 +105,7 @@ Run from repo root unless a command says otherwise.
 - Root `main` is the canonical branch.
 - Do not commit generated secrets or local env files.
 - Use conventional commit messages.
-- Before pushing delivery work, run `npm run check`.
+- Before pushing delivery work, run `npm run check`; it includes registry validation.
 - Keep commits scoped and inspect `git status` before every commit.
 
 ## Documentation Obligation
