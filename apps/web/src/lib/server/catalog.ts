@@ -37,6 +37,9 @@ export interface CatalogFilters {
   statuses?: string[];
 }
 
+const allowedStatuses = ["global", "community", "profile"] as const;
+type CatalogStatus = (typeof allowedStatuses)[number];
+
 interface CatalogOptions {
   includeMarkdown?: boolean;
 }
@@ -83,10 +86,19 @@ export async function getCatalogSkills(
         : [];
       const shouldFetchSkills =
         normalizedFilters.statuses.length === 0 ||
-        normalizedFilters.statuses.includes("global");
+        normalizedFilters.statuses.some((status) => status !== "profile");
       const shouldFetchForks =
         normalizedFilters.statuses.length === 0 ||
         normalizedFilters.statuses.includes("profile");
+      const registryKinds = normalizedFilters.statuses
+        .filter((status): status is Exclude<CatalogStatus, "profile"> =>
+          status === "global" || status === "community",
+        )
+        .map((status) =>
+          status === "global"
+            ? SkillRegistryKind.GLOBAL
+            : SkillRegistryKind.COMMUNITY,
+        );
       const skillWhere = {
         visibility: SkillVisibility.PUBLIC,
         ...(skillSearchFilters.length ? { OR: skillSearchFilters } : {}),
@@ -96,8 +108,8 @@ export async function getCatalogSkills(
         ...(normalizedFilters.compatibility.length
           ? { compatibleWith: { hasSome: normalizedFilters.compatibility } }
           : {}),
-        ...(normalizedFilters.statuses.includes("global")
-          ? { registryKind: SkillRegistryKind.GLOBAL }
+        ...(registryKinds.length
+          ? { registryKind: { in: registryKinds } }
           : {}),
       };
       const forkWhere = {
@@ -158,21 +170,23 @@ export async function getCatalogSkills(
         includeMarkdown,
       );
       const databaseSkills = skills.map((skill) => {
-          const summary = serializeSkillSummary(skill);
-          return {
-            ...summary,
-            description: skill.description,
-            categories: skill.categories,
-            installCommand: `papiskill install ${
-              skill.registryKind === SkillRegistryKind.COMMUNITY ? "community" : "official"
-            }/${skill.slug}`,
-            ...(includeMarkdown
-              ? { markdown: skill.files.at(0)?.content ?? "" }
-              : {}),
-            starCount: skill._count.stars,
-            commentCount: skill._count.comments,
-          };
-        });
+        const summary = serializeSkillSummary(skill);
+        return {
+          ...summary,
+          description: skill.description,
+          categories: skill.categories,
+          installCommand: `papiskill install ${
+            skill.registryKind === SkillRegistryKind.COMMUNITY
+              ? "community"
+              : "official"
+          }/${skill.slug}`,
+          ...(includeMarkdown
+            ? { markdown: skill.files.at(0)?.content ?? "" }
+            : {}),
+          starCount: skill._count.stars,
+          commentCount: skill._count.comments,
+        };
+      });
       const databaseSkillByKey = new Map(
         databaseSkills.map((skill) => [
           `${skill.registryKind}/${skill.slug}`,
@@ -241,9 +255,7 @@ function normalizeFilters(
     query: filters.query?.trim() ?? "",
     categories: uniqueNormalized(filters.categories ?? []),
     compatibility: uniqueNormalized(filters.compatibility ?? []),
-    statuses: uniqueNormalized(filters.statuses ?? []).filter(
-      (status) => status === "global" || status === "profile",
-    ),
+    statuses: uniqueNormalized(filters.statuses ?? []).filter(isCatalogStatus),
   };
 }
 
@@ -251,6 +263,10 @@ function uniqueNormalized(values: string[]) {
   return Array.from(
     new Set(values.map((value) => value.trim().toLowerCase()).filter(Boolean)),
   );
+}
+
+function isCatalogStatus(status: string): status is CatalogStatus {
+  return (allowedStatuses as readonly string[]).includes(status);
 }
 
 async function getFileCatalogSkills(

@@ -36,6 +36,13 @@ const compatibilityLabels: Record<string, string> = {
 type FilterKey = "categories" | "compatibility" | "statuses";
 type SearchParamValue = string | string[] | undefined;
 
+type FilterItem = { value: string; label: string };
+type FilterGroupDefinition = {
+  title: string;
+  key: FilterKey;
+  items: FilterItem[];
+};
+
 interface ActiveFilters {
   query: string;
   categories: string[];
@@ -43,44 +50,22 @@ interface ActiveFilters {
   statuses: string[];
 }
 
-const filterGroups: Array<{
-  title: string;
-  key: FilterKey;
-  param: string;
-  items: Array<{ value: string; label: string }>;
-}> = [
-  {
-    title: "Categories",
-    key: "categories",
-    param: "category",
-    items: [
-      { value: "coding", label: "Coding" },
-      { value: "documentation", label: "Documentation" },
-      { value: "security", label: "Security" },
-      { value: "productivity", label: "Productivity" },
-    ],
-  },
-  {
-    title: "Compatibility",
-    key: "compatibility",
-    param: "compatibility",
-    items: [
-      { value: "codex", label: "Codex" },
-      { value: "claude-code", label: "Claude Code" },
-      { value: "cursor", label: "Cursor" },
-      { value: "generic-agent", label: "Generic agent" },
-    ],
-  },
-  {
-    title: "Status",
-    key: "statuses",
-    param: "status",
-    items: [
-      { value: "global", label: "Global curated" },
-      { value: "profile", label: "Profile skills" },
-    ],
-  },
-];
+const categoryOrder = ["coding", "documentation", "security", "productivity"];
+const compatibilityOrder = ["codex", "claude-code", "cursor", "generic-agent"];
+const statusOrder = ["global", "community", "profile"];
+
+const categoryLabels: Record<string, string> = {
+  coding: "Coding",
+  documentation: "Documentation",
+  security: "Security",
+  productivity: "Productivity",
+};
+
+const statusLabels: Record<string, string> = {
+  global: "Global curated",
+  community: "Community reviewed",
+  profile: "Profile skills",
+};
 
 function skillReference(skill: {
   registryKind: string;
@@ -122,7 +107,8 @@ export default async function SkillsPage({
     categories: paramList(params.category),
     compatibility: paramList(params.compatibility),
     statuses: paramList(params.status).filter(
-      (status) => status === "global" || status === "profile",
+      (status) =>
+        status === "global" || status === "community" || status === "profile",
     ),
   };
   const hasStructuredFilters =
@@ -137,11 +123,13 @@ export default async function SkillsPage({
     baseSkillsPromise,
     skillsPromise,
   ]);
+  const filterGroups = buildFilterGroups(baseSkills, activeFilters);
   const selected = skills[0];
   const selectedDetail = selected
     ? await getSkillByReference(skillReference(selected))
     : null;
-  const activeFilterLabels = selectedFilterLabels(activeFilters);
+  const activeFilterLabels = selectedFilterLabels(activeFilters, filterGroups);
+  const hasActiveSearchOrFilters = Boolean(q) || activeFilterLabels.length > 0;
 
   return (
     <>
@@ -149,14 +137,16 @@ export default async function SkillsPage({
       <SkillsLayout
         filters={
           <>
-            <div className="mb-6 flex justify-end">
-              <Link
-                href="/skills"
-                className="text-xs font-medium text-slate-500 hover:text-slate-950"
-              >
-                Clear
-              </Link>
-            </div>
+            {hasActiveSearchOrFilters ? (
+              <div className="mb-6 flex justify-end">
+                <Link
+                  href="/skills"
+                  className="text-xs font-medium text-slate-500 hover:text-slate-950"
+                >
+                  Clear
+                </Link>
+              </div>
+            ) : null}
             {filterGroups.map((group) => (
               <FilterGroup
                 key={group.title}
@@ -200,6 +190,8 @@ export default async function SkillsPage({
                     value={
                       selected.registryKind === "profile"
                         ? "Profile-published"
+                        : selected.registryKind === "community"
+                          ? "Community-reviewed"
                         : "Curator-published"
                     }
                     icon={<ShieldCheck className="size-4 text-emerald-600" />}
@@ -327,17 +319,19 @@ export default async function SkillsPage({
                     compact
                   />
                 ))}
-                <Link
-                  href={skillsHref({
-                    ...activeFilters,
-                    categories: [],
-                    compatibility: [],
-                    statuses: [],
-                  })}
-                  className="text-sm font-semibold text-slate-600 hover:text-slate-950 sm:col-span-3"
-                >
-                  Clear filters
-                </Link>
+                {activeFilterLabels.length > 0 ? (
+                  <Link
+                    href={skillsHref({
+                      ...activeFilters,
+                      categories: [],
+                      compatibility: [],
+                      statuses: [],
+                    })}
+                    className="text-sm font-semibold text-slate-600 hover:text-slate-950 sm:col-span-3"
+                  >
+                    Clear filters
+                  </Link>
+                ) : null}
               </div>
             </details>
             <Link
@@ -381,110 +375,128 @@ export default async function SkillsPage({
 
           <div className="mb-3 flex items-center justify-between text-sm text-muted">
             <span>{skills.length} skills</span>
-            <span>Sort: curated first</span>
+            <span>Showing curated first</span>
           </div>
 
-          <div className="space-y-3">
-            {skills.map((skill) => {
-              const href = skillHref(skill);
-              const reference = skillReference(skill);
-              return (
-                <article
-                  key={`${skill.registryKind}/${skill.slug}`}
-                  className="rounded-lg border border-border bg-white p-4 shadow-sm transition hover:border-slate-300"
-                >
-                  <Link
-                    href={href}
-                    className="group flex gap-4 rounded-md outline-none focus-visible:ring-4 focus-visible:ring-accent/20"
+          {skills.length === 0 ? (
+            <div className="rounded-lg border border-dashed border-border bg-white p-8 text-center">
+              <h2 className="text-base font-semibold">
+                No skills match these filters
+              </h2>
+              <p className="mt-2 text-sm text-muted">
+                Try removing a filter or searching for a broader term.
+              </p>
+              <Link
+                href="/skills"
+                className="mt-4 inline-flex h-10 items-center justify-center rounded-md border border-border bg-white px-3 text-sm font-semibold hover:bg-slate-50"
+              >
+                Clear filters
+              </Link>
+            </div>
+          ) : (
+            <div className="space-y-3">
+              {skills.map((skill) => {
+                const href = skillHref(skill);
+                const reference = skillReference(skill);
+                return (
+                  <article
+                    key={`${skill.registryKind}/${skill.slug}`}
+                    className="rounded-lg border border-border bg-white p-4 shadow-sm transition hover:border-slate-300"
                   >
-                    <div className="grid size-14 shrink-0 place-items-center rounded-lg bg-slate-950 font-mono text-lg font-semibold text-white">
-                      {skill.name
-                        .split(/\s+/)
-                        .map((part) => part[0])
-                        .join("")
-                        .slice(0, 2)}
-                    </div>
-                    <div className="min-w-0 flex-1">
-                      <div className="flex flex-wrap items-center gap-2">
-                        <h2 className="text-base font-semibold group-hover:underline">
-                          {skill.name}
-                        </h2>
-                        <Badge
-                          variant={
-                            skill.registryKind === "global" ? "blue" : "neutral"
-                          }
-                        >
-                          {skill.registryKind === "global"
-                            ? "Global"
-                            : "Profile"}
-                        </Badge>
-                        <Badge variant="green">Validated</Badge>
+                    <Link
+                      href={href}
+                      className="group flex gap-4 rounded-md outline-none focus-visible:ring-4 focus-visible:ring-accent/20"
+                    >
+                      <div className="grid size-14 shrink-0 place-items-center rounded-lg bg-slate-950 font-mono text-lg font-semibold text-white">
+                        {skill.name
+                          .split(/\s+/)
+                          .map((part) => part[0])
+                          .join("")
+                          .slice(0, 2)}
                       </div>
-                      <p className="mt-1 text-sm text-muted">
-                        by {skill.author ?? "PapiSkill"}
-                      </p>
-                      <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-700">
-                        {skill.summary}
-                      </p>
-                      <div className="mt-3 flex flex-wrap gap-2">
-                        {skill.tags.map((tag) => (
-                          <Badge key={tag}>{tag}</Badge>
-                        ))}
+                      <div className="min-w-0 flex-1">
+                        <div className="flex flex-wrap items-center gap-2">
+                          <h2 className="text-base font-semibold group-hover:underline">
+                            {skill.name}
+                          </h2>
+                          <Badge
+                            variant={
+                              skill.registryKind === "global" ? "blue" : "neutral"
+                            }
+                          >
+                            {statusBadgeLabel(skill.registryKind)}
+                          </Badge>
+                          <Badge variant="green">Validated</Badge>
+                        </div>
+                        <p className="mt-1 text-sm text-muted">
+                          by {skill.author ?? "PapiSkill"}
+                        </p>
+                        <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-700">
+                          {skill.summary}
+                        </p>
+                        <div className="mt-3 flex flex-wrap gap-2">
+                          {skill.tags.map((tag) => (
+                            <Badge key={tag}>{tag}</Badge>
+                          ))}
+                        </div>
+                        <div className="mt-3">
+                          <EngagementCounts
+                            stars={skill.starCount}
+                            comments={skill.commentCount}
+                          />
+                        </div>
                       </div>
-                      <div className="mt-3">
-                        <EngagementCounts stars={skill.starCount} comments={skill.commentCount} />
-                      </div>
-                    </div>
-                    <ArrowRight
-                      className="mt-1 hidden size-4 shrink-0 text-slate-400 transition group-hover:translate-x-0.5 group-hover:text-slate-700 sm:block"
-                      aria-hidden
-                    />
-                  </Link>
-                  <div className="mt-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                    <div className="flex min-w-0 items-center rounded-md border border-border bg-slate-50">
-                      <code className="inline-flex min-w-0 items-center gap-2 px-3 py-2 font-mono text-xs text-slate-800">
-                        <Terminal className="size-3.5 shrink-0" aria-hidden />
-                        <span className="truncate">{`papiskill install ${reference}`}</span>
-                      </code>
-                      <CopyButton
-                        value={`papiskill install ${reference}`}
-                        label={`Copy install command for ${skill.name}`}
-                        className="inline-grid size-9 shrink-0 place-items-center border-l border-border text-slate-500 hover:bg-white hover:text-slate-950"
+                      <ArrowRight
+                        className="mt-1 hidden size-4 shrink-0 text-slate-400 transition group-hover:translate-x-0.5 group-hover:text-slate-700 sm:block"
+                        aria-hidden
                       />
+                    </Link>
+                    <div className="mt-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                      <div className="flex min-w-0 items-center rounded-md border border-border bg-slate-50">
+                        <code className="inline-flex min-w-0 items-center gap-2 px-3 py-2 font-mono text-xs text-slate-800">
+                          <Terminal className="size-3.5 shrink-0" aria-hidden />
+                          <span className="truncate">{`papiskill install ${reference}`}</span>
+                        </code>
+                        <CopyButton
+                          value={`papiskill install ${reference}`}
+                          label={`Copy install command for ${skill.name}`}
+                          className="inline-grid size-9 shrink-0 place-items-center border-l border-border text-slate-500 hover:bg-white hover:text-slate-950"
+                        />
+                      </div>
+                      <div className="flex flex-wrap gap-2">
+                        <Link
+                          href={href}
+                          aria-label={`View ${skill.name}`}
+                          title="View"
+                          className="inline-grid size-10 place-items-center rounded-md border border-border text-slate-700 hover:bg-slate-50 hover:text-slate-950"
+                        >
+                          <Eye className="size-4" aria-hidden />
+                        </Link>
+                        <Link
+                          href={`/download/${reference}`}
+                          prefetch={false}
+                          aria-label={`Download ${skill.name}`}
+                          title="Download"
+                          className="inline-grid size-10 place-items-center rounded-md border border-border text-slate-700 hover:bg-slate-50 hover:text-slate-950"
+                        >
+                          <Download className="size-4" aria-hidden />
+                        </Link>
+                        <Link
+                          href={`/dashboard/fork?skill=${reference}`}
+                          prefetch={false}
+                          aria-label={`Copy ${skill.name} to library`}
+                          title="Copy to library"
+                          className="inline-grid size-10 place-items-center rounded-md border border-border text-slate-700 hover:bg-slate-50 hover:text-slate-950"
+                        >
+                          <GitFork className="size-4" aria-hidden />
+                        </Link>
+                      </div>
                     </div>
-                    <div className="flex flex-wrap gap-2">
-                      <Link
-                        href={href}
-                        aria-label={`View ${skill.name}`}
-                        title="View"
-                        className="inline-grid size-10 place-items-center rounded-md border border-border text-slate-700 hover:bg-slate-50 hover:text-slate-950"
-                      >
-                        <Eye className="size-4" aria-hidden />
-                      </Link>
-                      <Link
-                        href={`/download/${reference}`}
-                        prefetch={false}
-                        aria-label={`Download ${skill.name}`}
-                        title="Download"
-                        className="inline-grid size-10 place-items-center rounded-md border border-border text-slate-700 hover:bg-slate-50 hover:text-slate-950"
-                      >
-                        <Download className="size-4" aria-hidden />
-                      </Link>
-                      <Link
-                        href={`/dashboard/fork?skill=${reference}`}
-                        prefetch={false}
-                        aria-label={`Copy ${skill.name} to library`}
-                        title="Copy to library"
-                        className="inline-grid size-10 place-items-center rounded-md border border-border text-slate-700 hover:bg-slate-50 hover:text-slate-950"
-                      >
-                        <GitFork className="size-4" aria-hidden />
-                      </Link>
-                    </div>
-                  </div>
-                </article>
-              );
-            })}
-          </div>
+                  </article>
+                );
+              })}
+            </div>
+          )}
         </section>
       </SkillsLayout>
     </>
@@ -497,7 +509,7 @@ function FilterGroup({
   countSource,
   compact = false,
 }: {
-  group: (typeof filterGroups)[number];
+  group: FilterGroupDefinition;
   filters: ActiveFilters;
   countSource: CatalogSkill[];
   compact?: boolean;
@@ -581,6 +593,12 @@ function filterSummary(filters: ActiveFilters) {
   return count === 0 ? "All skills" : `${count} selected`;
 }
 
+function statusBadgeLabel(registryKind: string) {
+  if (registryKind === "global") return "Global";
+  if (registryKind === "community") return "Community";
+  return "Profile";
+}
+
 function countMatching(skills: CatalogSkill[], key: FilterKey, value: string) {
   return skills.filter((skill) => {
     if (key === "categories") return skill.categories.includes(value);
@@ -589,7 +607,10 @@ function countMatching(skills: CatalogSkill[], key: FilterKey, value: string) {
   }).length;
 }
 
-function selectedFilterLabels(filters: ActiveFilters) {
+function selectedFilterLabels(
+  filters: ActiveFilters,
+  filterGroups: FilterGroupDefinition[],
+) {
   return filterGroups.flatMap((group) =>
     group.items
       .filter((item) => filters[group.key].includes(item.value))
@@ -599,6 +620,85 @@ function selectedFilterLabels(filters: ActiveFilters) {
         label: item.label,
       })),
   );
+}
+
+function buildFilterGroups(
+  skills: CatalogSkill[],
+  filters: ActiveFilters,
+): FilterGroupDefinition[] {
+  return [
+    buildFilterGroup({
+      title: "Categories",
+      key: "categories",
+      values: skills.flatMap((skill) => skill.categories),
+      activeValues: filters.categories,
+      preferredOrder: categoryOrder,
+      labels: categoryLabels,
+    }),
+    buildFilterGroup({
+      title: "Compatibility",
+      key: "compatibility",
+      values: skills.flatMap((skill) => skill.compatibleWith),
+      activeValues: filters.compatibility,
+      preferredOrder: compatibilityOrder,
+      labels: compatibilityLabels,
+    }),
+    buildFilterGroup({
+      title: "Status",
+      key: "statuses",
+      values: skills.map((skill) => skill.registryKind),
+      activeValues: filters.statuses,
+      preferredOrder: statusOrder,
+      labels: statusLabels,
+    }),
+  ].filter((group) => group.items.length > 0);
+}
+
+function buildFilterGroup({
+  title,
+  key,
+  values,
+  activeValues,
+  preferredOrder,
+  labels,
+}: {
+  title: string;
+  key: FilterKey;
+  values: string[];
+  activeValues: string[];
+  preferredOrder: string[];
+  labels: Record<string, string>;
+}): FilterGroupDefinition {
+  const available = new Set(values.map((value) => value.toLowerCase()));
+  const active = new Set(activeValues);
+  const allValues = Array.from(new Set([...available, ...active]));
+  allValues.sort((a, b) => {
+    const aIndex = preferredOrder.indexOf(a);
+    const bIndex = preferredOrder.indexOf(b);
+    if (aIndex !== -1 || bIndex !== -1) {
+      if (aIndex === -1) return 1;
+      if (bIndex === -1) return -1;
+      return aIndex - bIndex;
+    }
+    return a.localeCompare(b);
+  });
+
+  return {
+    title,
+    key,
+    items: allValues.map((value) => ({
+      value,
+      label: labels[value] ?? titleCase(value),
+    })),
+  };
+}
+
+function titleCase(value: string) {
+  return value
+    .split(/[-_\s]+/)
+    .filter(Boolean)
+    .map((part) => part[0]?.toUpperCase() + part.slice(1))
+    .join(" ");
 }
 
 function DetailRow({
