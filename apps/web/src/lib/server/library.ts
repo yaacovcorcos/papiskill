@@ -2,6 +2,7 @@ import { createHash } from "node:crypto";
 import { Prisma, SkillRegistryKind, SkillVisibility, ValidationLevel, type SkillFork, type User } from "@prisma/client";
 import { validateSkillPackage } from "@papiskill/skill-core";
 import { getPrisma } from "./prisma";
+import { readableForkVisibilityWhere } from "./visibility";
 
 export interface LibraryCopyInput {
   reference: string;
@@ -119,11 +120,7 @@ export async function getVisibleLibrarySource(reference: string, actorId?: strin
       slug,
       owner: { profile: { handle: namespace } },
       archivedAt: null,
-      OR: [
-        { visibility: SkillVisibility.PUBLIC },
-        { visibility: SkillVisibility.UNLISTED },
-        ...(actorId ? [{ ownerId: actorId }] : []),
-      ],
+      OR: readableForkVisibilityWhere(actorId),
     },
     include: {
       files: { orderBy: { path: "asc" } },

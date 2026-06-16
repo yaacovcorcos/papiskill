@@ -1,6 +1,7 @@
 import { errorResponse, publicCatalogCacheHeaders } from "@/lib/server/http";
 import { getCatalogSkills } from "@/lib/server/catalog";
 import { hasDatabaseUrl } from "@/lib/server/db-env";
+import { isPublicRegistryReference, referenceSlug } from "@/lib/server/references";
 import { getSessionUser, getTokenUser } from "@/lib/server/request-auth";
 import { getSkillByReference } from "@/lib/server/skills";
 
@@ -14,7 +15,8 @@ export async function GET(
   const joinedReference = reference.join("/");
   const isPublicRegistry = isPublicRegistryReference(joinedReference);
   const actor = isPublicRegistry ? null : await getActor(request);
-  const skill = await getDatabaseSkill(joinedReference, actor) ?? await getCatalogFallback(joinedReference);
+  const databaseSkill = await getDatabaseSkill(joinedReference, actor);
+  const skill = databaseSkill ?? (isPublicRegistry ? await getCatalogFallback(joinedReference) : null);
   if (!skill) {
     return errorResponse("Skill not found.", 404);
   }
@@ -50,17 +52,11 @@ async function getDatabaseSkill(reference: string, actor: Awaited<ReturnType<typ
 }
 
 async function getCatalogFallback(reference: string) {
-  const slug = reference.split("/").filter(Boolean).at(-1);
+  const slug = referenceSlug(reference);
   if (!slug) return null;
   return (await getCatalogSkills("", { includeMarkdown: true })).find((item) => item.slug === slug) ?? null;
 }
 
 function safeFilename(slug: string) {
   return slug.replace(/[^a-z0-9_.-]/gi, "-") || "SKILL";
-}
-
-function isPublicRegistryReference(reference: string) {
-  const parts = reference.split("/").filter(Boolean);
-  if (parts.length <= 1) return true;
-  return ["official", "global", "community"].includes(parts[0] ?? "");
 }

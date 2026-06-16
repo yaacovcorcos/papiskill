@@ -2,6 +2,7 @@ import { SkillRegistryKind, SkillVisibility, type User } from "@prisma/client";
 import { getPrisma } from "./prisma";
 import { getFileRegistrySkill } from "./catalog";
 import { generatedRegistry } from "./generated-registry";
+import { readableForkVisibilityWhere } from "./visibility";
 import {
   serializeForkDetail,
   serializeForkSummary,
@@ -131,11 +132,7 @@ async function getProfileFork(handle: string, slug: string, actor?: Pick<User, "
       slug,
       owner: { profile: { handle } },
       archivedAt: null,
-      OR: [
-        { visibility: SkillVisibility.PUBLIC },
-        { visibility: SkillVisibility.UNLISTED },
-        ...(actor ? [{ ownerId: actor.id }] : []),
-      ],
+      OR: readableForkVisibilityWhere(actor?.id),
     },
     include: {
       files: { orderBy: { path: "asc" } },

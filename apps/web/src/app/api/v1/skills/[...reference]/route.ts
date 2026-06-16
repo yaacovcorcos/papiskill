@@ -5,6 +5,7 @@ import {
 } from "@/lib/server/http";
 import { getCatalogSkills, getFileRegistrySkill } from "@/lib/server/catalog";
 import { hasDatabaseUrl } from "@/lib/server/db-env";
+import { isPublicRegistryReference, referenceSlug } from "@/lib/server/references";
 import { getSessionUser, getTokenUser } from "@/lib/server/request-auth";
 import { getSkillByReference } from "@/lib/server/skills";
 
@@ -18,7 +19,8 @@ export async function GET(
   const joinedReference = reference.join("/");
   const isPublicRegistry = isPublicRegistryReference(joinedReference);
   const actor = isPublicRegistry ? null : await getActor(request);
-  const skill = await getDatabaseSkill(joinedReference, actor) ?? await getCatalogFallback(joinedReference);
+  const databaseSkill = await getDatabaseSkill(joinedReference, actor);
+  const skill = databaseSkill ?? (isPublicRegistry ? await getCatalogFallback(joinedReference) : null);
   if (!skill) {
     return errorResponse("Skill not found.", 404);
   }
@@ -53,7 +55,7 @@ async function getCatalogFallback(reference: string) {
   const fileSkill = await getFileRegistrySkill(reference);
   if (fileSkill) return fileSkill;
 
-  const slug = reference.split("/").filter(Boolean).at(-1);
+  const slug = referenceSlug(reference);
   if (!slug) return null;
   const skill = (await getCatalogSkills("", { includeMarkdown: true })).find((item) => item.slug === slug);
   if (!skill) return null;
@@ -67,10 +69,4 @@ async function getCatalogFallback(reference: string) {
     ],
     installTargets: {},
   };
-}
-
-function isPublicRegistryReference(reference: string) {
-  const parts = reference.split("/").filter(Boolean);
-  if (parts.length <= 1) return true;
-  return ["official", "global", "community"].includes(parts[0] ?? "");
 }

@@ -28,7 +28,7 @@ Server-side ownership checks are mandatory.
 
 - No secrets in source control.
 - API tokens hashed at rest.
-- Private library access requires owner session or owner token.
+- Private and unlisted library access requires owner session or owner token.
 - Mutations must derive user ID from server session.
 - Do not execute skill scripts in the web app.
 - Display warnings for packages containing scripts or risky instructions.

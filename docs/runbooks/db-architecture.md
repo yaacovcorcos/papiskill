@@ -25,11 +25,11 @@
 
 - Globally published curated skills are indexed from Git, not authored directly in the database.
 - Public user library skills may be indexed and shown in search.
-- Private library skills are visible only to the owning user or a valid owner API token.
-- Unlisted library skills are not listed on public profiles but can be resolved by direct reference when access rules allow it.
+- Private and unlisted library skills are visible only to the owning user or a valid owner API token.
+- Unlisted library skills are reserved for future share-by-link behavior and must not be exposed through public routes until that access rule is explicitly implemented.
 - `sourceSkillId`, `sourceForkId`, `sourceReference`, `sourceVersion`, and `sourcePackageHash` preserve source lineage for update checks and attribution.
 - API tokens are stored hashed.
-- Download events must not expose private skill metadata to other users.
+- Download and skill-detail routes must not expose private or unlisted skill metadata to other users.
 - Skill IDs are lowercase slugs.
 - Stars and comments target exactly one public registry skill or one public profile library skill.
 - Comments are public when `VISIBLE`; deleted comments are retained as rows with `DELETED` status for audit continuity.
