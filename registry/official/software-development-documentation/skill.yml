@@ -1,0 +1,28 @@
+id: software-development-documentation
+name: Software Development Documentation
+summary: Create source-backed engineering docs for codebases, architecture, setup, testing, releases, and operations.
+description: "A portable documentation skill for generating and maintaining practical software development documentation from repository evidence, including architecture, setup, testing, debugging, deployment, security, APIs, and contributor workflows."
+version: 1.0.0
+license: MIT
+visibility: public
+categories:
+  - documentation
+  - coding
+tags:
+  - software-docs
+  - repo-wiki
+  - architecture
+  - onboarding
+  - api-docs
+compatible_with:
+  - codex
+  - claude-code
+  - cursor
+  - generic-agent
+install_targets:
+  codex: ~/.codex/skills/software-development-documentation
+  claude-code: ~/.claude/skills/software-development-documentation
+  cursor: ~/.cursor/skills/software-development-documentation
+source_url: https://github.com/yaacovcorcos/papiskill/tree/main/registry/official/software-development-documentation
+maintainers:
+  - github: yaacovcorcos

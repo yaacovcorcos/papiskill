@@ -1,0 +1,27 @@
+id: company-documentation-system
+name: Company Documentation System
+summary: Build and maintain clear company handbooks, knowledge bases, processes, and onboarding docs.
+description: "A portable documentation skill for creating practical company documentation systems: handbooks, operating principles, team pages, process docs, decision records, onboarding paths, and maintenance rules."
+version: 1.0.0
+license: MIT
+visibility: public
+categories:
+  - documentation
+tags:
+  - company-docs
+  - handbook
+  - knowledge-base
+  - onboarding
+  - operations
+compatible_with:
+  - codex
+  - claude-code
+  - cursor
+  - generic-agent
+install_targets:
+  codex: ~/.codex/skills/company-documentation-system
+  claude-code: ~/.claude/skills/company-documentation-system
+  cursor: ~/.cursor/skills/company-documentation-system
+source_url: https://github.com/yaacovcorcos/papiskill/tree/main/registry/official/company-documentation-system
+maintainers:
+  - github: yaacovcorcos

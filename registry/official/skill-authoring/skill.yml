@@ -1,7 +1,7 @@
 id: skill-authoring
 name: Skill Authoring
-summary: Draft portable SKILL.md packages with clear scope, metadata, examples, and safety boundaries.
-description: A skill for creating high-quality agent skills that are portable across tools, easy to inspect, and safe to install.
+summary: Create portable agent skills with strong trigger metadata, focused instructions, resources, safety boundaries, and validation.
+description: Create or improve portable agent skills with clear trigger metadata, focused instructions, bundled resources, safety boundaries, and real validation. Use when writing, reviewing, refactoring, packaging, or publishing a SKILL.md skill for PapiSkill, Codex, Claude Code, Factory, GitHub Copilot, Cursor, VS Code, or another agent runtime.
 version: 1.0.0
 license: MIT
 visibility: public
@@ -11,6 +11,8 @@ tags:
   - skills
   - authoring
   - documentation
+  - agent-skills
+  - validation
 compatible_with:
   - codex
   - claude-code

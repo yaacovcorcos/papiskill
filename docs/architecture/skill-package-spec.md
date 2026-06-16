@@ -61,6 +61,17 @@ maintainers:
 
 `SKILL.md` contains the agent-facing instructions. It should be direct, scoped, and portable.
 
+Official PapiSkill skills should include minimal YAML frontmatter for compatibility with common agent runtimes:
+
+```yaml
+---
+name: code-review
+description: Review code changes for bugs, regressions, missing tests, and risky assumptions. Use when asked to review a diff, pull request, patch, branch, or workspace changes.
+---
+```
+
+`skill.yml` remains the canonical PapiSkill registry manifest. Keep richer metadata such as categories, tags, compatibility, install targets, source URL, and maintainers in `skill.yml`.
+
 Rules:
 
 - Avoid assuming a single agent runtime unless declared in `compatible_with`.

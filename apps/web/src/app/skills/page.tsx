@@ -21,6 +21,7 @@ import { CopyButton } from "@/components/copy-button";
 import { EngagementCounts } from "@/components/skill-engagement-panel";
 import { getCatalogSkills, type CatalogSkill } from "@/lib/server/catalog";
 import { getSkillByReference } from "@/lib/server/skills";
+import { stripSkillFrontmatter } from "@/lib/skill-markdown";
 import { SkillsLayout } from "./skills-layout";
 
 export const revalidate = 60;
@@ -241,7 +242,7 @@ export default async function SkillsPage({
                     </Link>
                   </div>
                   <pre className="max-h-[360px] overflow-hidden rounded-lg border border-border bg-slate-50 p-4 font-mono text-xs leading-6 text-slate-800">
-                    {(selectedDetail?.markdown ?? "").slice(0, 900)}
+                    {stripSkillFrontmatter(selectedDetail?.markdown ?? "").slice(0, 900)}
                   </pre>
                 </div>
               </div>

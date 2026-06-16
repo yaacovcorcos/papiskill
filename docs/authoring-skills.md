@@ -35,6 +35,19 @@ assets/
 
 See [the package spec](./architecture/skill-package-spec.md).
 
+## Runtime frontmatter
+
+Official PapiSkill skills should include minimal `SKILL.md` frontmatter for portability across common agent runtimes:
+
+```markdown
+---
+name: my-skill
+description: What the skill does. Use when the user asks for the concrete trigger cases this skill handles.
+---
+```
+
+Keep `skill.yml` as the canonical PapiSkill registry manifest. Use `SKILL.md` frontmatter only for runtime discovery fields that other agents expect.
+
 ## Writing quality
 
 Good skills are direct, scoped, inspectable, and portable.

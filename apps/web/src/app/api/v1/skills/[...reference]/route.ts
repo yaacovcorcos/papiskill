@@ -3,7 +3,7 @@ import {
   jsonResponse,
   publicCatalogCacheHeaders,
 } from "@/lib/server/http";
-import { getCatalogSkills } from "@/lib/server/catalog";
+import { getCatalogSkills, getFileRegistrySkill } from "@/lib/server/catalog";
 import { hasDatabaseUrl } from "@/lib/server/db-env";
 import { getSessionUser, getTokenUser } from "@/lib/server/request-auth";
 import { getSkillByReference } from "@/lib/server/skills";
@@ -50,6 +50,9 @@ async function getDatabaseSkill(reference: string, actor: Awaited<ReturnType<typ
 }
 
 async function getCatalogFallback(reference: string) {
+  const fileSkill = await getFileRegistrySkill(reference);
+  if (fileSkill) return fileSkill;
+
   const slug = reference.split("/").filter(Boolean).at(-1);
   if (!slug) return null;
   const skill = (await getCatalogSkills("", { includeMarkdown: true })).find((item) => item.slug === slug);

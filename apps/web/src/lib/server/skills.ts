@@ -1,5 +1,6 @@
 import { SkillRegistryKind, SkillVisibility, type User } from "@prisma/client";
 import { getPrisma } from "./prisma";
+import { getFileRegistrySkill } from "./catalog";
 import { generatedRegistry } from "./generated-registry";
 import {
   serializeForkDetail,
@@ -60,7 +61,7 @@ export async function searchVisibleSkills(query: string) {
 
 export async function getSkillByReference(reference: string, actor?: Pick<User, "id"> | null) {
   if (!hasDatabaseUrl()) {
-    return getGeneratedRegistrySkill(reference);
+    return (await getFileRegistrySkill(reference)) ?? getGeneratedRegistrySkill(reference);
   }
 
   const parts = reference.split("/").filter(Boolean);
@@ -117,7 +118,11 @@ async function getGlobalSkill(slug: string, registryKind?: SkillRegistryKind) {
     },
   });
 
-  return skill ? serializeSkillDetail(skill) : null;
+  if (skill) return serializeSkillDetail(skill);
+  const namespace = registryKind === SkillRegistryKind.COMMUNITY
+    ? "community"
+    : "official";
+  return getFileRegistrySkill(`${namespace}/${slug}`);
 }
 
 async function getProfileFork(handle: string, slug: string, actor?: Pick<User, "id"> | null) {

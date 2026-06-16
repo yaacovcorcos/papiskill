@@ -12,6 +12,7 @@ import { getSessionUser } from "@/lib/server/request-auth";
 import { getPrisma } from "@/lib/server/prisma";
 import { getSkillEngagement } from "@/lib/server/engagement";
 import { getSkillByReference } from "@/lib/server/skills";
+import { stripSkillFrontmatter } from "@/lib/skill-markdown";
 
 export const dynamic = "force-dynamic";
 
@@ -66,6 +67,7 @@ export default async function UserSkillPage({ params }: { params: Params }) {
   }
 
   const reference = `${handle}/${slug}`;
+  const displayMarkdown = stripSkillFrontmatter(skill.markdown ?? "");
   const engagement = await getSkillEngagement(reference, viewer ? { id: viewer.id } : null);
   const showEngagement = skill.visibility === SkillVisibility.PUBLIC.toLowerCase();
 
@@ -90,7 +92,7 @@ export default async function UserSkillPage({ params }: { params: Params }) {
             </div>
 
             <section className="prose prose-slate mt-8 max-w-none prose-headings:tracking-tight prose-pre:rounded-lg prose-pre:border prose-pre:border-border prose-pre:bg-slate-50 prose-pre:text-slate-800">
-              <ReactMarkdown>{skill.markdown}</ReactMarkdown>
+              <ReactMarkdown>{displayMarkdown}</ReactMarkdown>
             </section>
             {showEngagement ? (
               <SkillEngagementPanel engagement={engagement} viewerSignedIn={Boolean(viewer)} />

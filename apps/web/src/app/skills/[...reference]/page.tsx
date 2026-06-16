@@ -9,6 +9,7 @@ import { hasDatabaseUrl } from "@/lib/server/db-env";
 import { getSkillEngagement } from "@/lib/server/engagement";
 import { getSessionUser } from "@/lib/server/request-auth";
 import { getSkillByReference } from "@/lib/server/skills";
+import { stripSkillFrontmatter } from "@/lib/skill-markdown";
 
 export const revalidate = 60;
 
@@ -32,6 +33,7 @@ export default async function SkillDetailPage({
   const skill = await getSkillByReference(requestedReference);
   if (!skill) notFound();
   const referenceId = skillReference(skill);
+  const displayMarkdown = stripSkillFrontmatter(skill.markdown ?? "");
   const viewer = hasDatabaseUrl() ? await getSessionUser().catch(() => null) : null;
   const engagement = await getSkillEngagement(referenceId, viewer ? { id: viewer.id } : null);
 
@@ -58,7 +60,7 @@ export default async function SkillDetailPage({
               </div>
 
               <section className="prose prose-slate mt-8 max-w-none prose-headings:tracking-tight prose-pre:rounded-lg prose-pre:border prose-pre:border-border prose-pre:bg-slate-50 prose-pre:text-slate-800">
-                <ReactMarkdown>{skill.markdown}</ReactMarkdown>
+                <ReactMarkdown>{displayMarkdown}</ReactMarkdown>
               </section>
               <SkillEngagementPanel engagement={engagement} viewerSignedIn={Boolean(viewer)} />
             </article>
