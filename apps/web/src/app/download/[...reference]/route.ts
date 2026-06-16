@@ -1,7 +1,7 @@
 import { errorResponse, publicCatalogCacheHeaders } from "@/lib/server/http";
-import { getCatalogSkills } from "@/lib/server/catalog";
+import { getFileRegistrySkill } from "@/lib/server/catalog";
 import { hasDatabaseUrl } from "@/lib/server/db-env";
-import { isPublicRegistryReference, referenceSlug } from "@/lib/server/references";
+import { isPublicRegistryReference } from "@/lib/server/references";
 import { getSessionUser, getTokenUser } from "@/lib/server/request-auth";
 import { getSkillByReference } from "@/lib/server/skills";
 
@@ -52,9 +52,7 @@ async function getDatabaseSkill(reference: string, actor: Awaited<ReturnType<typ
 }
 
 async function getCatalogFallback(reference: string) {
-  const slug = referenceSlug(reference);
-  if (!slug) return null;
-  return (await getCatalogSkills("", { includeMarkdown: true })).find((item) => item.slug === slug) ?? null;
+  return getFileRegistrySkill(reference);
 }
 
 function safeFilename(slug: string) {

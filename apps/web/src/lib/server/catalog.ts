@@ -329,6 +329,22 @@ function filterCatalogEntries(
 export async function getFileRegistrySkill(
   reference: string,
 ): Promise<CatalogSkillDetail | null> {
+  const skill = getGeneratedRegistrySkillByReference(reference);
+  if (!skill) return null;
+
+  return {
+    ...skill,
+    files: [
+      {
+        path: "SKILL.md",
+        content: skill.markdown ?? "",
+      },
+    ],
+    installTargets: {},
+  };
+}
+
+export function getGeneratedRegistrySkillByReference(reference: string): CatalogSkill | null {
   const parts = reference.split("/").filter(Boolean);
   const slug = parts.at(-1);
   const namespace = parts.length > 1 ? parts[0] : "official";
@@ -342,16 +358,5 @@ export async function getFileRegistrySkill(
     }
     return false;
   });
-  if (!skill) return null;
-
-  return {
-    ...skill,
-    files: [
-      {
-        path: "SKILL.md",
-        content: skill.markdown ?? "",
-      },
-    ],
-    installTargets: {},
-  };
+  return skill ?? null;
 }
