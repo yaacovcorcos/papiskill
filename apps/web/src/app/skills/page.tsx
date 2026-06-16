@@ -13,6 +13,7 @@ import {
   selectedFilterLabels,
   skillReference,
   skillsHref,
+  sortLabel,
   toggleFilterHref,
   type SearchParamValue,
 } from "./skill-filters";
@@ -27,7 +28,10 @@ export default async function SkillsPage({
   searchParams: Promise<Record<string, SearchParamValue>>;
 }) {
   const activeFilters = parseActiveFilters(await searchParams);
-  const baseSkillsPromise = getCatalogSkills({ query: activeFilters.query });
+  const baseSkillsPromise = getCatalogSkills({
+    query: activeFilters.query,
+    sort: activeFilters.sort,
+  });
   const skillsPromise = hasStructuredFilters(activeFilters)
     ? getCatalogSkills(activeFilters)
     : baseSkillsPromise;
@@ -118,9 +122,9 @@ export default async function SkillsPage({
             </div>
           ) : null}
 
-          <div className="mb-3 flex items-center justify-between text-sm text-muted">
+          <div className="mb-3 flex flex-col gap-2 text-sm text-muted sm:flex-row sm:items-center sm:justify-between">
             <span>{skills.length} skills</span>
-            <span>Showing curated first</span>
+            <SortLinks activeFilters={activeFilters} />
           </div>
 
           {skills.length === 0 ? (
@@ -218,8 +222,51 @@ function SearchForm({
             value={value}
           />
         ))}
+        {activeFilters.sort !== "curated" ? (
+          <input type="hidden" name="sort" value={activeFilters.sort} />
+        ) : null}
       </label>
     </form>
+  );
+}
+
+function SortLinks({
+  activeFilters,
+}: {
+  activeFilters: ReturnType<typeof parseActiveFilters>;
+}) {
+  const options = [
+    { value: "curated", label: "Curated" },
+    { value: "popular", label: "Popular" },
+    { value: "recent", label: "Recent" },
+  ] as const;
+
+  return (
+    <div className="flex flex-wrap items-center gap-2">
+      <span>{sortLabel(activeFilters.sort)}</span>
+      <span aria-hidden>·</span>
+      <div className="flex flex-wrap gap-1" aria-label="Sort skills">
+        {options.map((option) => {
+          const active = activeFilters.sort === option.value;
+          return active ? (
+            <span
+              key={option.value}
+              className="rounded-md bg-slate-100 px-2 py-1 font-semibold text-slate-950"
+            >
+              {option.label}
+            </span>
+          ) : (
+            <Link
+              key={option.value}
+              href={skillsHref({ ...activeFilters, sort: option.value })}
+              className="rounded-md px-2 py-1 font-medium text-slate-600 hover:bg-slate-100 hover:text-slate-950"
+            >
+              {option.label}
+            </Link>
+          );
+        })}
+      </div>
+    </div>
   );
 }
 

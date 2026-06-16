@@ -23,6 +23,7 @@ Required:
 
 - keyword search
 - category and agent compatibility filters
+- curated, popular, and recent sorting
 - global/community/profile distinction
 - clear install and download actions
 - trust/safety metadata

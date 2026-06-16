@@ -9,6 +9,7 @@ import {
   skillHref,
   skillReference,
   skillsHref,
+  sortLabel,
   toggleFilterHref,
 } from "./skill-filters";
 
@@ -58,6 +59,7 @@ describe("filter parsing and URLs", () => {
       categories: ["coding", "documentation"],
       compatibility: ["codex"],
       statuses: ["global"],
+      sort: "curated",
     });
     expect(hasStructuredFilters(filters)).toBe(true);
     expect(filterSummary(filters)).toBe("4 selected");
@@ -67,13 +69,22 @@ describe("filter parsing and URLs", () => {
     const filters = parseActiveFilters({
       q: "review",
       category: "coding",
+      sort: "popular",
     });
 
-    expect(skillsHref(filters)).toBe("/skills?q=review&category=coding");
-    expect(toggleFilterHref(filters, "categories", "coding")).toBe("/skills?q=review");
+    expect(skillsHref(filters)).toBe("/skills?q=review&category=coding&sort=popular");
+    expect(toggleFilterHref(filters, "categories", "coding")).toBe("/skills?q=review&sort=popular");
     expect(toggleFilterHref(filters, "compatibility", "codex")).toBe(
-      "/skills?q=review&category=coding&compatibility=codex",
+      "/skills?q=review&category=coding&compatibility=codex&sort=popular",
     );
+  });
+
+  it("normalizes supported sort modes and omits curated from URLs", () => {
+    expect(parseActiveFilters({ sort: "recent" }).sort).toBe("recent");
+    expect(parseActiveFilters({ sort: "nonsense" }).sort).toBe("curated");
+    expect(skillsHref(parseActiveFilters({ sort: "curated" }))).toBe("/skills");
+    expect(skillsHref(parseActiveFilters({ sort: "recent" }))).toBe("/skills?sort=recent");
+    expect(sortLabel("popular")).toBe("Popular first");
   });
 });
 
@@ -111,5 +122,6 @@ function skill(overrides: Partial<CatalogSkill>): CatalogSkill {
     installCommand: "papiskill install official/skill",
     starCount: 0,
     commentCount: 0,
+    updatedAt: overrides.updatedAt,
   };
 }

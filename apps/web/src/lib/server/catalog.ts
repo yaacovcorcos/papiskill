@@ -24,6 +24,7 @@ export interface CatalogSkill {
   files?: Array<{ path: string; content: string }>;
   starCount: number;
   commentCount: number;
+  updatedAt?: string;
 }
 
 export interface CatalogSkillDetail extends CatalogSkill {
@@ -36,10 +37,13 @@ export interface CatalogFilters {
   categories?: string[];
   compatibility?: string[];
   statuses?: string[];
+  sort?: CatalogSort;
 }
 
 const allowedStatuses = ["global", "community", "profile"] as const;
 type CatalogStatus = (typeof allowedStatuses)[number];
+const allowedSorts = ["curated", "popular", "recent"] as const;
+export type CatalogSort = (typeof allowedSorts)[number];
 
 interface CatalogOptions {
   includeMarkdown?: boolean;
@@ -186,6 +190,7 @@ export async function getCatalogSkills(
             : {}),
           starCount: skill._count.stars,
           commentCount: skill._count.comments,
+          updatedAt: skill.updatedAt.toISOString(),
         };
       });
       const databaseSkillByKey = new Map(
@@ -195,7 +200,7 @@ export async function getCatalogSkills(
         ]),
       );
 
-      return [
+      return sortCatalogSkills([
         ...fileCatalog.map((fileSkill) => {
           const databaseSkill = databaseSkillByKey.get(
             `${fileSkill.registryKind}/${fileSkill.slug}`,
@@ -205,6 +210,7 @@ export async function getCatalogSkills(
                 ...fileSkill,
                 starCount: databaseSkill.starCount,
                 commentCount: databaseSkill.commentCount,
+                updatedAt: databaseSkill.updatedAt,
               }
             : fileSkill;
         }),
@@ -229,9 +235,10 @@ export async function getCatalogSkills(
               : {}),
             starCount: fork._count.stars,
             commentCount: fork._count.comments,
+            updatedAt: fork.updatedAt.toISOString(),
           };
         }),
-      ];
+      ], normalizedFilters.sort);
     } catch {
       return getFileCatalogSkills(normalizedFilters, includeMarkdown);
     }
@@ -249,6 +256,7 @@ function normalizeFilters(
       categories: [],
       compatibility: [],
       statuses: [],
+      sort: "curated",
     };
   }
 
@@ -257,6 +265,7 @@ function normalizeFilters(
     categories: uniqueNormalized(filters.categories ?? []),
     compatibility: uniqueNormalized(filters.compatibility ?? []),
     statuses: uniqueNormalized(filters.statuses ?? []).filter(isCatalogStatus),
+    sort: isCatalogSort(filters.sort) ? filters.sort : "curated",
   };
 }
 
@@ -270,11 +279,18 @@ function isCatalogStatus(status: string): status is CatalogStatus {
   return (allowedStatuses as readonly string[]).includes(status);
 }
 
+function isCatalogSort(sort: string | undefined): sort is CatalogSort {
+  return Boolean(sort && (allowedSorts as readonly string[]).includes(sort));
+}
+
 async function getFileCatalogSkills(
   filters: Required<CatalogFilters>,
   includeMarkdown: boolean,
 ): Promise<CatalogSkill[]> {
-  return filterCatalogEntries(generatedRegistry, filters, includeMarkdown);
+  return sortCatalogSkills(
+    filterCatalogEntries(generatedRegistry, filters, includeMarkdown),
+    filters.sort,
+  );
 }
 
 function filterCatalogEntries(
@@ -325,6 +341,39 @@ function filterCatalogEntries(
     .map((entry) =>
       includeMarkdown ? entry : { ...entry, markdown: undefined },
     );
+}
+
+export function sortCatalogSkills(skills: CatalogSkill[], sort: CatalogSort): CatalogSkill[] {
+  if (sort === "curated") return skills;
+
+  return [...skills].sort((a, b) => {
+    if (sort === "popular") {
+      return (
+        b.starCount - a.starCount ||
+        b.commentCount - a.commentCount ||
+        statusRank(a.registryKind) - statusRank(b.registryKind) ||
+        a.name.localeCompare(b.name)
+      );
+    }
+
+    return (
+      timestamp(b.updatedAt) - timestamp(a.updatedAt) ||
+      statusRank(a.registryKind) - statusRank(b.registryKind) ||
+      a.name.localeCompare(b.name)
+    );
+  });
+}
+
+function timestamp(value: string | undefined) {
+  if (!value) return 0;
+  const parsed = Date.parse(value);
+  return Number.isNaN(parsed) ? 0 : parsed;
+}
+
+function statusRank(registryKind: string) {
+  if (registryKind === "global") return 0;
+  if (registryKind === "community") return 1;
+  return 2;
 }
 
 export async function getFileRegistrySkill(

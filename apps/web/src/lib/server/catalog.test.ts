@@ -2,6 +2,8 @@ import { describe, expect, it } from "vitest";
 import {
   getFileRegistrySkill,
   getGeneratedRegistrySkillByReference,
+  sortCatalogSkills,
+  type CatalogSkill,
 } from "./catalog";
 
 describe("generated registry reference lookup", () => {
@@ -31,3 +33,62 @@ describe("generated registry reference lookup", () => {
     expect(getGeneratedRegistrySkillByReference("yaacovcorcos/code-review")).toBeNull();
   });
 });
+
+describe("catalog sorting", () => {
+  it("keeps curated order unchanged", () => {
+    const skills = [
+      skill({ slug: "b", name: "B", starCount: 1 }),
+      skill({ slug: "a", name: "A", starCount: 10 }),
+    ];
+
+    expect(sortCatalogSkills(skills, "curated").map((item) => item.slug)).toEqual(["b", "a"]);
+  });
+
+  it("sorts popular skills by stars then visible comments", () => {
+    const skills = [
+      skill({ slug: "quiet", name: "Quiet", starCount: 1, commentCount: 0 }),
+      skill({ slug: "talked", name: "Talked", starCount: 2, commentCount: 10 }),
+      skill({ slug: "liked", name: "Liked", starCount: 3, commentCount: 0 }),
+    ];
+
+    expect(sortCatalogSkills(skills, "popular").map((item) => item.slug)).toEqual([
+      "liked",
+      "talked",
+      "quiet",
+    ]);
+  });
+
+  it("sorts recently updated skills before generated entries without timestamps", () => {
+    const skills = [
+      skill({ slug: "generated", name: "Generated" }),
+      skill({ slug: "older", name: "Older", updatedAt: "2026-01-01T00:00:00.000Z" }),
+      skill({ slug: "newer", name: "Newer", updatedAt: "2026-06-01T00:00:00.000Z" }),
+    ];
+
+    expect(sortCatalogSkills(skills, "recent").map((item) => item.slug)).toEqual([
+      "newer",
+      "older",
+      "generated",
+    ]);
+  });
+});
+
+function skill(overrides: Partial<CatalogSkill>): CatalogSkill {
+  return {
+    id: overrides.slug ?? "skill",
+    slug: overrides.slug ?? "skill",
+    name: overrides.name ?? "Skill",
+    summary: "Summary",
+    description: "Description",
+    registryKind: overrides.registryKind ?? "global",
+    visibility: "public",
+    author: "author",
+    compatibleWith: ["generic-agent"],
+    tags: [],
+    categories: ["coding"],
+    installCommand: "papiskill install official/skill",
+    starCount: overrides.starCount ?? 0,
+    commentCount: overrides.commentCount ?? 0,
+    updatedAt: overrides.updatedAt,
+  };
+}

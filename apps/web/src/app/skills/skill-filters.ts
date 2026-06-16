@@ -1,4 +1,5 @@
 import type { CatalogSkill } from "@/lib/server/catalog";
+import type { CatalogSort } from "@/lib/server/catalog";
 
 export const compatibilityLabels: Record<string, string> = {
   codex: "Codex",
@@ -22,6 +23,7 @@ export interface ActiveFilters {
   categories: string[];
   compatibility: string[];
   statuses: string[];
+  sort: CatalogSort;
 }
 
 export interface ActiveFilterLabel {
@@ -33,6 +35,7 @@ export interface ActiveFilterLabel {
 const categoryOrder = ["coding", "documentation", "security", "productivity"];
 const compatibilityOrder = ["codex", "claude-code", "cursor", "generic-agent"];
 const statusOrder = ["global", "community", "profile"];
+const sortOrder = ["curated", "popular", "recent"] as const;
 
 const categoryLabels: Record<string, string> = {
   coding: "Coding",
@@ -78,6 +81,7 @@ export function skillHref(skill: {
 }
 
 export function parseActiveFilters(params: Record<string, SearchParamValue>): ActiveFilters {
+  const sort = firstParam(params.sort).toLowerCase();
   return {
     query: firstParam(params.q),
     categories: paramList(params.category),
@@ -85,6 +89,7 @@ export function parseActiveFilters(params: Record<string, SearchParamValue>): Ac
     statuses: paramList(params.status).filter((status) =>
       validStatuses.has(status),
     ),
+    sort: isSortValue(sort) ? sort : "curated",
   };
 }
 
@@ -120,6 +125,7 @@ export function skillsHref(filters: ActiveFilters) {
     params.append("compatibility", value),
   );
   filters.statuses.forEach((value) => params.append("status", value));
+  if (filters.sort !== "curated") params.set("sort", filters.sort);
   const query = params.toString();
   return query ? `/skills?${query}` : "/skills";
 }
@@ -148,6 +154,12 @@ export function statusBadgeLabel(registryKind: string) {
   if (registryKind === "global") return "Global";
   if (registryKind === "community") return "Community";
   return "Profile";
+}
+
+export function sortLabel(sort: CatalogSort) {
+  if (sort === "popular") return "Popular first";
+  if (sort === "recent") return "Recently updated";
+  return "Curated first";
 }
 
 export function countMatching(skills: CatalogSkill[], key: FilterKey, value: string) {
@@ -250,4 +262,8 @@ function titleCase(value: string) {
     .filter(Boolean)
     .map((part) => part[0]?.toUpperCase() + part.slice(1))
     .join(" ");
+}
+
+function isSortValue(value: string): value is CatalogSort {
+  return (sortOrder as readonly string[]).includes(value);
 }
