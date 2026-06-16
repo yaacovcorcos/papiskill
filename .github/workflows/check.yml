@@ -48,3 +48,6 @@ jobs:
 
       - name: Build
         run: npm run build
+
+      - name: Verify CLI npm package dry run
+        run: npm run cli:pack

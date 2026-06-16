@@ -2,7 +2,24 @@
   "name": "@papiskill/skill-core",
   "version": "0.1.0",
   "description": "Shared parser, schema, validation, and install target logic for PapiSkill packages.",
+  "license": "MIT",
   "type": "module",
+  "homepage": "https://papiskill.com",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/yaacovcorcos/papiskill.git",
+    "directory": "packages/skill-core"
+  },
+  "bugs": {
+    "url": "https://github.com/yaacovcorcos/papiskill/issues"
+  },
+  "keywords": [
+    "agent",
+    "skills",
+    "skill-md",
+    "validation",
+    "schema"
+  ],
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "exports": {
@@ -15,8 +32,16 @@
       "import": "./dist/registry-loader.js"
     }
   },
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
   "scripts": {
-    "build": "tsc -p tsconfig.json",
+    "clean": "node -e \"require('node:fs').rmSync('dist', { recursive: true, force: true })\"",
+    "build": "npm run clean && tsc -p tsconfig.build.json",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "test": "vitest run",
     "validate:registry": "tsx src/validate-registry.ts ../../registry"

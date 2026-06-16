@@ -2,15 +2,39 @@
   "name": "papiskill",
   "version": "0.1.0",
   "description": "CLI for searching, installing, downloading, validating, and authenticating PapiSkill packages.",
+  "license": "MIT",
   "type": "module",
+  "homepage": "https://papiskill.com",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/yaacovcorcos/papiskill.git",
+    "directory": "packages/cli"
+  },
+  "bugs": {
+    "url": "https://github.com/yaacovcorcos/papiskill/issues"
+  },
+  "keywords": [
+    "agent",
+    "skills",
+    "skill-md",
+    "cli",
+    "codex",
+    "claude-code",
+    "cursor"
+  ],
   "bin": {
     "papiskill": "./dist/index.js"
   },
+  "engines": {
+    "node": ">=22.12.0"
+  },
   "files": [
-    "dist"
+    "dist",
+    "README.md"
   ],
   "scripts": {
-    "build": "tsc -p tsconfig.json",
+    "clean": "node -e \"require('node:fs').rmSync('dist', { recursive: true, force: true })\"",
+    "build": "npm run clean && tsc -p tsconfig.build.json",
     "dev": "tsx src/index.ts",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "test": "vitest run"

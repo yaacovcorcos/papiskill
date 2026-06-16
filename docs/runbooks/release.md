@@ -8,6 +8,7 @@ Run from repo root:
 npm install
 npm run registry:generate
 npm run check
+npm run cli:pack
 ```
 
 ## Database
@@ -66,6 +67,7 @@ vercel --prod
 - public API health route responds
 - public skill API and public download routes return `CDN-Cache-Control: public, max-age=60, stale-while-revalidate=300`
 - CLI can search public registry against production API
+- `npm run cli:pack` passes before any CLI publication
 - `npm run a11y:public -- --base-url https://papiskill.com` passes
 - `npm run perf:public -- --base-url https://papiskill.com` passes
 - Vercel error logs show no fresh Prisma schema errors after loading changed routes:

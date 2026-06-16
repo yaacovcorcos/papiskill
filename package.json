@@ -16,6 +16,7 @@
     "test": "npm run test --workspaces --if-present",
     "check": "npm run typecheck && npm run lint && npm run test && npm run build",
     "a11y:public": "tsx apps/web/scripts/public-accessibility.ts",
+    "cli:pack": "npm run build --workspace @papiskill/skill-core && npm run build --workspace papiskill && npm pack --workspace @papiskill/skill-core --dry-run && npm pack --workspace papiskill --dry-run",
     "perf:public": "tsx apps/web/scripts/public-performance.ts",
     "db:generate": "npm --workspace @papiskill/web run db:generate",
     "db:migrate": "npm --workspace @papiskill/web run db:migrate",

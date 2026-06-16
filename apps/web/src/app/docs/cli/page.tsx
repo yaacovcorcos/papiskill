@@ -18,6 +18,9 @@ export default function CliDocsPage() {
         <p className="mt-3 text-lg leading-8 text-muted">
           The `papiskill` CLI installs skills into Codex, Claude Code, Cursor, generic project folders, or a custom directory.
         </p>
+        <p className="mt-3 text-sm leading-6 text-muted">
+          The npm package is prepared through a dry-run packaging gate and will be available with `npx papiskill` after the first npm publication.
+        </p>
         <div className="mt-8 space-y-3">
           {commands.map((command) => (
             <code key={command} className="block rounded-lg border border-border bg-slate-950 px-4 py-3 font-mono text-sm text-white">

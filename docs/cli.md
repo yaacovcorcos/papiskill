@@ -10,11 +10,19 @@ During development:
 npm --workspace papiskill run dev -- search review
 ```
 
-After publish:
+After npm publication:
 
 ```bash
 npx papiskill search review
 ```
+
+Publication readiness is verified with:
+
+```bash
+npm run cli:pack
+```
+
+That dry-run packs both `@papiskill/skill-core` and `papiskill` so the CLI package can resolve its shared parser and validation dependency when installed from npm.
 
 ## Public commands
 

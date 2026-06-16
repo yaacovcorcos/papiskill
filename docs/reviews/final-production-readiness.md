@@ -16,7 +16,7 @@ The remaining blockers for declaring the overall build complete are:
 - authenticated browser verification against production or a production-like database
 - authenticated editor accessibility and performance passes
 - a final decision on the sidebar/filter layout after the user's review
-- CLI distribution decision: repo/local CLI is implemented, npm publication is not yet done
+- CLI npm publication is dry-run verified, but the first npm publish is not yet done
 
 ## Production deploy evidence
 
@@ -111,9 +111,10 @@ sidebar should remain, collapse by default, or move permanently into compact con
 
 ### CLI distribution
 
-The CLI is implemented and tested as the `papiskill` workspace package. Publication to npm is not done.
-Before announcing CLI installation broadly, decide whether v1 means:
+The CLI is implemented and tested as the `papiskill` workspace package. The npm package path is prepared
+but not published:
 
-- local repo install only
-- GitHub package/release artifact
-- npm publication under the `papiskill` package name
+- `npm run cli:pack` builds and dry-runs npm packs for `@papiskill/skill-core` and `papiskill`
+- package tarballs exclude compiled test files and include package READMEs
+- CI runs the dry-run packaging gate after build
+- first npm publication still needs an explicit release decision and npm account/auth confirmation

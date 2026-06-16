@@ -48,6 +48,7 @@ Prove PapiSkill is production-ready before declaring the goal complete.
 - Custom install paths work.
 - Agent target presets are explicit.
 - CLI errors are actionable.
+- `npm run cli:pack` dry-runs publishable `@papiskill/skill-core` and `papiskill` tarballs.
 
 ### Documentation
 
