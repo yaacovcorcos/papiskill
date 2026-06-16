@@ -1,8 +1,13 @@
-import { jsonResponse } from "@/lib/server/http";
+import { jsonResponse, publicHealthCacheHeaders } from "@/lib/server/http";
 
 export function GET() {
-  return jsonResponse({
-    ok: true,
-    service: "papiskill",
-  });
+  return jsonResponse(
+    {
+      ok: true,
+      service: "papiskill",
+    },
+    {
+      headers: publicHealthCacheHeaders,
+    },
+  );
 }

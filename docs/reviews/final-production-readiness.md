@@ -81,8 +81,8 @@ needs moderation hardening before meaningful traffic:
 Public pages are already small and fast enough for the seed catalog, but the app still needs a measured pass:
 
 - record baseline Lighthouse or Playwright trace for `/skills`, skill detail, and editor
-- confirm cache headers for public API, registry pages, and downloads
-- keep private library routes and token routes out of shared caches
+- public API, public registry downloads, and health responses now use explicit shared cache headers
+- private library/download/token/user responses remain `no-store` or `private, no-store`
 - preload detail routes only after checking that it improves the current layout
 
 ### Accessibility

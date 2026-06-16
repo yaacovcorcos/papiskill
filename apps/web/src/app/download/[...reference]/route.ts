@@ -1,4 +1,8 @@
-import { errorResponse, publicCatalogCacheHeaders } from "@/lib/server/http";
+import {
+  errorResponse,
+  privateNoStoreCacheHeaders,
+  publicCatalogCacheHeaders,
+} from "@/lib/server/http";
 import { getFileRegistrySkill } from "@/lib/server/catalog";
 import { hasDatabaseUrl } from "@/lib/server/db-env";
 import { recordDownloadEvent } from "@/lib/server/download-events";
@@ -37,9 +41,7 @@ export async function GET(
       headers: {
         "Content-Type": "application/zip",
         "Content-Disposition": `attachment; filename="${packageDownloadFilename(skill.slug)}"`,
-        ...(isPublicRegistry
-          ? publicCatalogCacheHeaders
-          : { "Cache-Control": "private, no-store" }),
+        ...(isPublicRegistry ? publicCatalogCacheHeaders : privateNoStoreCacheHeaders),
       },
     });
   }
@@ -54,9 +56,7 @@ export async function GET(
     headers: {
       "Content-Type": "text/markdown; charset=utf-8",
       "Content-Disposition": `attachment; filename="${packageDownloadFilename(skill.slug, "md")}"`,
-      ...(isPublicRegistry
-        ? publicCatalogCacheHeaders
-        : { "Cache-Control": "private, no-store" }),
+      ...(isPublicRegistry ? publicCatalogCacheHeaders : privateNoStoreCacheHeaders),
     },
   });
 }
