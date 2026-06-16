@@ -18,16 +18,18 @@ export async function installSkill(skill: ApiSkillDetail, options: InstallOption
     install_targets: skill.installTargets,
   }, resolutionOptions);
 
-  await mkdir(resolution.directory, { recursive: true });
+  const installRoot = path.resolve(resolution.directory);
+  await mkdir(installRoot, { recursive: true });
 
   for (const file of skill.files) {
-    const destination = path.join(resolution.directory, file.path);
-    if (!destination.startsWith(path.resolve(resolution.directory))) {
+    const destination = path.resolve(installRoot, file.path);
+    const relativeDestination = path.relative(installRoot, destination);
+    if (relativeDestination.startsWith("..") || path.isAbsolute(relativeDestination)) {
       throw new Error(`Refusing to write outside install directory: ${file.path}`);
     }
     await mkdir(path.dirname(destination), { recursive: true });
     await writeFile(destination, file.content, "utf8");
   }
 
-  return resolution.directory;
+  return installRoot;
 }

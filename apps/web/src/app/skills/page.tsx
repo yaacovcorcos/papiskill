@@ -42,7 +42,7 @@ export default async function SkillsPage({
   return (
     <>
       <AppHeader />
-      <main className="mx-auto grid w-full max-w-[1500px] flex-1 grid-cols-1 lg:grid-cols-[270px_minmax(0,1fr)_430px]">
+      <main className="mx-auto grid w-full max-w-[1500px] flex-1 grid-cols-1 lg:grid-cols-[270px_minmax(0,1fr)] xl:grid-cols-[270px_minmax(0,1fr)_430px]">
         <aside className="hidden border-r border-border bg-surface-subtle px-5 py-6 lg:block">
           <div className="mb-6 flex items-center justify-between">
             <h2 className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-700">Filters</h2>
