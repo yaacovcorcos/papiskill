@@ -24,6 +24,7 @@ function createAuth() {
     advanced: {
       ipAddress: {
         ipAddressHeaders: [
+          "x-vercel-forwarded-for",
           "x-forwarded-for",
           "x-real-ip",
           "cf-connecting-ip",

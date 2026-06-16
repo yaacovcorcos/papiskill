@@ -18,6 +18,7 @@ export async function GET(request: Request) {
         "content-type": "application/json",
         origin: requestUrl.origin,
         cookie: request.headers.get("cookie") ?? "",
+        ...forwardedIpHeaders(request.headers),
       },
       body: JSON.stringify({
         provider: "github",
@@ -48,4 +49,18 @@ function getSetCookies(headers: Headers): string[] {
   if (getSetCookie) return getSetCookie.call(headers);
   const cookie = headers.get("set-cookie");
   return cookie ? [cookie] : [];
+}
+
+function forwardedIpHeaders(headers: Headers): Record<string, string> {
+  const forwarded: Record<string, string> = {};
+  for (const name of [
+    "x-vercel-forwarded-for",
+    "x-forwarded-for",
+    "x-real-ip",
+    "cf-connecting-ip",
+  ]) {
+    const value = headers.get(name);
+    if (value) forwarded[name] = value;
+  }
+  return forwarded;
 }
