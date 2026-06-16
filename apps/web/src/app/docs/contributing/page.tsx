@@ -40,6 +40,7 @@ export default function ContributingDocsPage() {
           <h2 className="text-lg font-semibold">Global registry skills</h2>
           <p className="mt-3 text-sm leading-7 text-slate-700">
             Curated global skills live in <code className="rounded bg-slate-100 px-1.5 py-0.5">registry/official/&lt;skill-id&gt;/</code>.
+            Existing skill detail pages show the exact source path and link to GitHub for focused edits.
           </p>
           <ul className="mt-4 space-y-2 text-sm leading-6 text-slate-700">
             {registryRequirements.map((item) => (

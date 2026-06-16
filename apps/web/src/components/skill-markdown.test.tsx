@@ -1,5 +1,9 @@
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
+import {
+  RegistrySourceCard,
+  registrySourcePath,
+} from "./registry-source-card";
 import { SkillMarkdown } from "./skill-markdown";
 import { SkillMarkdownEditor } from "./skill-markdown-editor";
 import { SkillSourceBlock } from "./skill-source-block";
@@ -56,5 +60,34 @@ describe("SkillSourceBlock", () => {
     expect(html).toContain("Copy Raw SKILL.md");
     expect(html).toContain("name: sample");
     expect(html).toContain("# Sample");
+  });
+});
+
+describe("RegistrySourceCard", () => {
+  it("builds exact git registry source paths for global and community skills", () => {
+    expect(
+      registrySourcePath({ registryKind: "global", slug: "code-review" }),
+    ).toBe("registry/official/code-review");
+    expect(
+      registrySourcePath({ registryKind: "community", slug: "docs" }),
+    ).toBe("registry/community/docs");
+    expect(
+      registrySourcePath({ registryKind: "profile", slug: "mine" }),
+    ).toBeNull();
+  });
+
+  it("renders source and edit links for global registry packages", () => {
+    const html = renderToStaticMarkup(
+      <RegistrySourceCard registryKind="global" slug="code-review" />,
+    );
+
+    expect(html).toContain("registry/official/code-review/");
+    expect(html).toContain(
+      "https://github.com/yaacovcorcos/papiskill/tree/main/registry/official/code-review",
+    );
+    expect(html).toContain(
+      "https://github.com/yaacovcorcos/papiskill/edit/main/registry/official/code-review/SKILL.md",
+    );
+    expect(html).toContain("Contribution guide");
   });
 });

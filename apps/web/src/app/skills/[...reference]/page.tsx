@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { ArrowLeft, Download, GitFork, ShieldCheck, Terminal } from "lucide-react";
 import { AppHeader } from "@/components/app-header";
 import { Badge } from "@/components/badge";
+import { RegistrySourceCard } from "@/components/registry-source-card";
 import { SkillMarkdown } from "@/components/skill-markdown";
 import { SkillEngagementPanel } from "@/components/skill-engagement-panel";
 import { SkillSourceBlock } from "@/components/skill-source-block";
@@ -104,6 +105,8 @@ export default async function SkillDetailPage({
                   </div>
                 </div>
               </div>
+
+              <RegistrySourceCard registryKind={skill.registryKind} slug={skill.slug} />
 
               <div className="mt-4 rounded-lg border border-emerald-200 bg-emerald-50 p-5 text-sm text-emerald-900">
                 <div className="flex items-center gap-2 font-semibold">

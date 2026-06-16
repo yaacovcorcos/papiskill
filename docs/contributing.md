@@ -16,6 +16,10 @@ Global skills live under:
 registry/official/<skill-id>/
 ```
 
+Existing global skill detail pages show the exact source path and link to the
+GitHub source/editor for `SKILL.md`. Use those links when proposing a focused
+change to an already-published skill.
+
 They require:
 
 - valid `skill.yml`
