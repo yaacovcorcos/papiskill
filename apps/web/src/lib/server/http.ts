@@ -1,5 +1,5 @@
 export const publicCatalogCacheHeaders = {
-  "Cache-Control": "public, max-age=0, must-revalidate",
+  "cache-control": "public, max-age=0, must-revalidate",
   "CDN-Cache-Control": "public, max-age=60, stale-while-revalidate=300",
   "Vercel-CDN-Cache-Control": "public, max-age=60, stale-while-revalidate=300",
 };
