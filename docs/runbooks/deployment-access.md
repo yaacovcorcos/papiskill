@@ -45,6 +45,8 @@ Completed:
 
 - `papiskill.com` added to Vercel project `papiskill`.
 - `www.papiskill.com` added to Vercel project `papiskill`.
+- The app redirects `https://www.papiskill.com/*` to the canonical
+  `https://papiskill.com/*` origin.
 - Cloudflare DNS records created in DNS-only mode:
   - `A papiskill.com 76.76.21.21`
   - `A www.papiskill.com 76.76.21.21`
@@ -53,6 +55,7 @@ Verification commands:
 
 ```bash
 curl -I https://papiskill.com
+curl -I https://www.papiskill.com
 curl -sS https://papiskill.com/api/v1/health
 curl -sS 'https://papiskill.com/api/v1/skills?q=review'
 vercel domains inspect papiskill.com --scope yaacovs-projects-a4ee3dc9
@@ -62,4 +65,4 @@ vercel domains inspect www.papiskill.com --scope yaacovs-projects-a4ee3dc9
 Known state from initial deploy:
 
 - `papiskill.com` is live and aliased to the production deployment.
-- `www.papiskill.com` DNS is present but SSL may need time to provision.
+- `www.papiskill.com` DNS is present and should redirect to `papiskill.com`.
