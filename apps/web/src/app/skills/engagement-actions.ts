@@ -8,6 +8,7 @@ import { getSessionUser } from "@/lib/server/request-auth";
 import { getPrisma } from "@/lib/server/prisma";
 import {
   engagementPathForReference,
+  engagementTargetWhere,
   getPublicEngagementTarget,
   normalizeCommentBody,
 } from "@/lib/server/engagement";
@@ -20,9 +21,7 @@ export async function toggleStarAction(formData: FormData) {
     redirect(engagementPathForReference(reference));
   }
 
-  const targetWhere = target.kind === "skill"
-    ? { skillId: target.id }
-    : { forkId: target.id };
+  const targetWhere = engagementTargetWhere(target);
   const existing = await getPrisma().skillStar.findFirst({
     where: { userId: user.id, ...targetWhere },
     select: { id: true },
@@ -54,14 +53,11 @@ export async function createCommentAction(formData: FormData) {
     return;
   }
 
-  const targetData = target.kind === "skill"
-    ? { skillId: target.id }
-    : { forkId: target.id };
   await getPrisma().skillComment.create({
     data: {
       userId: user.id,
       body,
-      ...targetData,
+      ...engagementTargetWhere(target),
     },
   });
 
@@ -83,6 +79,7 @@ export async function deleteCommentAction(formData: FormData) {
       id: commentId,
       userId: user.id,
       status: SkillCommentStatus.VISIBLE,
+      ...engagementTargetWhere(target),
     },
     data: {
       status: SkillCommentStatus.DELETED,

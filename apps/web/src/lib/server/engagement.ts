@@ -24,11 +24,17 @@ export interface SkillEngagement {
   comments: SkillEngagementComment[];
 }
 
-interface EngagementTarget {
+export interface EngagementTarget {
   kind: "skill" | "fork";
   id: string;
   reference: string;
   path: string;
+}
+
+export function engagementTargetWhere(target: Pick<EngagementTarget, "kind" | "id">) {
+  return target.kind === "skill"
+    ? { skillId: target.id }
+    : { forkId: target.id };
 }
 
 export function normalizeCommentBody(value: string): string {
@@ -63,9 +69,7 @@ export async function getSkillEngagement(
     return emptyEngagement(reference, path);
   }
 
-  const targetWhere = target.kind === "skill"
-    ? { skillId: target.id }
-    : { forkId: target.id };
+  const targetWhere = engagementTargetWhere(target);
   const [starCount, commentCount, viewerStar, comments] = await Promise.all([
     getPrisma().skillStar.count({ where: targetWhere }),
     getPrisma().skillComment.count({

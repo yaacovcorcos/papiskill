@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
   engagementPathForReference,
+  engagementTargetWhere,
   maxCommentBodyLength,
   normalizeCommentBody,
 } from "./engagement";
@@ -24,5 +25,19 @@ describe("normalizeCommentBody", () => {
 
   it("bounds comment length", () => {
     expect(normalizeCommentBody("x".repeat(maxCommentBodyLength + 10))).toHaveLength(maxCommentBodyLength);
+  });
+});
+
+describe("engagementTargetWhere", () => {
+  it("scopes registry skill engagement by skill id", () => {
+    expect(engagementTargetWhere({ kind: "skill", id: "skill_123" })).toEqual({
+      skillId: "skill_123",
+    });
+  });
+
+  it("scopes profile fork engagement by fork id", () => {
+    expect(engagementTargetWhere({ kind: "fork", id: "fork_123" })).toEqual({
+      forkId: "fork_123",
+    });
   });
 });
