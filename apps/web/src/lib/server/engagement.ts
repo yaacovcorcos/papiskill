@@ -1,4 +1,5 @@
 import { SkillCommentStatus, SkillRegistryKind, SkillVisibility, type User } from "@prisma/client";
+import { hasDatabaseUrl } from "./db-env";
 import { getPrisma } from "./prisma";
 
 export const maxCommentBodyLength = 2_000;
@@ -53,7 +54,7 @@ export async function getSkillEngagement(
   viewer?: Pick<User, "id"> | null,
 ): Promise<SkillEngagement> {
   const path = engagementPathForReference(reference);
-  if (!process.env.DATABASE_URL) {
+  if (!hasDatabaseUrl()) {
     return emptyEngagement(reference, path);
   }
 

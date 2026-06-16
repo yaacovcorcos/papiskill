@@ -1,13 +1,14 @@
 import { PrismaClient } from "@prisma/client";
 import { PrismaPg } from "@prisma/adapter-pg";
 import { Pool } from "pg";
+import { getDatabaseUrl } from "./db-env";
 
 let prisma: PrismaClient | null = null;
 let pool: Pool | null = null;
 
 export function getPrisma(): PrismaClient {
   if (!prisma) {
-    const connectionString = process.env.DATABASE_URL;
+    const connectionString = getDatabaseUrl();
     if (!connectionString) {
       throw new Error("DATABASE_URL is required for database-backed PapiSkill routes.");
     }

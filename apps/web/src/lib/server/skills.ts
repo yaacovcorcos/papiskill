@@ -7,6 +7,7 @@ import {
   serializeSkillDetail,
   serializeSkillSummary,
 } from "./skill-serializers";
+import { hasDatabaseUrl } from "./db-env";
 
 export async function searchVisibleSkills(query: string) {
   const prisma = getPrisma();
@@ -58,7 +59,7 @@ export async function searchVisibleSkills(query: string) {
 }
 
 export async function getSkillByReference(reference: string, actor?: Pick<User, "id"> | null) {
-  if (!process.env.DATABASE_URL) {
+  if (!hasDatabaseUrl()) {
     return getGeneratedRegistrySkill(reference);
   }
 

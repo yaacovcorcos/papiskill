@@ -1,5 +1,6 @@
 import { errorResponse, publicCatalogCacheHeaders } from "@/lib/server/http";
 import { getCatalogSkills } from "@/lib/server/catalog";
+import { hasDatabaseUrl } from "@/lib/server/db-env";
 import { getSessionUser, getTokenUser } from "@/lib/server/request-auth";
 import { getSkillByReference } from "@/lib/server/skills";
 
@@ -31,7 +32,7 @@ export async function GET(
 }
 
 async function getActor(request: Request) {
-  if (!process.env.DATABASE_URL) return null;
+  if (!hasDatabaseUrl()) return null;
   try {
     return await getTokenUser(request) ?? await getSessionUser();
   } catch {
@@ -40,7 +41,7 @@ async function getActor(request: Request) {
 }
 
 async function getDatabaseSkill(reference: string, actor: Awaited<ReturnType<typeof getActor>>) {
-  if (!process.env.DATABASE_URL) return null;
+  if (!hasDatabaseUrl()) return null;
   try {
     return await getSkillByReference(reference, actor);
   } catch {

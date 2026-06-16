@@ -1,10 +1,11 @@
 import { headers } from "next/headers";
 import { getAuth } from "@/lib/auth";
+import { hasDatabaseUrl } from "@/lib/server/db-env";
 import { hashApiToken } from "@/lib/server/tokens";
 import { getPrisma } from "./prisma";
 
 export async function getSessionUser() {
-  if (!process.env.DATABASE_URL && process.env.NODE_ENV === "development") {
+  if (!hasDatabaseUrl()) {
     return null;
   }
 
@@ -23,6 +24,10 @@ export async function requireSessionUser() {
 }
 
 export async function getTokenUser(request: Request) {
+  if (!hasDatabaseUrl()) {
+    return null;
+  }
+
   const header = request.headers.get("authorization");
   if (!header?.startsWith("Bearer ")) {
     return null;

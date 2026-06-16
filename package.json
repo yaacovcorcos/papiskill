@@ -12,7 +12,7 @@
     "dev": "npm --workspace @papiskill/web run dev",
     "build": "npm run db:generate && npm --workspace @papiskill/skill-core run build && npm --workspace papiskill run build && npm --workspace @papiskill/web run build",
     "lint": "npm run lint --workspaces --if-present",
-    "typecheck": "npm --workspace @papiskill/skill-core run typecheck && npm --workspace @papiskill/skill-core run build && npm --workspace papiskill run typecheck && npm --workspace @papiskill/web run typecheck",
+    "typecheck": "npm run db:generate && npm --workspace @papiskill/skill-core run typecheck && npm --workspace @papiskill/skill-core run build && npm --workspace papiskill run typecheck && npm --workspace @papiskill/web run typecheck",
     "test": "npm run test --workspaces --if-present",
     "check": "npm run typecheck && npm run lint && npm run test && npm run build",
     "db:generate": "npm --workspace @papiskill/web run db:generate",

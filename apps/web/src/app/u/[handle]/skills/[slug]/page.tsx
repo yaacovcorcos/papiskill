@@ -7,6 +7,7 @@ import { SkillVisibility } from "@prisma/client";
 import { AppHeader } from "@/components/app-header";
 import { Badge } from "@/components/badge";
 import { SkillEngagementPanel } from "@/components/skill-engagement-panel";
+import { hasDatabaseUrl } from "@/lib/server/db-env";
 import { getSessionUser } from "@/lib/server/request-auth";
 import { getPrisma } from "@/lib/server/prisma";
 import { getSkillEngagement } from "@/lib/server/engagement";
@@ -18,7 +19,7 @@ type Params = Promise<{ handle: string; slug: string }>;
 
 export async function generateMetadata({ params }: { params: Params }): Promise<Metadata> {
   const { handle, slug } = await params;
-  if (!process.env.DATABASE_URL) {
+  if (!hasDatabaseUrl()) {
     return {
       title: `${slug} by @${handle}`,
       description: `PapiSkill profile skill ${slug} by @${handle}.`,
@@ -34,7 +35,7 @@ export async function generateMetadata({ params }: { params: Params }): Promise<
 
 export default async function UserSkillPage({ params }: { params: Params }) {
   const { handle, slug } = await params;
-  if (!process.env.DATABASE_URL) {
+  if (!hasDatabaseUrl()) {
     return (
       <>
         <AppHeader />

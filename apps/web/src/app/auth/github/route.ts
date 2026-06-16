@@ -1,9 +1,10 @@
 import { NextResponse } from "next/server";
 import { getAuth } from "@/lib/auth";
+import { hasDatabaseUrl } from "@/lib/server/db-env";
 
 export async function GET(request: Request) {
   const requestUrl = new URL(request.url);
-  if (!process.env.DATABASE_URL && process.env.NODE_ENV === "development") {
+  if (!hasDatabaseUrl()) {
     return NextResponse.redirect(new URL("/auth/sign-in", requestUrl.origin));
   }
 

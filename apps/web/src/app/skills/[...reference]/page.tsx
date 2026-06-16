@@ -5,6 +5,7 @@ import { ArrowLeft, Download, GitFork, ShieldCheck, Terminal } from "lucide-reac
 import { AppHeader } from "@/components/app-header";
 import { Badge } from "@/components/badge";
 import { SkillEngagementPanel } from "@/components/skill-engagement-panel";
+import { hasDatabaseUrl } from "@/lib/server/db-env";
 import { getSkillEngagement } from "@/lib/server/engagement";
 import { getSessionUser } from "@/lib/server/request-auth";
 import { getSkillByReference } from "@/lib/server/skills";
@@ -31,7 +32,7 @@ export default async function SkillDetailPage({
   const skill = await getSkillByReference(requestedReference);
   if (!skill) notFound();
   const referenceId = skillReference(skill);
-  const viewer = process.env.DATABASE_URL ? await getSessionUser().catch(() => null) : null;
+  const viewer = hasDatabaseUrl() ? await getSessionUser().catch(() => null) : null;
   const engagement = await getSkillEngagement(referenceId, viewer ? { id: viewer.id } : null);
 
   return (

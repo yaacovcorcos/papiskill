@@ -6,6 +6,7 @@ import { Download, GitFork, UserRound } from "lucide-react";
 import { SkillVisibility } from "@prisma/client";
 import { AppHeader } from "@/components/app-header";
 import { Badge } from "@/components/badge";
+import { hasDatabaseUrl } from "@/lib/server/db-env";
 import { getPrisma } from "@/lib/server/prisma";
 import { serializeForkSummary, serializeSkillSummary } from "@/lib/server/skill-serializers";
 
@@ -17,7 +18,7 @@ export async function generateMetadata({
   params: Promise<{ handle: string }>;
 }): Promise<Metadata> {
   const { handle } = await params;
-  if (!process.env.DATABASE_URL) {
+  if (!hasDatabaseUrl()) {
     return {
       title: `@${handle}`,
       description: `Public PapiSkill profile for @${handle}.`,
@@ -38,7 +39,7 @@ export default async function UserProfilePage({
   params: Promise<{ handle: string }>;
 }) {
   const { handle } = await params;
-  if (!process.env.DATABASE_URL) {
+  if (!hasDatabaseUrl()) {
     return (
       <>
         <AppHeader />

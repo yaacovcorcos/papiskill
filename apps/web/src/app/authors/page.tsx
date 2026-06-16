@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { UserRound } from "lucide-react";
 import { AppHeader } from "@/components/app-header";
+import { hasDatabaseUrl } from "@/lib/server/db-env";
 import { getPrisma } from "@/lib/server/prisma";
 
 export const revalidate = 60;
@@ -46,7 +47,7 @@ export default async function AuthorsPage() {
 }
 
 async function getProfiles() {
-  if (!process.env.DATABASE_URL) return [];
+  if (!hasDatabaseUrl()) return [];
   try {
     return await getPrisma().profile.findMany({
       select: {

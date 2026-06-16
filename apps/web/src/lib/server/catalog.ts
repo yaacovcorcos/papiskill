@@ -5,6 +5,7 @@ import {
   serializeForkSummary,
   serializeSkillSummary,
 } from "./skill-serializers";
+import { hasDatabaseUrl } from "./db-env";
 
 export interface CatalogSkill {
   id: string;
@@ -42,7 +43,7 @@ export async function getCatalogSkills(
   const normalizedFilters = normalizeFilters(filters);
   const includeMarkdown = options.includeMarkdown ?? false;
 
-  if (process.env.DATABASE_URL) {
+  if (hasDatabaseUrl()) {
     try {
       const prisma = getPrisma();
       const q = normalizedFilters.query;
