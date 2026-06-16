@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { deriveHandle } from "./profiles";
+import { deriveHandle, githubHandleFromEmail } from "./profiles";
 
 describe("deriveHandle", () => {
   it("creates a stable lowercase handle from email", () => {
@@ -16,5 +16,18 @@ describe("deriveHandle", () => {
       email: "@example.com",
       name: "",
     })).toBe("abcdefgh12345");
+  });
+
+  it("derives handles from GitHub noreply email formats", () => {
+    expect(deriveHandle({
+      id: "user_12345678",
+      email: "123456+Octo-Cat@users.noreply.github.com",
+      name: "Octo Cat",
+    })).toBe("octo-cat");
+    expect(githubHandleFromEmail("Octo-Cat@users.noreply.github.com")).toBe("octo-cat");
+  });
+
+  it("does not treat normal email local parts as GitHub handles", () => {
+    expect(githubHandleFromEmail("jane@example.com")).toBeNull();
   });
 });

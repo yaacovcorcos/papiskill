@@ -14,12 +14,20 @@ const reservedHandles = new Set([
 ]);
 
 export function deriveHandle(user: Pick<User, "email" | "name" | "id">): string {
-  const emailName = user.email.split("@")[0] || user.name || user.id;
+  const emailName = githubHandleFromEmail(user.email) || user.email.split("@")[0] || user.name || user.id;
   return emailName
     .toLowerCase()
     .replace(/[^a-z0-9-]+/g, "-")
     .replace(/^-+|-+$/g, "")
     .slice(0, 32) || `user-${user.id.slice(0, 8)}`;
+}
+
+export function githubHandleFromEmail(email: string): string | null {
+  const [localPart, domain] = email.toLowerCase().split("@");
+  if (!localPart || domain !== "users.noreply.github.com") return null;
+
+  const plusMatch = localPart.match(/^\d+\+(.+)$/);
+  return plusMatch?.[1] || localPart;
 }
 
 export function normalizeHandle(value: string): string {
@@ -50,6 +58,7 @@ export async function ensureProfile(user: Pick<User, "id" | "email" | "name"> & 
   }
 
   const base = deriveHandle(user);
+  const githubHandle = githubHandleFromEmail(user.email);
   let handle = base;
   for (let attempt = 1; attempt < 20; attempt += 1) {
     const taken = await prisma.profile.findUnique({ where: { handle } });
@@ -60,7 +69,7 @@ export async function ensureProfile(user: Pick<User, "id" | "email" | "name"> & 
           handle,
           name: user.name,
           avatarUrl: user.image,
-          githubUrl: `https://github.com/${handle}`,
+          githubUrl: githubHandle ? `https://github.com/${githubHandle}` : null,
         },
       });
     }
