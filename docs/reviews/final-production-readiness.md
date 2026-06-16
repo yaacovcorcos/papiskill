@@ -14,7 +14,7 @@ local/repo CLI, authenticated library editor, and engagement foundation.
 The remaining blockers for declaring the overall build complete are:
 
 - authenticated browser verification against production or a production-like database
-- explicit accessibility and performance passes on the registry, detail, and editor flows
+- explicit accessibility and authenticated editor performance passes
 - a final decision on the sidebar/filter layout after the user's review
 - CLI distribution decision: repo/local CLI is implemented, npm publication is not yet done
 
@@ -78,12 +78,15 @@ needs moderation hardening before meaningful traffic:
 
 ### Performance and caching
 
-Public pages are already small and fast enough for the seed catalog, but the app still needs a measured pass:
+Public pages are already small and fast enough for the seed catalog, and public registry/detail routes now
+have a repeatable browser smoke:
 
-- record baseline Lighthouse or Playwright trace for `/skills`, skill detail, and editor
+- `npm run perf:public -- --base-url https://papiskill.com` records `/skills`, official skill detail, public API, and public download baselines
+- the first production baseline is recorded in `docs/reviews/performance-baseline.md`
 - public API, public registry downloads, and health responses now use explicit shared cache headers
 - private library/download/token/user responses remain `no-store` or `private, no-store`
 - shared header navigation disables automatic route prefetching to avoid unrelated page data and avatar preloads
+- authenticated editor performance still needs a signed-in browser pass before calling performance complete
 - preload detail routes only after checking that it improves the current layout
 
 ### Accessibility

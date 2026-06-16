@@ -38,6 +38,7 @@ Prove PapiSkill is production-ready before declaring the goal complete.
 - Editor has preview, validation, save, visibility, and download.
 - Mobile and desktop are usable.
 - No visible no-op controls.
+- Public registry and detail pages pass `npm run perf:public -- --base-url https://papiskill.com` before final release.
 
 ### CLI
 
