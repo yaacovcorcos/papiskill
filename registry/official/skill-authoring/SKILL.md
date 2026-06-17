@@ -131,6 +131,10 @@ Choose the level of control based on fragility:
 
 Use prose for judgment. Use checklists for workflows where steps are easy to skip. Use scripts for deterministic work.
 
+Before adding a rule, ask what failure it prevents or what better judgment it enables. Stable rules can be unconditional; situational guidance should name the condition that activates it and, when useful, the reason it matters. Heavy procedure belongs only in the branch where that rigor is needed.
+
+Avoid rules that are merely sometimes true. Prefer first principles, examples, and scoped decision points that help the agent adapt intelligently when the user's request, available tools, risk level, or desired depth changes.
+
 ## Structure SKILL.md
 
 Prefer this shape, adapting headings when another structure reads better:
