@@ -36,6 +36,29 @@ Use \`SKILL.md\` well.
     expect(html).toContain("<code>SKILL.md</code>");
     expect(html).not.toContain("description: Internal metadata");
   });
+
+  it("renders common list shapes emitted by SKILL.md files", () => {
+    const html = renderToStaticMarkup(
+      <SkillMarkdown
+        markdown={`# Lists
+
+- Unordered item
+- [ ] Pending task
+- [x] Done task
+
+1. First step
+2. Second step
+`}
+      />,
+    );
+
+    expect(html).toContain("<ul");
+    expect(html).toContain("<ol>");
+    expect(html).toContain("<li>Unordered item</li>");
+    expect(html).toContain('type="checkbox"');
+    expect(html).toContain('checked=""');
+    expect(html).toContain("<li>First step</li>");
+  });
 });
 
 describe("SkillMarkdownEditor", () => {

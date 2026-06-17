@@ -166,6 +166,30 @@ select {
   padding-left: 1.4rem;
 }
 
+.skill-markdown ul {
+  list-style-type: disc;
+}
+
+.skill-markdown ol {
+  list-style-type: decimal;
+}
+
+.skill-markdown ul ul {
+  list-style-type: circle;
+}
+
+.skill-markdown ul ul ul {
+  list-style-type: square;
+}
+
+.skill-markdown ol ol {
+  list-style-type: lower-alpha;
+}
+
+.skill-markdown ol ol ol {
+  list-style-type: lower-roman;
+}
+
 .skill-markdown li {
   margin: 0.35rem 0;
   padding-left: 0.15rem;
