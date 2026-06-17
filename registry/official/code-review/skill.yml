@@ -1,16 +1,19 @@
 id: code-review
-name: Code Review
-summary: Review code changes for bugs, regressions, missing tests, and risky assumptions.
-description: A portable code-review skill for AI agents. It focuses review output on concrete findings, file references, severity, test gaps, and residual risk.
+name: Code Change Review
+summary: Review PRs, branches, commits, patches, and local changes for real bugs, regressions, and risky assumptions.
+description: "A portable code-change review skill for AI agents. It reviews diffs and local workspace changes with findings-first output, severity, source locations, tests, security and deployment risk, agent-generated PR checks, and residual risk."
 version: 1.0.0
 license: MIT
 visibility: public
 categories:
   - coding
 tags:
+  - code-review
+  - pr-review
   - review
   - testing
   - reliability
+  - git
 compatible_with:
   - codex
   - claude-code
@@ -20,5 +23,6 @@ install_targets:
   codex: ~/.codex/skills/code-review
   claude-code: ~/.claude/skills/code-review
   cursor: ~/.cursor/skills/code-review
+source_url: https://github.com/yaacovcorcos/papiskill/tree/main/registry/official/code-review
 maintainers:
   - github: yaacovcorcos
