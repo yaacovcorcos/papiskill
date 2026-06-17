@@ -7,7 +7,9 @@ import {
 } from "@prisma/client";
 import { resolveBetterAuthSecret } from "../auth-secret";
 import { hasDatabaseUrl } from "./db-env";
+import { logServerWarning } from "./observability";
 import { getPrisma } from "./prisma";
+import { parseSkillReference } from "./references";
 import { readableForkVisibilityWhere } from "./visibility";
 
 const ipHeaders = [
@@ -38,8 +40,11 @@ export async function recordDownloadEvent(input: DownloadEventInput) {
     await getPrisma().downloadEvent.create({
       data: downloadEventData(target, input.request, input.actor),
     });
-  } catch {
-    // Downloads should remain available if analytics/audit recording fails.
+  } catch (error) {
+    logServerWarning("download_event.record_failed", error, {
+      reference: input.reference,
+      actorSignedIn: Boolean(input.actor),
+    });
   }
 }
 
@@ -47,16 +52,14 @@ async function findDownloadTarget(
   reference: string,
   actorId?: string | null,
 ): Promise<DownloadTarget | null> {
-  const parts = reference.split("/").filter(Boolean);
-  const namespace = parts.length > 1 ? parts[0] : "official";
-  const slug = parts.at(-1);
-  if (!namespace || !slug) return null;
+  const parsed = parseSkillReference(reference);
+  if (!parsed) return null;
 
-  if (namespace === "official" || namespace === "global" || namespace === "community") {
+  if (parsed.kind === "registry") {
     const skill = await getPrisma().skill.findFirst({
       where: {
-        slug,
-        registryKind: namespace === "community" ? SkillRegistryKind.COMMUNITY : SkillRegistryKind.GLOBAL,
+        slug: parsed.slug,
+        registryKind: parsed.registryKind === "community" ? SkillRegistryKind.COMMUNITY : SkillRegistryKind.GLOBAL,
         visibility: SkillVisibility.PUBLIC,
       },
       select: { id: true },
@@ -66,8 +69,8 @@ async function findDownloadTarget(
 
   const fork = await getPrisma().skillFork.findFirst({
     where: {
-      slug,
-      owner: { profile: { handle: namespace } },
+      slug: parsed.slug,
+      owner: { profile: { handle: parsed.handle } },
       archivedAt: null,
       OR: readableForkVisibilityWhere(actorId),
     },

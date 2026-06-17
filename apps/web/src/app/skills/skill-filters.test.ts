@@ -10,6 +10,7 @@ import {
   skillReference,
   skillsHref,
   sortLabel,
+  statusBadgeLabel,
   toggleFilterHref,
 } from "./skill-filters";
 
@@ -42,6 +43,10 @@ describe("skill reference helpers", () => {
     });
     expect(skillReference(profileSkill)).toBe("yaacov/mine");
     expect(skillHref(profileSkill)).toBe("/u/yaacov/skills/mine");
+
+    expect(statusBadgeLabel("global")).toBe("Global");
+    expect(statusBadgeLabel("community")).toBe("Community");
+    expect(statusBadgeLabel("profile")).toBe("Profile");
   });
 });
 
@@ -125,6 +130,6 @@ function skill(overrides: Partial<CatalogSkill>): CatalogSkill {
     starCount: 0,
     commentCount: 0,
     validationIssues: overrides.validationIssues ?? [],
-    updatedAt: overrides.updatedAt,
+    ...(overrides.updatedAt ? { updatedAt: overrides.updatedAt } : {}),
   };
 }

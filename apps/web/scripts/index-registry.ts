@@ -21,6 +21,11 @@ async function main() {
     const packageHash = createHash("sha256")
       .update(JSON.stringify(registryPackage.files))
       .digest("hex");
+    const maintainer = manifest.maintainers[0];
+    const authorName = maintainer?.github ?? maintainer?.name ?? null;
+    const authorUrl = maintainer?.github
+      ? `https://github.com/${maintainer.github}`
+      : maintainer?.url ?? null;
 
     const skill = await prisma.skill.upsert({
       where: {
@@ -41,7 +46,7 @@ async function main() {
           : SkillRegistryKind.COMMUNITY,
         visibility: "PUBLIC",
         sourcePath: registryPackage.packagePath,
-        sourceUrl: manifest.source_url,
+        sourceUrl: manifest.source_url ?? null,
         packageHash,
         version: manifest.version,
         license: manifest.license,
@@ -49,10 +54,8 @@ async function main() {
         tags: manifest.tags.map((tag) => tag.toLowerCase()),
         compatibleWith: manifest.compatible_with,
         installTargets: manifest.install_targets,
-        authorName: manifest.maintainers[0]?.github ?? manifest.maintainers[0]?.name,
-        authorUrl: manifest.maintainers[0]?.github
-          ? `https://github.com/${manifest.maintainers[0].github}`
-          : manifest.maintainers[0]?.url,
+        authorName,
+        authorUrl,
         publishedAt: new Date(),
       },
       update: {
@@ -61,7 +64,7 @@ async function main() {
         description: manifest.description,
         visibility: "PUBLIC",
         sourcePath: registryPackage.packagePath,
-        sourceUrl: manifest.source_url,
+        sourceUrl: manifest.source_url ?? null,
         packageHash,
         version: manifest.version,
         license: manifest.license,
@@ -69,10 +72,8 @@ async function main() {
         tags: manifest.tags.map((tag) => tag.toLowerCase()),
         compatibleWith: manifest.compatible_with,
         installTargets: manifest.install_targets,
-        authorName: manifest.maintainers[0]?.github ?? manifest.maintainers[0]?.name,
-        authorUrl: manifest.maintainers[0]?.github
-          ? `https://github.com/${manifest.maintainers[0].github}`
-          : manifest.maintainers[0]?.url,
+        authorName,
+        authorUrl,
         publishedAt: new Date(),
       },
     });
@@ -97,7 +98,7 @@ async function main() {
         level: issue.level === "error" ? ValidationLevel.ERROR : ValidationLevel.WARNING,
         code: issue.code,
         message: issue.message,
-        path: issue.path,
+        path: issue.path ?? null,
       })),
     });
 

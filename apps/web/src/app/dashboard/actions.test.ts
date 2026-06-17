@@ -66,13 +66,19 @@ vi.mock("@/lib/server/tokens", () => ({
   createApiToken: mocks.createApiToken,
 }));
 
-vi.mock("@/lib/server/library", async () => {
-  const actual = await vi.importActual<typeof import("../../lib/server/library")>("../../lib/server/library");
+vi.mock("@/lib/server/library", () => {
   return {
-    ...actual,
     createLibraryCopy: mocks.createLibraryCopy,
     createBlankLibrarySkill: mocks.createBlankLibrarySkill,
     persistForkValidation: mocks.persistForkValidation,
+    normalizeSlug: (value: string) =>
+      value
+        .toLowerCase()
+        .replace(/[^a-z0-9-]+/g, "-")
+        .replace(/^-+|-+$/g, "")
+        .slice(0, 48),
+    recordFromJson: (value: unknown) =>
+      value && typeof value === "object" && !Array.isArray(value) ? value : {},
     uniqueLibrarySlug: mocks.uniqueLibrarySlug,
     validateForkDraftPackage: mocks.validateForkDraftPackage,
   };
@@ -168,6 +174,19 @@ describe("dashboard server actions", () => {
     expect(mocks.ensureProfile).toHaveBeenCalledWith(user);
     expect(mocks.revalidatePath).toHaveBeenCalledWith("/dashboard/library");
     expect(mocks.revalidatePath).toHaveBeenCalledWith("/u/yaacov");
+  });
+
+  it("preserves the requested skill when signed-out users try to copy to their library", async () => {
+    const { copySkillToLibraryAction } = await import("./actions");
+    mocks.getSessionUser.mockResolvedValue(null);
+    const formData = new FormData();
+    formData.set("reference", "official/code-review");
+
+    await expect(copySkillToLibraryAction(formData)).rejects.toMatchObject({
+      path: "/auth/sign-in?callbackURL=%2Fdashboard%2Ffork%3Fskill%3Dofficial%252Fcode-review",
+    });
+
+    expect(mocks.createLibraryCopy).not.toHaveBeenCalled();
   });
 
   it("does not persist invalid fork edits", async () => {

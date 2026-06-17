@@ -1,5 +1,10 @@
 import type { CatalogSkill } from "@/lib/server/catalog";
 import type { CatalogSort } from "@/lib/server/catalog";
+export {
+  skillHref,
+  skillReference,
+  statusBadgeLabel,
+} from "@/lib/references";
 
 export const compatibilityLabels: Record<string, string> = {
   codex: "Codex",
@@ -51,34 +56,6 @@ const statusLabels: Record<string, string> = {
 };
 
 const validStatuses = new Set(statusOrder);
-
-export function skillReference(skill: {
-  registryKind: string;
-  slug: string;
-  author: string | null;
-}) {
-  if (skill.registryKind === "profile" && skill.author) {
-    return `${skill.author}/${skill.slug}`;
-  }
-  if (skill.registryKind === "community") {
-    return `community/${skill.slug}`;
-  }
-  return `official/${skill.slug}`;
-}
-
-export function skillHref(skill: {
-  registryKind: string;
-  slug: string;
-  author: string | null;
-}) {
-  if (skill.registryKind === "profile" && skill.author) {
-    return `/u/${skill.author}/skills/${skill.slug}`;
-  }
-  if (skill.registryKind === "community") {
-    return `/skills/community/${skill.slug}`;
-  }
-  return `/skills/official/${skill.slug}`;
-}
 
 export function parseActiveFilters(params: Record<string, SearchParamValue>): ActiveFilters {
   const sort = firstParam(params.sort).toLowerCase();
@@ -148,12 +125,6 @@ export function filterSummary(filters: ActiveFilters) {
     filters.compatibility.length +
     filters.statuses.length;
   return count === 0 ? "All skills" : `${count} selected`;
-}
-
-export function statusBadgeLabel(registryKind: string) {
-  if (registryKind === "global") return "Global";
-  if (registryKind === "community") return "Community";
-  return "Profile";
 }
 
 export function sortLabel(sort: CatalogSort) {

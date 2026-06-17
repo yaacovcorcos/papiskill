@@ -1,3 +1,5 @@
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
 import { DownloadSubjectType } from "@prisma/client";
 import { describe, expect, it } from "vitest";
 import {
@@ -51,5 +53,22 @@ describe("download event helpers", () => {
       forkId: "fork_123",
       subjectType: DownloadSubjectType.FORK,
     });
+  });
+});
+
+describe("download event migration invariants", () => {
+  it("keeps the database-level exactly-one-target constraint", () => {
+    const migration = readFileSync(
+      join(
+        process.cwd(),
+        "prisma/migrations/20260617000000_download_event_target_constraint/migration.sql",
+      ),
+      "utf8",
+    );
+
+    expect(migration).toContain("DownloadEvent_exactly_one_target");
+    expect(migration).toContain('"skillId" IS NULL');
+    expect(migration).toContain('"forkId" IS NULL');
+    expect(migration).toContain("= 1");
   });
 });

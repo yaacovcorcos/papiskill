@@ -4,6 +4,7 @@ import { validateSkillPackage, type SkillValidationResult } from "@papiskill/ski
 import YAML from "yaml";
 import { getFileRegistrySkill, type CatalogSkillDetail } from "./catalog";
 import { getPrisma } from "./prisma";
+import { canonicalRegistryReference, parseSkillReference } from "./references";
 import { readableForkVisibilityWhere } from "./visibility";
 
 export interface LibraryCopyInput {
@@ -86,10 +87,10 @@ export async function createLibraryCopy(input: LibraryCopyInput): Promise<SkillF
   return getPrisma().skillFork.create({
     data: {
       ownerId: input.user.id,
-      sourceSkillId: source.sourceSkillId,
-      sourceForkId: source.sourceForkId,
+      sourceSkillId: source.sourceSkillId ?? null,
+      sourceForkId: source.sourceForkId ?? null,
       sourceReference: source.sourceReference,
-      sourceVersion: source.sourceVersion,
+      sourceVersion: source.sourceVersion ?? null,
       sourcePackageHash: source.sourcePackageHash ?? packageHash(source.files),
       slug,
       name: source.name,
@@ -105,19 +106,10 @@ export async function createLibraryCopy(input: LibraryCopyInput): Promise<SkillF
       lastValidatedAt: now,
       publishedAt: input.visibility === SkillVisibility.PUBLIC ? now : null,
       files: {
-        create: source.files.map((file) => ({
-          path: file.path,
-          content: file.content,
-          sizeBytes: Buffer.byteLength(file.content),
-        })),
+        create: forkFileCreateData(source.files),
       },
       validations: {
-        create: validation.issues.map((issue) => ({
-          level: issue.level === "error" ? ValidationLevel.ERROR : ValidationLevel.WARNING,
-          code: issue.code,
-          message: issue.message,
-          path: issue.path,
-        })),
+        create: forkValidationCreateData(validation),
       },
     },
   });
@@ -144,47 +136,36 @@ export async function createBlankLibrarySkill(input: BlankLibrarySkillInput): Pr
       installTargets: draft.installTargets,
       lastValidatedAt: now,
       files: {
-        create: draft.files.map((file) => ({
-          path: file.path,
-          content: file.content,
-          sizeBytes: Buffer.byteLength(file.content),
-        })),
+        create: forkFileCreateData(draft.files),
       },
       validations: {
-        create: draft.validation.issues.map((issue) => ({
-          level: issue.level === "error" ? ValidationLevel.ERROR : ValidationLevel.WARNING,
-          code: issue.code,
-          message: issue.message,
-          path: issue.path,
-        })),
+        create: forkValidationCreateData(draft.validation),
       },
     },
   });
 }
 
 export async function getVisibleLibrarySource(reference: string, actorId?: string | null): Promise<LibrarySource | null> {
-  const parts = reference.split("/").filter(Boolean);
-  const namespace = parts.length > 1 ? parts[0] : "official";
-  const slug = parts.at(-1);
-  if (!namespace || !slug) return null;
+  const parsed = parseSkillReference(reference);
+  if (!parsed) return null;
 
-  if (namespace === "official" || namespace === "global" || namespace === "community") {
-    const registryKind = namespace === "community" ? SkillRegistryKind.COMMUNITY : SkillRegistryKind.GLOBAL;
+  if (parsed.kind === "registry") {
+    const registryKind = parsed.registryKind === "community" ? SkillRegistryKind.COMMUNITY : SkillRegistryKind.GLOBAL;
     const skill = await getPrisma().skill.findFirst({
       where: {
-        slug,
+        slug: parsed.slug,
         registryKind,
         visibility: SkillVisibility.PUBLIC,
       },
       include: { files: { orderBy: { path: "asc" } } },
     });
     if (!skill) {
-      const fallback = await getFileRegistrySkill(`${namespace}/${slug}`);
+      const fallback = await getFileRegistrySkill(parsed.reference);
       return fallback ? librarySourceFromCatalogSkill(fallback) : null;
     }
     return {
       sourceSkillId: skill.id,
-      sourceReference: `${namespace === "community" ? "community" : "official"}/${skill.slug}`,
+      sourceReference: parsed.reference,
       sourceVersion: skill.version,
       sourcePackageHash: skill.packageHash ?? packageHash(skill.files),
       slug: skill.slug,
@@ -203,8 +184,8 @@ export async function getVisibleLibrarySource(reference: string, actorId?: strin
 
   const fork = await getPrisma().skillFork.findFirst({
     where: {
-      slug,
-      owner: { profile: { handle: namespace } },
+      slug: parsed.slug,
+      owner: { profile: { handle: parsed.handle } },
       archivedAt: null,
       OR: readableForkVisibilityWhere(actorId),
     },
@@ -215,10 +196,10 @@ export async function getVisibleLibrarySource(reference: string, actorId?: strin
   });
   if (!fork) return null;
 
-  const handle = fork.owner.profile?.handle ?? namespace;
+  const handle = fork.owner.profile?.handle ?? parsed.handle;
   return {
     sourceForkId: fork.id,
-    sourceSkillId: fork.sourceSkillId ?? undefined,
+    ...(fork.sourceSkillId ? { sourceSkillId: fork.sourceSkillId } : {}),
     sourceReference: `${handle}/${fork.slug}`,
     sourceVersion: fork.version,
     sourcePackageHash: packageHash(fork.files),
@@ -237,10 +218,8 @@ export async function getVisibleLibrarySource(reference: string, actorId?: strin
 }
 
 export function librarySourceFromCatalogSkill(skill: CatalogSkillDetail): LibrarySource {
-  const namespace = skill.registryKind === "community" ? "community" : "official";
   return {
-    sourceReference: `${namespace}/${skill.slug}`,
-    sourceVersion: undefined,
+    sourceReference: canonicalRegistryReference(skill.registryKind, skill.slug),
     sourcePackageHash: packageHash(skill.files),
     slug: skill.slug,
     name: skill.name,
@@ -263,13 +242,7 @@ export async function persistForkValidation(forkId: string, files: Array<{ path:
   await getPrisma().$transaction([
     getPrisma().skillForkValidation.deleteMany({ where: { forkId } }),
     getPrisma().skillForkValidation.createMany({
-      data: validation.issues.map((issue) => ({
-        forkId,
-        level: issue.level === "error" ? ValidationLevel.ERROR : ValidationLevel.WARNING,
-        code: issue.code,
-        message: issue.message,
-        path: issue.path,
-      })),
+      data: forkValidationCreateManyData(forkId, validation),
     }),
     getPrisma().skillFork.update({
       where: { id: forkId },
@@ -461,4 +434,32 @@ function packageHash(files: Array<{ path: string; content: string }>) {
   return createHash("sha256")
     .update(JSON.stringify(files.map((file) => ({ path: file.path, content: file.content }))))
     .digest("hex");
+}
+
+function forkFileCreateData(files: Array<{ path: string; content: string }>) {
+  return files.map((file) => ({
+    path: file.path,
+    content: file.content,
+    sizeBytes: Buffer.byteLength(file.content),
+  }));
+}
+
+function forkValidationCreateData(validation: SkillValidationResult) {
+  return validation.issues.map((issue) => ({
+    level: validationLevel(issue.level),
+    code: issue.code,
+    message: issue.message,
+    path: issue.path ?? null,
+  }));
+}
+
+function forkValidationCreateManyData(forkId: string, validation: SkillValidationResult) {
+  return forkValidationCreateData(validation).map((issue) => ({
+    forkId,
+    ...issue,
+  }));
+}
+
+function validationLevel(level: SkillValidationResult["issues"][number]["level"]) {
+  return level === "error" ? ValidationLevel.ERROR : ValidationLevel.WARNING;
 }

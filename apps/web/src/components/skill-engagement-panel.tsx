@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { EyeOff, MessageSquare, Star, Trash2 } from "lucide-react";
+import { signInPath } from "@/lib/auth-callback";
 import type { SkillEngagement } from "@/lib/server/engagement";
 import {
   deleteCommentAction,
@@ -39,7 +40,7 @@ export function SkillEngagementPanel({
           <CommentForm reference={engagement.reference} />
         ) : engagement.enabled ? (
           <div className="rounded-lg border border-border bg-surface-subtle p-4 text-sm text-muted">
-            <Link href="/auth/sign-in" className="font-semibold text-slate-950 hover:underline">
+            <Link href={signInPath(engagement.path)} className="font-semibold text-slate-950 hover:underline">
               Sign in with GitHub
             </Link>{" "}
             to star and comment.
@@ -145,7 +146,7 @@ function StarControl({
   if (!viewerSignedIn) {
     return (
       <Link
-        href="/auth/sign-in"
+        href={signInPath(engagement.path)}
         aria-label={signInToStarLabel(engagement.starCount)}
         title="Sign in to star skill"
         className="inline-flex h-10 items-center gap-2 rounded-md border border-border bg-white px-3 text-sm font-semibold hover:bg-slate-50"

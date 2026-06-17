@@ -6,6 +6,8 @@ import {
   serializeSkillSummary,
 } from "./skill-serializers";
 import { hasDatabaseUrl } from "./db-env";
+import { logServerWarning } from "./observability";
+import { canonicalRegistryReference, parseSkillReference } from "./references";
 
 export interface CatalogSkill {
   id: string;
@@ -188,15 +190,12 @@ export async function getCatalogSkills(
       );
       const databaseSkills = skills.map((skill) => {
         const summary = serializeSkillSummary(skill);
+        const reference = canonicalRegistryReference(summary.registryKind, summary.slug);
         return {
           ...summary,
           description: skill.description,
           categories: skill.categories,
-          installCommand: `papiskill install ${
-            skill.registryKind === SkillRegistryKind.COMMUNITY
-              ? "community"
-              : "official"
-          }/${skill.slug}`,
+          installCommand: `papiskill install ${reference}`,
           ...(includeMarkdown
             ? { markdown: skill.files.at(0)?.content ?? "" }
             : {}),
@@ -206,7 +205,7 @@ export async function getCatalogSkills(
             level: issue.level.toLowerCase() as "error" | "warning",
             code: issue.code,
             message: issue.message,
-            path: issue.path,
+            path: issue.path ?? null,
           })),
           updatedAt: skill.updatedAt.toISOString(),
         };
@@ -258,13 +257,20 @@ export async function getCatalogSkills(
               level: issue.level.toLowerCase() as "error" | "warning",
               code: issue.code,
               message: issue.message,
-              path: issue.path,
+              path: issue.path ?? null,
             })),
             updatedAt: fork.updatedAt.toISOString(),
           };
         }),
       ], normalizedFilters.sort);
-    } catch {
+    } catch (error) {
+      logServerWarning("catalog.database_fallback", error, {
+        hasQuery: Boolean(normalizedFilters.query),
+        categoryCount: normalizedFilters.categories.length,
+        compatibilityCount: normalizedFilters.compatibility.length,
+        statusCount: normalizedFilters.statuses.length,
+        sort: normalizedFilters.sort,
+      });
       return getFileCatalogSkills(normalizedFilters, includeMarkdown);
     }
   }
@@ -363,9 +369,12 @@ function filterCatalogEntries(
         .toLowerCase();
       return text.includes(normalizedQuery);
     })
-    .map((entry) =>
-      includeMarkdown ? entry : { ...entry, markdown: undefined },
-    );
+    .map((entry) => {
+      if (includeMarkdown) return entry;
+      const entryWithoutMarkdown = { ...entry };
+      delete entryWithoutMarkdown.markdown;
+      return entryWithoutMarkdown;
+    });
 }
 
 export function sortCatalogSkills(skills: CatalogSkill[], sort: CatalogSort): CatalogSkill[] {
@@ -420,18 +429,11 @@ export async function getFileRegistrySkill(
 }
 
 export function getGeneratedRegistrySkillByReference(reference: string): CatalogSkill | null {
-  const parts = reference.split("/").filter(Boolean);
-  const slug = parts.at(-1);
-  const namespace = parts.length > 1 ? parts[0] : "official";
-  if (!slug) return null;
+  const parsed = parseSkillReference(reference);
+  if (parsed?.kind !== "registry") return null;
 
   const skill = generatedRegistry.find((entry) => {
-    if (entry.slug !== slug) return false;
-    if (namespace === "community") return entry.registryKind === "community";
-    if (namespace === "official" || namespace === "global") {
-      return entry.registryKind === "global";
-    }
-    return false;
+    return entry.slug === parsed.slug && entry.registryKind === parsed.registryKind;
   });
   return skill ?? null;
 }

@@ -1,14 +1,15 @@
 import { NextResponse } from "next/server";
 import { getAuth } from "@/lib/auth";
+import { localCallbackPath, signInPath } from "@/lib/auth-callback";
 import { hasDatabaseUrl } from "@/lib/server/db-env";
 
 export async function GET(request: Request) {
   const requestUrl = new URL(request.url);
+  const callbackURL = localCallbackPath(requestUrl.searchParams.get("callbackURL"));
   if (!hasDatabaseUrl()) {
-    return NextResponse.redirect(new URL("/auth/sign-in", requestUrl.origin));
+    return NextResponse.redirect(new URL(signInPath(callbackURL, "auth_not_configured"), requestUrl.origin));
   }
 
-  const callbackURL = localCallbackURL(requestUrl.searchParams.get("callbackURL"));
   const authUrl = new URL("/api/auth/sign-in/social", requestUrl.origin);
 
   const authResponse = await getAuth().handler(
@@ -29,7 +30,7 @@ export async function GET(request: Request) {
 
   const payload = await authResponse.json().catch(() => null);
   if (!authResponse.ok || !payload?.url) {
-    return NextResponse.redirect(new URL("/auth/sign-in", requestUrl.origin));
+    return NextResponse.redirect(new URL(signInPath(callbackURL, "auth_unavailable"), requestUrl.origin));
   }
 
   const response = NextResponse.redirect(payload.url);
@@ -37,11 +38,6 @@ export async function GET(request: Request) {
     response.headers.append("set-cookie", cookie);
   }
   return response;
-}
-
-function localCallbackURL(value: string | null): string {
-  if (!value?.startsWith("/") || value.startsWith("//")) return "/dashboard";
-  return value;
 }
 
 function getSetCookies(headers: Headers): string[] {

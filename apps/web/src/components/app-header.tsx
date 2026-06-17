@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { GithubSignInButton } from "./github-sign-in-button";
+import { HeaderAccountSlot } from "./header-account-slot";
 
 const navItems = [
   { href: "/skills", label: "Skills" },
@@ -42,12 +42,7 @@ export function AppHeader() {
             >
               CLI
             </Link>
-            <GithubSignInButton
-              className="focus-ring inline-flex items-center gap-1.5 rounded-md border border-border bg-white px-2.5 py-2 text-sm font-semibold text-slate-950 shadow-sm hover:bg-slate-50 sm:gap-2 sm:px-3.5"
-            >
-              <span className="sm:hidden">Sign in</span>
-              <span className="hidden sm:inline">Sign in with GitHub</span>
-            </GithubSignInButton>
+            <HeaderAccountSlot />
           </div>
         </div>
       </header>

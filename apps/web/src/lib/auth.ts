@@ -42,7 +42,7 @@ function createAuth() {
               const fallbackEmail = login ? `${login}@users.noreply.github.com` : undefined;
               return {
                 name: profile.name || login || "PapiSkill user",
-                email: profile.email || fallbackEmail,
+                email: profile.email || fallbackEmail || null,
                 image: profile.avatar_url,
               };
             },

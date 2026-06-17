@@ -2,6 +2,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { ExternalLink, UserRound } from "lucide-react";
 import { AppHeader } from "@/components/app-header";
+import { signInPath } from "@/lib/auth-callback";
 import { ensureProfile } from "@/lib/server/profiles";
 import { getSessionUser } from "@/lib/server/request-auth";
 import { ProfileForm } from "./profile-form";
@@ -11,7 +12,7 @@ export const dynamic = "force-dynamic";
 export default async function DashboardProfilePage() {
   const user = await getSessionUser();
   if (!user) {
-    redirect("/auth/sign-in");
+    redirect(signInPath("/dashboard/profile"));
   }
   const profile = await ensureProfile(user);
 

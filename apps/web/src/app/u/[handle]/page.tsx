@@ -7,6 +7,7 @@ import { SkillCommentStatus, SkillVisibility } from "@prisma/client";
 import { AppHeader } from "@/components/app-header";
 import { Badge } from "@/components/badge";
 import { EngagementCounts } from "@/components/skill-engagement-panel";
+import { skillHref, skillReference } from "@/lib/references";
 import { hasDatabaseUrl } from "@/lib/server/db-env";
 import { getPrisma } from "@/lib/server/prisma";
 import { serializeForkSummary, serializeSkillSummary } from "@/lib/server/skill-serializers";
@@ -96,22 +97,28 @@ export default async function UserProfilePage({
   ]);
 
   const rows = [
-    ...skills.map((skill) => ({
-      ...serializeSkillSummary(skill),
-      href: `/skills/community/${skill.slug}`,
-      reference: `community/${skill.slug}`,
-      kindLabel: skill.registryKind.toLowerCase(),
-      starCount: skill._count.stars,
-      commentCount: skill._count.comments,
-    })),
-    ...forks.map((fork) => ({
-      ...serializeForkSummary(fork),
-      href: `/u/${profile.handle}/skills/${fork.slug}`,
-      reference: `${profile.handle}/${fork.slug}`,
-      kindLabel: fork.visibility.toLowerCase(),
-      starCount: fork._count.stars,
-      commentCount: fork._count.comments,
-    })),
+    ...skills.map((skill) => {
+      const summary = serializeSkillSummary(skill);
+      return {
+        ...summary,
+        href: skillHref(summary),
+        reference: skillReference(summary),
+        kindLabel: summary.registryKind,
+        starCount: skill._count.stars,
+        commentCount: skill._count.comments,
+      };
+    }),
+    ...forks.map((fork) => {
+      const summary = serializeForkSummary(fork);
+      return {
+        ...summary,
+        href: skillHref(summary),
+        reference: skillReference(summary),
+        kindLabel: fork.visibility.toLowerCase(),
+        starCount: fork._count.stars,
+        commentCount: fork._count.comments,
+      };
+    }),
   ];
 
   return (

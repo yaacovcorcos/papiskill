@@ -92,6 +92,6 @@ function skill(overrides: Partial<CatalogSkill>): CatalogSkill {
     starCount: overrides.starCount ?? 0,
     commentCount: overrides.commentCount ?? 0,
     validationIssues: overrides.validationIssues ?? [],
-    updatedAt: overrides.updatedAt,
+    ...(overrides.updatedAt ? { updatedAt: overrides.updatedAt } : {}),
   };
 }

@@ -7,6 +7,7 @@ const root = process.cwd();
 describe("skill detail mobile layout", () => {
   it.each([
     ["official detail", "src/app/skills/[...reference]/page.tsx"],
+    ["public registry detail", "src/app/skills/public-registry-detail.tsx"],
     ["profile detail", "src/app/u/[handle]/skills/[slug]/page.tsx"],
   ])("%s uses shrinkable, responsive detail layout classes", (_name, relativePath) => {
     const source = readFileSync(join(root, relativePath), "utf8");

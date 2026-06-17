@@ -1,6 +1,7 @@
 import { SkillCommentStatus, SkillRegistryKind, SkillVisibility, type User } from "@prisma/client";
 import { hasDatabaseUrl } from "./db-env";
 import { getPrisma } from "./prisma";
+import { parseSkillReference } from "./references";
 
 export const maxCommentBodyLength = 2_000;
 export const commentRateLimitWindowMs = 60 * 60 * 1_000;
@@ -68,17 +69,7 @@ export function commentLimitExceeded(count: number, max = maxCommentsPerRateLimi
 }
 
 export function engagementPathForReference(reference: string): string {
-  const parts = reference.split("/").filter(Boolean);
-  const namespace = parts.length > 1 ? parts[0] : "official";
-  const slug = parts.at(-1) ?? "";
-
-  if (namespace === "community") {
-    return `/skills/community/${slug}`;
-  }
-  if (namespace === "official" || namespace === "global") {
-    return `/skills/official/${slug}`;
-  }
-  return `/u/${namespace}/skills/${slug}`;
+  return parseSkillReference(reference)?.path ?? "/skills";
 }
 
 export async function getSkillEngagement(
@@ -142,16 +133,14 @@ export async function getSkillEngagement(
 }
 
 export async function getPublicEngagementTarget(reference: string): Promise<EngagementTarget | null> {
-  const parts = reference.split("/").filter(Boolean);
-  const namespace = parts.length > 1 ? parts[0] : "official";
-  const slug = parts.at(-1);
-  if (!namespace || !slug) return null;
+  const parsed = parseSkillReference(reference);
+  if (!parsed) return null;
 
-  if (namespace === "official" || namespace === "global" || namespace === "community") {
-    const registryKind = namespace === "community" ? SkillRegistryKind.COMMUNITY : SkillRegistryKind.GLOBAL;
+  if (parsed.kind === "registry") {
+    const registryKind = parsed.registryKind === "community" ? SkillRegistryKind.COMMUNITY : SkillRegistryKind.GLOBAL;
     const skill = await getPrisma().skill.findFirst({
       where: {
-        slug,
+        slug: parsed.slug,
         registryKind,
         visibility: SkillVisibility.PUBLIC,
       },
@@ -159,27 +148,26 @@ export async function getPublicEngagementTarget(reference: string): Promise<Enga
     });
     if (!skill) return null;
 
-    const canonicalNamespace = skill.registryKind === SkillRegistryKind.COMMUNITY ? "community" : "official";
     return {
       kind: "skill",
       id: skill.id,
-      reference: `${canonicalNamespace}/${skill.slug}`,
-      path: `/skills/${canonicalNamespace}/${skill.slug}`,
+      reference: parsed.reference,
+      path: parsed.path,
     };
   }
 
   const fork = await getPrisma().skillFork.findFirst({
     where: {
-      slug,
+      slug: parsed.slug,
       archivedAt: null,
       visibility: SkillVisibility.PUBLIC,
-      owner: { profile: { handle: namespace } },
+      owner: { profile: { handle: parsed.handle } },
     },
     include: { owner: { include: { profile: true } } },
   });
   if (!fork) return null;
 
-  const handle = fork.owner.profile?.handle ?? namespace;
+  const handle = fork.owner.profile?.handle ?? parsed.handle;
   return {
     kind: "fork",
     id: fork.id,

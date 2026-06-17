@@ -16,6 +16,9 @@ const mocks = vi.hoisted(() => ({
       findUnique: vi.fn(),
     },
     skillComment: {
+      count: vi.fn(),
+      findFirst: vi.fn(),
+      create: vi.fn(),
       updateMany: vi.fn(),
     },
   },
@@ -77,11 +80,40 @@ beforeEach(() => {
     "/skills",
     "/api/v1/skills",
   ]);
-  mocks.engagementPathForReference.mockImplementation(
-    (reference: string) => `/skills/official/${reference.split("/").at(-1)}`,
+  mocks.engagementPathForReference.mockImplementation((reference: string) =>
+    reference === "official/missing"
+      ? "/skills/official/missing"
+      : "/skills/official/code-review",
   );
   mocks.prisma.user.findUnique.mockResolvedValue({ isCurator: true });
+  mocks.prisma.skillComment.count.mockResolvedValue(0);
+  mocks.prisma.skillComment.findFirst.mockResolvedValue(null);
+  mocks.prisma.skillComment.create.mockResolvedValue({ id: "comment_456" });
   mocks.prisma.skillComment.updateMany.mockResolvedValue({ count: 1 });
+});
+
+describe("comment creation actions", () => {
+  it("returns the created comment id so clients can refresh after every successful post", async () => {
+    const { createCommentAction } = await import("./engagement-actions");
+    const formData = new FormData();
+    formData.set("reference", "official/code-review");
+    formData.set("body", "This is useful.");
+
+    const result = await createCommentAction({}, formData);
+
+    expect(result).toEqual({ ok: true, commentId: "comment_456" });
+    expect(mocks.prisma.skillComment.create).toHaveBeenCalledWith({
+      data: {
+        userId: "user_123",
+        body: "This is useful.",
+        skillId: "skill_123",
+      },
+      select: { id: true },
+    });
+    expect(mocks.revalidatePath).toHaveBeenCalledWith("/skills/official/code-review");
+    expect(mocks.revalidatePath).toHaveBeenCalledWith("/skills");
+    expect(mocks.revalidatePath).toHaveBeenCalledWith("/api/v1/skills");
+  });
 });
 
 describe("engagement moderation actions", () => {

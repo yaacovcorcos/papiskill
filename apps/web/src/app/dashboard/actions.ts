@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { SkillVisibility } from "@prisma/client";
+import { signInPath } from "@/lib/auth-callback";
 import { getSessionUser } from "@/lib/server/request-auth";
 import { ensureProfile, normalizeHandle, validateHandle } from "@/lib/server/profiles";
 import { getPrisma } from "@/lib/server/prisma";
@@ -122,9 +123,9 @@ export async function updateProfileAction(
 }
 
 export async function copySkillToLibraryAction(formData: FormData) {
-  const user = await getRequiredUser();
-  const profile = await ensureProfile(user);
   const reference = stringField(formData, "reference");
+  const user = await getRequiredUser(reference ? `/dashboard/fork?skill=${encodeURIComponent(reference)}` : "/dashboard/fork");
+  const profile = await ensureProfile(user);
   const visibility = visibilityField(formData, "visibility");
   if (!reference) {
     redirect("/skills");
@@ -269,10 +270,10 @@ export async function saveForkAction(
   };
 }
 
-async function getRequiredUser() {
+async function getRequiredUser(callbackURL = "/dashboard") {
   const user = await getSessionUser();
   if (!user) {
-    redirect("/auth/sign-in");
+    redirect(signInPath(callbackURL));
   }
   return user;
 }

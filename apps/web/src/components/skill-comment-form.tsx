@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, useEffect } from "react";
 import {
   createCommentAction,
   type CommentActionState,
@@ -9,8 +9,20 @@ import { FormFeedback } from "@/components/form-feedback";
 
 const initialState: CommentActionState = {};
 
-export function CommentForm({ reference }: { reference: string }) {
+export function CommentForm({
+  reference,
+  onPosted,
+}: {
+  reference: string;
+  onPosted?: () => void | Promise<void>;
+}) {
   const [state, action, pending] = useActionState(createCommentAction, initialState);
+
+  useEffect(() => {
+    if (state.ok && state.commentId) {
+      void onPosted?.();
+    }
+  }, [onPosted, state.commentId, state.ok]);
 
   return (
     <form action={action} className="rounded-lg border border-border bg-white p-4 shadow-sm">

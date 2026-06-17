@@ -5,6 +5,8 @@ const mocks = vi.hoisted(() => ({
   getSessionUser: vi.fn(),
   getSkillByReference: vi.fn(),
   getFileRegistrySkill: vi.fn(),
+  logServerWarning: vi.fn(),
+  hasDatabaseUrl: vi.fn(),
 }));
 
 vi.mock("@/lib/server/request-auth", () => ({
@@ -18,6 +20,14 @@ vi.mock("@/lib/server/skills", () => ({
 
 vi.mock("@/lib/server/catalog", () => ({
   getFileRegistrySkill: mocks.getFileRegistrySkill,
+}));
+
+vi.mock("@/lib/server/db-env", () => ({
+  hasDatabaseUrl: mocks.hasDatabaseUrl,
+}));
+
+vi.mock("@/lib/server/observability", () => ({
+  logServerWarning: mocks.logServerWarning,
 }));
 
 const catalogSkill = {
@@ -48,6 +58,7 @@ describe("GET /api/v1/skills/[...reference]", () => {
     mocks.getSessionUser.mockResolvedValue(null);
     mocks.getSkillByReference.mockResolvedValue(null);
     mocks.getFileRegistrySkill.mockResolvedValue(catalogSkill);
+    mocks.hasDatabaseUrl.mockReturnValue(true);
   });
 
   it("allows catalog fallback for official-style references", async () => {
@@ -74,5 +85,26 @@ describe("GET /api/v1/skills/[...reference]", () => {
 
     expect(response.status).toBe(404);
     expect(mocks.getFileRegistrySkill).not.toHaveBeenCalled();
+  });
+
+  it("logs database lookup failures while preserving the not-found response", async () => {
+    const error = new Error("database unavailable");
+    mocks.getSkillByReference.mockRejectedValue(error);
+    const { GET } = await import("./route");
+
+    const response = await GET(
+      new Request("https://papiskill.test/api/v1/skills/alice/code-review"),
+      { params: Promise.resolve({ reference: ["alice", "code-review"] }) },
+    );
+
+    expect(response.status).toBe(404);
+    expect(mocks.logServerWarning).toHaveBeenCalledWith(
+      "api.skills.database_lookup_failed",
+      error,
+      {
+        reference: "alice/code-review",
+        actorSignedIn: false,
+      },
+    );
   });
 });

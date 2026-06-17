@@ -79,7 +79,7 @@ function serializeValidationIssues(validations: Array<SkillValidation | SkillFor
     level: issue.level.toLowerCase() as "error" | "warning",
     code: issue.code,
     message: issue.message,
-    path: issue.path,
+    path: issue.path ?? null,
   }));
 }
 

@@ -1,4 +1,6 @@
 import { AppHeader } from "@/components/app-header";
+import { GithubSignInButton } from "@/components/github-sign-in-button";
+import { getSessionUser } from "@/lib/server/request-auth";
 import { copySkillToLibraryAction } from "../actions";
 
 export const dynamic = "force-dynamic";
@@ -10,6 +12,8 @@ export default async function CopyToLibraryPage({
 }) {
   const params = await searchParams;
   const reference = params.skill ?? "";
+  const user = await getSessionUser();
+  const callbackURL = reference ? `/dashboard/fork?skill=${encodeURIComponent(reference)}` : "/dashboard/fork";
 
   return (
     <>
@@ -17,6 +21,18 @@ export default async function CopyToLibraryPage({
       <main className="mx-auto w-full max-w-2xl px-5 py-10">
         <h1 className="text-3xl font-semibold tracking-tight">Copy to library</h1>
         <p className="mt-3 text-muted">Create a profile-owned copy that you can keep private, publish publicly, edit, download, and install with the CLI.</p>
+        {!user ? (
+          <section className="mt-8 rounded-lg border border-border bg-white p-5 shadow-sm">
+            <h2 className="text-lg font-semibold">Sign in to keep your copy</h2>
+            <p className="mt-2 text-sm leading-6 text-muted">
+              PapiSkill saves copied and modified skills to your profile library, so GitHub sign-in is required before creating a private or public copy.
+            </p>
+            <GithubSignInButton
+              callbackURL={callbackURL}
+              className="mt-5 inline-flex items-center gap-2 rounded-md bg-slate-950 px-4 py-2.5 text-sm font-semibold text-white hover:bg-slate-800"
+            />
+          </section>
+        ) : (
         <form action={copySkillToLibraryAction} className="mt-8 rounded-lg border border-border bg-white p-5 shadow-sm">
           <label className="block text-sm font-medium">
             Source skill
@@ -32,6 +48,7 @@ export default async function CopyToLibraryPage({
           </label>
           <button type="submit" className="mt-5 rounded-md bg-slate-950 px-4 py-2 text-sm font-semibold text-white">Copy to library</button>
         </form>
+        )}
       </main>
     </>
   );

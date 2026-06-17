@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { Prisma, SkillCommentStatus } from "@prisma/client";
+import { signInPath } from "@/lib/auth-callback";
 import { ensureProfile } from "@/lib/server/profiles";
 import { getSessionUser } from "@/lib/server/request-auth";
 import { getPrisma } from "@/lib/server/prisma";
@@ -21,11 +22,12 @@ import {
 export interface CommentActionState {
   ok?: boolean;
   error?: string;
+  commentId?: string;
 }
 
 export async function toggleStarAction(formData: FormData) {
-  const user = await getRequiredUser();
   const reference = stringField(formData, "reference");
+  const user = await getRequiredUser(engagementPathForReference(reference));
   const target = await getPublicEngagementTarget(reference);
   if (!target) {
     redirect(engagementPathForReference(reference));
@@ -58,9 +60,9 @@ export async function createCommentAction(
   _previousState: CommentActionState,
   formData: FormData,
 ): Promise<CommentActionState> {
-  const user = await getRequiredUser();
-  await ensureProfile(user);
   const reference = stringField(formData, "reference");
+  const user = await getRequiredUser(engagementPathForReference(reference));
+  await ensureProfile(user);
   const body = normalizeCommentBody(stringField(formData, "body"));
   const target = await getPublicEngagementTarget(reference);
   if (!target) {
@@ -103,21 +105,22 @@ export async function createCommentAction(
     return { error: "That comment was just posted." };
   }
 
-  await getPrisma().skillComment.create({
+  const comment = await getPrisma().skillComment.create({
     data: {
       userId: user.id,
       body,
       ...targetWhere,
     },
+    select: { id: true },
   });
 
   revalidateEngagementPaths(target);
-  return { ok: true };
+  return { ok: true, commentId: comment.id };
 }
 
 export async function deleteCommentAction(formData: FormData) {
-  const user = await getRequiredUser();
   const reference = stringField(formData, "reference");
+  const user = await getRequiredUser(engagementPathForReference(reference));
   const commentId = stringField(formData, "commentId");
   const target = await getPublicEngagementTarget(reference);
   if (!target || !commentId) {
@@ -141,8 +144,8 @@ export async function deleteCommentAction(formData: FormData) {
 }
 
 export async function hideCommentAction(formData: FormData) {
-  const user = await getRequiredUser();
   const reference = stringField(formData, "reference");
+  const user = await getRequiredUser(engagementPathForReference(reference));
   const commentId = stringField(formData, "commentId");
   const target = await getPublicEngagementTarget(reference);
   if (!target || !commentId) {
@@ -183,10 +186,10 @@ function isUniqueConstraintError(error: unknown) {
   return error instanceof Prisma.PrismaClientKnownRequestError && error.code === "P2002";
 }
 
-async function getRequiredUser() {
+async function getRequiredUser(callbackURL: string) {
   const user = await getSessionUser();
   if (!user) {
-    redirect("/auth/sign-in");
+    redirect(signInPath(callbackURL));
   }
   return user;
 }

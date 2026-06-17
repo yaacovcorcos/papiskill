@@ -59,7 +59,7 @@ export function SkillCard({ skill }: { skill: CatalogSkill }) {
       </Link>
       <div className="mt-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex min-w-0 items-center rounded-md border border-border bg-slate-50">
-          <code className="inline-flex min-w-0 items-center gap-2 px-3 py-2 font-mono text-xs text-slate-800">
+          <code className="flex min-w-0 flex-1 items-center gap-2 px-3 py-2 font-mono text-xs text-slate-800">
             <Terminal className="size-3.5 shrink-0" aria-hidden />
             <span className="truncate">{`papiskill install ${reference}`}</span>
           </code>

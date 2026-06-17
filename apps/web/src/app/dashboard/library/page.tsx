@@ -5,6 +5,8 @@ import { AppHeader } from "@/components/app-header";
 import { copyInstallCommandLabel } from "@/components/action-labels";
 import { Badge } from "@/components/badge";
 import { CopyButton } from "@/components/copy-button";
+import { signInPath } from "@/lib/auth-callback";
+import { canonicalRegistryReference } from "@/lib/references";
 import { ensureProfile } from "@/lib/server/profiles";
 import { getPrisma } from "@/lib/server/prisma";
 import { getSessionUser } from "@/lib/server/request-auth";
@@ -15,7 +17,7 @@ export const dynamic = "force-dynamic";
 export default async function LibraryPage() {
   const user = await getSessionUser();
   if (!user) {
-    redirect("/auth/sign-in");
+    redirect(signInPath("/dashboard/library"));
   }
   const profile = await ensureProfile(user);
   const items = await getPrisma().skillFork.findMany({
@@ -140,7 +142,7 @@ function sourceLabel(item: {
   sourceFork: { slug: string; name: string; owner: { profile: { handle: string } | null } } | null;
 }) {
   if (item.sourceReference) return item.sourceReference;
-  if (item.sourceSkill) return `${item.sourceSkill.registryKind.toLowerCase()}/${item.sourceSkill.slug}`;
+  if (item.sourceSkill) return canonicalRegistryReference(item.sourceSkill.registryKind.toLowerCase(), item.sourceSkill.slug);
   if (item.sourceFork?.owner.profile) return `${item.sourceFork.owner.profile.handle}/${item.sourceFork.slug}`;
   return "manual";
 }

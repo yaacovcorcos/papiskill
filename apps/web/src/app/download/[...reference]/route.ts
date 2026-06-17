@@ -6,6 +6,7 @@ import {
 import { getFileRegistrySkill } from "@/lib/server/catalog";
 import { hasDatabaseUrl } from "@/lib/server/db-env";
 import { recordDownloadEvent } from "@/lib/server/download-events";
+import { logServerWarning } from "@/lib/server/observability";
 import { buildSkillPackageZip, packageDownloadFilename } from "@/lib/server/package-archive";
 import { isPublicRegistryReference } from "@/lib/server/references";
 import { getSessionUser, getTokenUser } from "@/lib/server/request-auth";
@@ -20,7 +21,7 @@ export async function GET(
   const { reference } = await context.params;
   const joinedReference = reference.join("/");
   const isPublicRegistry = isPublicRegistryReference(joinedReference);
-  const actor = isPublicRegistry ? null : await getActor(request);
+  const actor = isPublicRegistry ? null : await getActor(request, joinedReference);
   const catalogSkill = isPublicRegistry ? await getCatalogFallback(joinedReference) : null;
   const skill = catalogSkill ?? await getDatabaseSkill(joinedReference, actor);
   if (!skill) {
@@ -61,11 +62,12 @@ export async function GET(
   });
 }
 
-async function getActor(request: Request) {
+async function getActor(request: Request, reference: string) {
   if (!hasDatabaseUrl()) return null;
   try {
     return await getTokenUser(request) ?? await getSessionUser();
-  } catch {
+  } catch (error) {
+    logServerWarning("download.actor_lookup_failed", error, { reference });
     return null;
   }
 }
@@ -74,7 +76,11 @@ async function getDatabaseSkill(reference: string, actor: Awaited<ReturnType<typ
   if (!hasDatabaseUrl()) return null;
   try {
     return await getSkillByReference(reference, actor);
-  } catch {
+  } catch (error) {
+    logServerWarning("download.database_lookup_failed", error, {
+      reference,
+      actorSignedIn: Boolean(actor),
+    });
     return null;
   }
 }

@@ -15,19 +15,9 @@ import { getSkillEngagement } from "@/lib/server/engagement";
 import { isPublicRegistryReference } from "@/lib/server/references";
 import { getSessionUser } from "@/lib/server/request-auth";
 import { getSkillByReference } from "@/lib/server/skills";
-import { compatibilityLabels } from "../skill-filters";
+import { compatibilityLabels, skillReference, statusBadgeLabel } from "../skill-filters";
 
 export const revalidate = 60;
-
-function skillReference(skill: { registryKind: string; slug: string; author: string | null }) {
-  if (skill.registryKind === "profile" && skill.author) {
-    return `${skill.author}/${skill.slug}`;
-  }
-  if (skill.registryKind === "community") {
-    return `community/${skill.slug}`;
-  }
-  return `official/${skill.slug}`;
-}
 
 export default async function SkillDetailPage({
   params,
@@ -55,28 +45,28 @@ export default async function SkillDetailPage({
         </Link>
 
         <div className="grid grid-cols-[minmax(0,1fr)] gap-6 lg:grid-cols-[minmax(0,1fr)_320px] lg:gap-8">
-            <article className="min-w-0">
-              <div className="border-b border-border pb-6">
-                <div className="mb-3 flex flex-wrap items-center gap-2">
-                  <Badge variant={skill.registryKind === "global" ? "blue" : "neutral"}>
-                    {skill.registryKind === "global" ? "Global registry" : "Profile skill"}
-                  </Badge>
-                  <SkillValidationBadges issues={skill.validationIssues} />
-                </div>
-                <h1 className="text-3xl font-semibold tracking-tight sm:text-4xl">{skill.name}</h1>
-                <p className="mt-3 max-w-2xl text-base leading-7 text-muted sm:text-lg sm:leading-8">{skill.summary}</p>
+          <article className="min-w-0">
+            <div className="border-b border-border pb-6">
+              <div className="mb-3 flex flex-wrap items-center gap-2">
+                <Badge variant={skill.registryKind === "global" ? "blue" : "neutral"}>
+                  {statusBadgeLabel(skill.registryKind)}
+                </Badge>
+                <SkillValidationBadges issues={skill.validationIssues} />
               </div>
+              <h1 className="text-3xl font-semibold tracking-tight sm:text-4xl">{skill.name}</h1>
+              <p className="mt-3 max-w-2xl text-base leading-7 text-muted sm:text-lg sm:leading-8">{skill.summary}</p>
+            </div>
 
-              <SkillMarkdown markdown={skill.markdown ?? ""} className="mt-8" />
-              <SkillSourceBlock markdown={skill.markdown ?? ""} />
-              <SkillEngagementPanel engagement={engagement} viewerSignedIn={Boolean(viewer)} />
-            </article>
+            <SkillMarkdown markdown={skill.markdown ?? ""} className="mt-8" />
+            <SkillSourceBlock markdown={skill.markdown ?? ""} />
+            <SkillEngagementPanel engagement={engagement} viewerSignedIn={Boolean(viewer)} />
+          </article>
 
-            <aside className="min-w-0 lg:sticky lg:top-24 lg:self-start">
+          <aside className="min-w-0 lg:sticky lg:top-24 lg:self-start">
               <div className="rounded-lg border border-border bg-white p-5 shadow-sm">
                 <h2 className="text-sm font-semibold uppercase tracking-[0.14em] text-muted">Install</h2>
                 <div className="mt-3 flex min-w-0 items-center rounded-md border border-border bg-slate-50">
-                  <code className="inline-flex min-w-0 items-center gap-2 px-3 py-2 font-mono text-xs text-slate-800">
+                  <code className="flex min-w-0 flex-1 items-center gap-2 px-3 py-2 font-mono text-xs text-slate-800">
                     <Terminal className="size-3.5 shrink-0" aria-hidden />
                     <span className="truncate">{`papiskill install ${referenceId}`}</span>
                   </code>
@@ -128,7 +118,7 @@ export default async function SkillDetailPage({
                 issues={skill.validationIssues}
                 note="PapiSkill validates package structure and highlights risky content before install. Review warnings before installing third-party skills."
               />
-            </aside>
+          </aside>
         </div>
       </main>
     </>

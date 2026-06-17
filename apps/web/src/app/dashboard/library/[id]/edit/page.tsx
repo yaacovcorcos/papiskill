@@ -1,6 +1,8 @@
 import { notFound, redirect } from "next/navigation";
 import { SkillVisibility } from "@prisma/client";
 import { AppHeader } from "@/components/app-header";
+import { signInPath } from "@/lib/auth-callback";
+import { canonicalRegistryReference } from "@/lib/references";
 import { ensureProfile } from "@/lib/server/profiles";
 import { getPrisma } from "@/lib/server/prisma";
 import { getSessionUser } from "@/lib/server/request-auth";
@@ -13,12 +15,12 @@ export default async function EditLibrarySkillPage({
 }: {
   params: Promise<{ id: string }>;
 }) {
+  const { id } = await params;
   const user = await getSessionUser();
   if (!user) {
-    redirect("/auth/sign-in");
+    redirect(signInPath(`/dashboard/library/${id}/edit`));
   }
   const profile = await ensureProfile(user);
-  const { id } = await params;
   const fork = await getPrisma().skillFork.findFirst({
     where: { id, ownerId: user.id, archivedAt: null },
     include: {
@@ -46,7 +48,7 @@ export default async function EditLibrarySkillPage({
     level: issue.level.toLowerCase() as "error" | "warning",
     code: issue.code,
     message: issue.message,
-    path: issue.path ?? undefined,
+    ...(issue.path ? { path: issue.path } : {}),
   }));
 
   return (
@@ -83,7 +85,7 @@ function sourceLabel(item: {
   sourceFork: { slug: string; owner: { profile: { handle: string } | null } } | null;
 }) {
   if (item.sourceReference) return item.sourceReference;
-  if (item.sourceSkill) return `${item.sourceSkill.registryKind.toLowerCase()}/${item.sourceSkill.slug}`;
+  if (item.sourceSkill) return canonicalRegistryReference(item.sourceSkill.registryKind.toLowerCase(), item.sourceSkill.slug);
   if (item.sourceFork?.owner.profile) return `${item.sourceFork.owner.profile.handle}/${item.sourceFork.slug}`;
   return "manual";
 }

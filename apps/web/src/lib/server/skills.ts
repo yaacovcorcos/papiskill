@@ -1,7 +1,6 @@
 import { SkillRegistryKind, SkillVisibility, type User } from "@prisma/client";
 import { getPrisma } from "./prisma";
 import { getFileRegistrySkill } from "./catalog";
-import { generatedRegistry } from "./generated-registry";
 import { readableForkVisibilityWhere } from "./visibility";
 import {
   serializeForkDetail,
@@ -10,6 +9,7 @@ import {
   serializeSkillSummary,
 } from "./skill-serializers";
 import { hasDatabaseUrl } from "./db-env";
+import { parseSkillReference } from "./references";
 
 export async function searchVisibleSkills(query: string) {
   const prisma = getPrisma();
@@ -62,55 +62,28 @@ export async function searchVisibleSkills(query: string) {
 
 export async function getSkillByReference(reference: string, actor?: Pick<User, "id"> | null) {
   if (!hasDatabaseUrl()) {
-    return (await getFileRegistrySkill(reference)) ?? getGeneratedRegistrySkill(reference);
+    return getFileRegistrySkill(reference);
   }
 
-  const parts = reference.split("/").filter(Boolean);
-  if (parts.length === 1) {
-    return getGlobalSkill(parts[0]!);
+  const parsed = parseSkillReference(reference);
+  if (!parsed) return null;
+  if (parsed.kind === "registry") {
+    return getGlobalSkill(
+      parsed.slug,
+      parsed.registryKind === "community"
+        ? SkillRegistryKind.COMMUNITY
+        : SkillRegistryKind.GLOBAL,
+    );
   }
 
-  const [namespace, slug] = parts;
-  if (!namespace || !slug) {
-    return null;
-  }
-
-  if (["official", "global", "community"].includes(namespace)) {
-    return getGlobalSkill(slug, namespace === "community" ? SkillRegistryKind.COMMUNITY : undefined);
-  }
-
-  return getProfileFork(namespace, slug, actor);
-}
-
-function getGeneratedRegistrySkill(reference: string) {
-  const parts = reference.split("/").filter(Boolean);
-  const namespace = parts.length > 1 ? parts[0] : "official";
-  const slug = parts.at(-1);
-  if (!slug) return null;
-  if (namespace && !["official", "global", "community"].includes(namespace)) {
-    return null;
-  }
-
-  const skill = generatedRegistry.find((entry) => entry.slug === slug);
-  if (!skill) return null;
-  return {
-    ...skill,
-    files: [
-      {
-        path: "SKILL.md",
-        content: skill.markdown ?? "",
-      },
-    ],
-    installTargets: {},
-    markdown: skill.markdown ?? "",
-  };
+  return getProfileFork(parsed.handle, parsed.slug, actor);
 }
 
 async function getGlobalSkill(slug: string, registryKind?: SkillRegistryKind) {
   const skill = await getPrisma().skill.findFirst({
     where: {
       slug,
-      registryKind: registryKind ?? undefined,
+      ...(registryKind ? { registryKind } : {}),
       visibility: SkillVisibility.PUBLIC,
     },
     include: {

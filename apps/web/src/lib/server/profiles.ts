@@ -48,7 +48,7 @@ export function validateHandle(value: string): string | null {
   return null;
 }
 
-export async function ensureProfile(user: Pick<User, "id" | "email" | "name"> & { image?: string | null }) {
+export async function ensureProfile(user: Pick<User, "id" | "email" | "name"> & { image?: string | null | undefined }) {
   const prisma = getPrisma();
   const existing = await prisma.profile.findUnique({
     where: { userId: user.id },
@@ -68,7 +68,7 @@ export async function ensureProfile(user: Pick<User, "id" | "email" | "name"> & 
           userId: user.id,
           handle,
           name: user.name,
-          avatarUrl: user.image,
+          avatarUrl: user.image ?? null,
           githubUrl: githubHandle ? `https://github.com/${githubHandle}` : null,
         },
       });
@@ -81,7 +81,7 @@ export async function ensureProfile(user: Pick<User, "id" | "email" | "name"> & 
       userId: user.id,
       handle: `${base}-${user.id.slice(0, 8)}`,
       name: user.name,
-      avatarUrl: user.image,
+      avatarUrl: user.image ?? null,
     },
   });
 }
