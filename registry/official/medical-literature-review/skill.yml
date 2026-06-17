@@ -1,0 +1,29 @@
+id: medical-literature-review
+name: Medical Literature Review
+summary: Search and synthesize biomedical literature for clinical, scientific, and medical research questions.
+description: "Search and synthesize biomedical literature for medical, clinical, epidemiologic, public-health, and translational research questions. Use when the user asks what the literature says, asks for evidence on a medical claim, wants PubMed or biomedical database searching, asks for a literature review, or needs studies found, screened, compared, or summarized. Do not use for patient-specific diagnosis or treatment advice."
+version: 0.1.0
+license: MIT
+visibility: public
+categories:
+  - research
+tags:
+  - medicine
+  - literature-review
+  - pubmed
+  - evidence
+  - research
+  - clinical
+  - citations
+compatible_with:
+  - codex
+  - claude-code
+  - cursor
+  - generic-agent
+install_targets:
+  codex: ~/.codex/skills/medical-literature-review
+  claude-code: ~/.claude/skills/medical-literature-review
+  cursor: ~/.cursor/skills/medical-literature-review
+source_url: https://github.com/yaacovcorcos/papiskill/tree/main/registry/official/medical-literature-review
+maintainers:
+  - github: yaacovcorcos
