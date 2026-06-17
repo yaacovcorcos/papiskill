@@ -83,6 +83,7 @@ select {
   color: #1f2a44;
   font-size: 1.0125rem;
   line-height: 1.62;
+  overflow-wrap: break-word;
 }
 
 .skill-markdown > *:first-child {
@@ -237,8 +238,14 @@ select {
   font-size: 0.88em;
 }
 
+.skill-markdown :where(p, li, th, td) > code {
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
 .skill-markdown pre {
   margin: 1rem 0;
+  max-width: 100%;
   overflow-x: auto;
   border: 1px solid #d8e0ea;
   border-radius: 0.65rem;
@@ -262,6 +269,7 @@ select {
 .skill-markdown table {
   display: block;
   width: 100%;
+  max-width: 100%;
   margin: 1rem 0;
   overflow-x: auto;
   border-collapse: collapse;

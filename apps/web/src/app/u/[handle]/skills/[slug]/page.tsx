@@ -75,21 +75,21 @@ export default async function UserSkillPage({ params }: { params: Params }) {
   return (
     <>
       <AppHeader />
-      <main className="mx-auto w-full max-w-6xl px-5 py-8">
+      <main className="mx-auto w-full max-w-6xl px-4 py-6 sm:px-5 sm:py-8">
         <Link href={`/u/${handle}`} className="mb-6 inline-flex items-center gap-2 text-sm font-medium text-muted hover:text-slate-950">
           <ArrowLeft className="size-4" aria-hidden />
           Back to @{handle}
         </Link>
 
-        <div className="grid gap-8 lg:grid-cols-[1fr_320px]">
+        <div className="grid grid-cols-[minmax(0,1fr)] gap-6 lg:grid-cols-[minmax(0,1fr)_320px] lg:gap-8">
           <article className="min-w-0">
             <div className="border-b border-border pb-6">
               <div className="mb-3 flex flex-wrap items-center gap-2">
                 <Badge>{skill.visibility}</Badge>
                 <SkillValidationBadges issues={skill.validationIssues} />
               </div>
-              <h1 className="text-4xl font-semibold tracking-tight">{skill.name}</h1>
-              <p className="mt-3 max-w-2xl text-lg leading-8 text-muted">{skill.summary}</p>
+              <h1 className="text-3xl font-semibold tracking-tight sm:text-4xl">{skill.name}</h1>
+              <p className="mt-3 max-w-2xl text-base leading-7 text-muted sm:text-lg sm:leading-8">{skill.summary}</p>
             </div>
 
             <SkillMarkdown markdown={skill.markdown ?? ""} className="mt-8" />
@@ -99,7 +99,7 @@ export default async function UserSkillPage({ params }: { params: Params }) {
             ) : null}
           </article>
 
-          <aside className="lg:sticky lg:top-24 lg:self-start">
+          <aside className="min-w-0 lg:sticky lg:top-24 lg:self-start">
             <div className="rounded-lg border border-border bg-white p-5 shadow-sm">
               <h2 className="text-sm font-semibold uppercase tracking-[0.14em] text-muted">Install</h2>
               <code className="mt-3 flex items-center gap-2 rounded-md bg-slate-950 px-3 py-3 font-mono text-xs text-white">

@@ -59,6 +59,15 @@ Use \`SKILL.md\` well.
     expect(html).toContain('checked=""');
     expect(html).toContain("<li>First step</li>");
   });
+
+  it("renders long inline code through the markdown renderer", () => {
+    const html = renderToStaticMarkup(
+      <SkillMarkdown markdown={"Use `apps/web/src/app/api/private/route.ts:42`."} />,
+    );
+
+    expect(html).toContain("<p>Use <code>");
+    expect(html).toContain("apps/web/src/app/api/private/route.ts:42");
+  });
 });
 
 describe("SkillMarkdownEditor", () => {
@@ -85,6 +94,17 @@ describe("SkillSourceBlock", () => {
     expect(html).toContain("Copy Raw SKILL.md");
     expect(html).toContain("name: sample");
     expect(html).toContain("# Sample");
+  });
+
+  it("contains long source text inside a mobile-safe scrolling region", () => {
+    const html = renderToStaticMarkup(
+      <SkillSourceBlock markdown={"# Sample\n\n" + "very-long-source-line".repeat(24)} />,
+    );
+
+    expect(html).toContain("min-w-0");
+    expect(html).toContain("max-w-full");
+    expect(html).toContain("overflow-x-auto");
+    expect(html).toContain("overflow-y-auto");
   });
 });
 

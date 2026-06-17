@@ -15,7 +15,7 @@ export function AppHeader() {
         Skip to content
       </a>
       <header className="sticky top-0 z-20 border-b border-border bg-white/95 backdrop-blur">
-        <div className="mx-auto flex h-16 max-w-[1500px] items-center gap-8 px-5">
+        <div className="mx-auto flex h-16 max-w-[1500px] items-center gap-6 px-4 sm:gap-8 sm:px-5">
           <Link href="/skills" prefetch={false} className="focus-ring flex items-center gap-3 rounded-md" aria-label="PapiSkill home">
             <span className="grid size-9 place-items-center rounded-lg bg-[#111318] font-mono text-sm font-semibold text-white">
               PS
@@ -43,8 +43,11 @@ export function AppHeader() {
               CLI
             </Link>
             <GithubSignInButton
-              className="focus-ring inline-flex items-center gap-2 rounded-md border border-border bg-white px-3.5 py-2 text-sm font-semibold text-slate-950 shadow-sm hover:bg-slate-50"
-            />
+              className="focus-ring inline-flex items-center gap-1.5 rounded-md border border-border bg-white px-2.5 py-2 text-sm font-semibold text-slate-950 shadow-sm hover:bg-slate-50 sm:gap-2 sm:px-3.5"
+            >
+              <span className="sm:hidden">Sign in</span>
+              <span className="hidden sm:inline">Sign in with GitHub</span>
+            </GithubSignInButton>
           </div>
         </div>
       </header>
