@@ -14,6 +14,7 @@ import {
   signInToStarLabel,
   starCountLabel,
 } from "./action-labels";
+import { PendingSubmitButton } from "./pending-submit-button";
 import { CommentForm } from "./skill-comment-form";
 
 export function SkillEngagementPanel({
@@ -84,28 +85,28 @@ export function SkillEngagementPanel({
                       <form action={hideCommentAction}>
                         <input type="hidden" name="reference" value={engagement.reference} />
                         <input type="hidden" name="commentId" value={comment.id} />
-                        <button
-                          type="submit"
+                        <PendingSubmitButton
                           aria-label={hideLabel}
                           title={hideLabel}
+                          pendingChildren={<EyeOff className="size-4" aria-hidden />}
                           className="focus-ring inline-grid size-8 place-items-center rounded-md text-slate-400 hover:bg-slate-50 hover:text-amber-700"
                         >
                           <EyeOff className="size-4" aria-hidden />
-                        </button>
+                        </PendingSubmitButton>
                       </form>
                     ) : null}
                     {comment.viewerCanDelete ? (
                       <form action={deleteCommentAction}>
                         <input type="hidden" name="reference" value={engagement.reference} />
                         <input type="hidden" name="commentId" value={comment.id} />
-                        <button
-                          type="submit"
+                        <PendingSubmitButton
                           aria-label={deleteLabel}
                           title={deleteLabel}
+                          pendingChildren={<Trash2 className="size-4" aria-hidden />}
                           className="focus-ring inline-grid size-8 place-items-center rounded-md text-slate-400 hover:bg-slate-50 hover:text-red-700"
                         >
                           <Trash2 className="size-4" aria-hidden />
-                        </button>
+                        </PendingSubmitButton>
                       </form>
                     ) : null}
                   </div>
@@ -160,15 +161,20 @@ function StarControl({
   return (
     <form action={toggleStarAction}>
       <input type="hidden" name="reference" value={engagement.reference} />
-      <button
-        type="submit"
+      <PendingSubmitButton
         aria-label={label}
         title={label}
+        pendingChildren={
+          <>
+            <Star className="size-4" fill={engagement.viewerHasStarred ? "currentColor" : "none"} aria-hidden />
+            {engagement.starCount}
+          </>
+        }
         className={`focus-ring inline-flex h-10 items-center gap-2 rounded-md border px-3 text-sm font-semibold ${engagement.viewerHasStarred ? "border-slate-950 bg-slate-950 text-white hover:bg-slate-800" : "border-border bg-white hover:bg-slate-50"}`}
       >
         <Star className="size-4" fill={engagement.viewerHasStarred ? "currentColor" : "none"} aria-hidden />
         {engagement.starCount}
-      </button>
+      </PendingSubmitButton>
     </form>
   );
 }

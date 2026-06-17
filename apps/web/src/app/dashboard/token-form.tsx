@@ -27,7 +27,7 @@ export function TokenForm() {
       <button
         type="submit"
         disabled={pending}
-        className="mt-4 rounded-md bg-slate-950 px-4 py-2 text-sm font-semibold text-white disabled:opacity-60"
+        className="mt-4 rounded-md bg-slate-950 px-4 py-2 text-sm font-semibold text-white hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-60"
       >
         {pending ? "Creating..." : "Create token"}
       </button>

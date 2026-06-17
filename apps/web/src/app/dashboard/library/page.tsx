@@ -5,6 +5,7 @@ import { AppHeader } from "@/components/app-header";
 import { copyInstallCommandLabel } from "@/components/action-labels";
 import { Badge } from "@/components/badge";
 import { CopyButton } from "@/components/copy-button";
+import { PendingSubmitButton } from "@/components/pending-submit-button";
 import { signInPath } from "@/lib/auth-callback";
 import { canonicalRegistryReference } from "@/lib/references";
 import { ensureProfile } from "@/lib/server/profiles";
@@ -51,10 +52,13 @@ export default async function LibraryPage() {
           </div>
           <div className="flex flex-wrap gap-2">
             <form action={createBlankSkillAction}>
-              <button type="submit" className="inline-flex items-center justify-center gap-2 rounded-md bg-slate-950 px-4 py-2 text-sm font-semibold text-white hover:bg-slate-800">
+              <PendingSubmitButton
+                className="inline-flex items-center justify-center gap-2 rounded-md bg-slate-950 px-4 py-2 text-sm font-semibold text-white hover:bg-slate-800"
+                pendingChildren="Creating..."
+              >
                 <Plus className="size-4" aria-hidden />
                 New skill
-              </button>
+              </PendingSubmitButton>
             </form>
             <Link href="/skills" className="inline-flex items-center justify-center rounded-md border border-border px-4 py-2 text-sm font-semibold hover:bg-slate-50">
               Copy a skill
@@ -70,10 +74,13 @@ export default async function LibraryPage() {
             </p>
             <div className="mt-5 flex flex-wrap gap-2">
               <form action={createBlankSkillAction}>
-                <button type="submit" className="inline-flex items-center gap-2 rounded-md bg-slate-950 px-3 py-2 text-sm font-semibold text-white hover:bg-slate-800">
+                <PendingSubmitButton
+                  className="inline-flex items-center gap-2 rounded-md bg-slate-950 px-3 py-2 text-sm font-semibold text-white hover:bg-slate-800"
+                  pendingChildren="Creating..."
+                >
                   <Plus className="size-4" aria-hidden />
                   New skill
-                </button>
+                </PendingSubmitButton>
               </form>
               <Link href="/skills" className="inline-flex rounded-md border border-border px-3 py-2 text-sm font-semibold hover:bg-slate-50">
                 Browse skills
@@ -122,14 +129,14 @@ export default async function LibraryPage() {
                       </Link>
                       <form action={archiveLibrarySkillAction}>
                         <input type="hidden" name="forkId" value={item.id} />
-                        <button
-                          type="submit"
+                        <PendingSubmitButton
                           aria-label={`Delete ${item.name}`}
                           title="Delete"
+                          pendingChildren={<Trash2 className="size-4" aria-hidden />}
                           className="focus-ring inline-grid size-10 place-items-center rounded-md border border-border text-slate-700 hover:bg-slate-50 hover:text-slate-950"
                         >
                           <Trash2 className="size-4" aria-hidden />
-                        </button>
+                        </PendingSubmitButton>
                       </form>
                     </div>
                   </div>

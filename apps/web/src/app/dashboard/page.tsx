@@ -3,6 +3,7 @@ import { BookOpen, ExternalLink, Library, Plus, UserRound } from "lucide-react";
 import { SkillVisibility } from "@prisma/client";
 import { AppHeader } from "@/components/app-header";
 import { GithubSignInButton } from "@/components/github-sign-in-button";
+import { PendingSubmitButton } from "@/components/pending-submit-button";
 import { getPrisma } from "@/lib/server/prisma";
 import { ensureProfile } from "@/lib/server/profiles";
 import { getSessionUser } from "@/lib/server/request-auth";
@@ -60,10 +61,13 @@ export default async function DashboardPage() {
                 </div>
                 <div className="flex flex-wrap gap-2">
                   <form action={createBlankSkillAction}>
-                    <button type="submit" className="inline-flex items-center justify-center gap-2 rounded-md bg-slate-950 px-3 py-2 text-sm font-semibold text-white hover:bg-slate-800">
+                    <PendingSubmitButton
+                      className="inline-flex items-center justify-center gap-2 rounded-md bg-slate-950 px-3 py-2 text-sm font-semibold text-white hover:bg-slate-800"
+                      pendingChildren="Creating..."
+                    >
                       <Plus className="size-4" aria-hidden />
                       New skill
-                    </button>
+                    </PendingSubmitButton>
                   </form>
                   <Link href="/dashboard/library" className="inline-flex items-center justify-center rounded-md border border-border px-3 py-2 text-sm font-semibold hover:bg-slate-50">
                     Open library
@@ -129,7 +133,12 @@ export default async function DashboardPage() {
                         <p className="text-xs text-muted">{token.prefix} · {token.revokedAt ? "revoked" : "active"}</p>
                       </div>
                       {!token.revokedAt ? (
-                        <button className="text-sm font-semibold text-red-700" type="submit">Revoke</button>
+                        <PendingSubmitButton
+                          className="text-sm font-semibold text-slate-700 hover:text-slate-950"
+                          pendingChildren="Revoking..."
+                        >
+                          Revoke
+                        </PendingSubmitButton>
                       ) : null}
                     </form>
                   ))}

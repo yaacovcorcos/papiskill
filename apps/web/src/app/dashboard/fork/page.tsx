@@ -1,5 +1,6 @@
 import { AppHeader } from "@/components/app-header";
 import { GithubSignInButton } from "@/components/github-sign-in-button";
+import { PendingSubmitButton } from "@/components/pending-submit-button";
 import { getSessionUser } from "@/lib/server/request-auth";
 import { copySkillToLibraryAction } from "../actions";
 
@@ -46,7 +47,12 @@ export default async function CopyToLibraryPage({
               <option value="UNLISTED">Unlisted</option>
             </select>
           </label>
-          <button type="submit" className="mt-5 rounded-md bg-slate-950 px-4 py-2 text-sm font-semibold text-white">Copy to library</button>
+          <PendingSubmitButton
+            className="mt-5 rounded-md bg-slate-950 px-4 py-2 text-sm font-semibold text-white hover:bg-slate-800"
+            pendingChildren="Copying..."
+          >
+            Copy to library
+          </PendingSubmitButton>
         </form>
         )}
       </main>
