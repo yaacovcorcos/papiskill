@@ -81,8 +81,8 @@ select {
 
 .skill-markdown {
   color: #1f2a44;
-  font-size: 0.975rem;
-  line-height: 1.58;
+  font-size: 1.0125rem;
+  line-height: 1.62;
 }
 
 .skill-markdown > *:first-child {
