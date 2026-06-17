@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { ArrowLeft, Download, GitFork, Terminal } from "lucide-react";
 import { AppHeader } from "@/components/app-header";
 import { Badge } from "@/components/badge";
+import { CopyButton } from "@/components/copy-button";
 import { RegistrySourceCard } from "@/components/registry-source-card";
 import { SkillMarkdown } from "@/components/skill-markdown";
 import { SkillEngagementPanel } from "@/components/skill-engagement-panel";
@@ -74,10 +75,17 @@ export default async function SkillDetailPage({
             <aside className="lg:sticky lg:top-24 lg:self-start">
               <div className="rounded-lg border border-border bg-white p-5 shadow-sm">
                 <h2 className="text-sm font-semibold uppercase tracking-[0.14em] text-muted">Install</h2>
-                <code className="mt-3 flex items-center gap-2 rounded-md bg-slate-950 px-3 py-3 font-mono text-xs text-white">
-                  <Terminal className="size-4 shrink-0" aria-hidden />
-                  <span className="break-all">{`papiskill install ${referenceId}`}</span>
-                </code>
+                <div className="mt-3 flex min-w-0 items-center rounded-md border border-border bg-slate-50">
+                  <code className="inline-flex min-w-0 items-center gap-2 px-3 py-2 font-mono text-xs text-slate-800">
+                    <Terminal className="size-3.5 shrink-0" aria-hidden />
+                    <span className="truncate">{`papiskill install ${referenceId}`}</span>
+                  </code>
+                  <CopyButton
+                    value={`papiskill install ${referenceId}`}
+                    label={`Copy install command for ${skill.name}`}
+                    className="inline-grid size-9 shrink-0 place-items-center border-l border-border text-slate-500 hover:bg-white hover:text-slate-950"
+                  />
+                </div>
                 <div className="mt-4 grid grid-cols-2 gap-2">
                   <Link href={`/download/${referenceId}?format=zip`} prefetch={false} className="inline-flex items-center justify-center gap-2 rounded-md border border-border px-3 py-2 text-sm font-semibold hover:bg-slate-50">
                     <Download className="size-4" aria-hidden />
