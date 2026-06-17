@@ -1,6 +1,11 @@
 import { describe, expect, it } from "vitest";
 import YAML from "yaml";
-import { buildBlankLibraryDraft, librarySourceFromCatalogSkill, validateForkDraftPackage } from "./library";
+import {
+  buildBlankLibraryDraft,
+  getVisibleLibrarySource,
+  librarySourceFromCatalogSkill,
+  validateForkDraftPackage,
+} from "./library";
 
 const baseDraft = {
   slug: "code-review",
@@ -146,5 +151,25 @@ describe("librarySourceFromCatalogSkill", () => {
     });
     expect(source.sourceSkillId).toBeUndefined();
     expect(source.files).toHaveLength(2);
+  });
+});
+
+describe("getVisibleLibrarySource", () => {
+  it("uses the git-backed registry package when copying official skills", async () => {
+    const source = await getVisibleLibrarySource("official/code-review", "user_1");
+
+    expect(source).toEqual(
+      expect.objectContaining({
+        sourceReference: "official/code-review",
+        name: "Code Change Review",
+      }),
+    );
+    expect(source?.sourceSkillId).toBeUndefined();
+    expect(source?.files).toContainEqual(
+      expect.objectContaining({
+        path: "SKILL.md",
+        content: expect.stringContaining("# Code Change Review"),
+      }),
+    );
   });
 });

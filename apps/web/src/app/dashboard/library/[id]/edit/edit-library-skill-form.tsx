@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useActionState } from "react";
-import { Download, ExternalLink, Save } from "lucide-react";
+import { Download, ExternalLink, Save, Terminal } from "lucide-react";
 import {
   copyInstallCommandLabel,
   downloadSkillLabel,
@@ -111,8 +111,16 @@ export function EditLibrarySkillForm({
 
           <section className="rounded-lg border border-border bg-white p-5 shadow-sm">
             <h2 className="text-sm font-semibold uppercase tracking-[0.14em] text-muted">Reference</h2>
-            <div className="mt-3 rounded-md bg-slate-950 px-3 py-2 font-mono text-xs text-white">
-              <span className="break-all">{installCommand}</span>
+            <div className="mt-3 flex min-w-0 items-center rounded-md border border-border bg-slate-50">
+              <code className="flex min-w-0 flex-1 items-center gap-2 px-3 py-2 font-mono text-xs text-slate-800">
+                <Terminal className="size-3.5 shrink-0" aria-hidden />
+                <span className="truncate">{installCommand}</span>
+              </code>
+              <CopyButton
+                value={installCommand}
+                label={copyInstallCommandLabel(fork.name)}
+                className="inline-grid size-9 shrink-0 place-items-center border-l border-border text-slate-500 hover:bg-white hover:text-slate-950"
+              />
             </div>
             <dl className="mt-4 space-y-3 text-sm">
               <Meta label="Profile ref" value={reference} />

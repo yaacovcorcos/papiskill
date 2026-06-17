@@ -23,15 +23,13 @@ describe("shared accessibility affordances", () => {
     expect(html).toContain('id="main-content"');
   });
 
-  it("keeps the shared GitHub sign-in compact on mobile", () => {
+  it("does not flash a signed-out account state before hydration", () => {
     const html = renderToStaticMarkup(<AppHeader />);
 
-    expect(html).toContain("sm:hidden");
-    expect(html).toContain(">Sign in</span>");
-    expect(html).toContain("hidden sm:inline");
-    expect(html).toContain(">Sign in with GitHub</span>");
-    expect(html).toContain("px-2.5");
-    expect(html).toContain("sm:px-3.5");
+    expect(html).toContain("h-10 w-36");
+    expect(html).toContain('aria-hidden="true"');
+    expect(html).not.toContain(">Sign in</span>");
+    expect(html).not.toContain(">Sign in with GitHub</span>");
   });
 
   it("keeps copy buttons keyboard-visible and labelled", () => {

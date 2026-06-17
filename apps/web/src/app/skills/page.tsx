@@ -45,21 +45,11 @@ export default async function SkillsPage({
     ? await getSkillByReference(skillReference(selected))
     : null;
   const activeFilterLabels = selectedFilterLabels(activeFilters, filterGroups);
-  const hasActiveSearchOrFilters =
-    Boolean(activeFilters.query) || activeFilterLabels.length > 0;
 
   return (
     <>
       <AppHeader />
       <SkillsLayout
-        filters={
-          <RegistrySidebarFilters
-            activeFilters={activeFilters}
-            filterGroups={filterGroups}
-            countSource={baseSkills}
-            showClear={hasActiveSearchOrFilters}
-          />
-        }
         detail={
           <SkillPreviewPanel
             selected={selected}
@@ -145,41 +135,6 @@ export default async function SkillsPage({
   );
 }
 
-function RegistrySidebarFilters({
-  activeFilters,
-  filterGroups,
-  countSource,
-  showClear,
-}: {
-  activeFilters: ReturnType<typeof parseActiveFilters>;
-  filterGroups: ReturnType<typeof buildFilterGroups>;
-  countSource: Awaited<ReturnType<typeof getCatalogSkills>>;
-  showClear: boolean;
-}) {
-  return (
-    <>
-      {showClear ? (
-        <div className="mb-6 flex justify-end">
-          <Link
-            href="/skills"
-            className="focus-ring rounded-sm text-xs font-medium text-slate-500 hover:text-slate-950"
-          >
-            Clear
-          </Link>
-        </div>
-      ) : null}
-      {filterGroups.map((group) => (
-        <FilterGroup
-          key={group.title}
-          group={group}
-          filters={activeFilters}
-          countSource={countSource}
-        />
-      ))}
-    </>
-  );
-}
-
 function SearchForm({
   activeFilters,
 }: {
@@ -197,7 +152,7 @@ function SearchForm({
           defaultValue={activeFilters.query}
           aria-label="Search skills"
           placeholder="Search skills, authors, tags..."
-          className="focus-ring h-11 w-full rounded-lg border border-border bg-white pl-10 pr-4 text-sm transition focus:border-accent"
+          className="h-11 w-full rounded-lg border border-border bg-white pl-10 pr-4 text-sm outline-none transition focus:border-slate-400 focus:bg-white"
         />
         {activeFilters.categories.map((value) => (
           <input
@@ -283,7 +238,7 @@ function MobileFilterBar({
   countSource: Awaited<ReturnType<typeof getCatalogSkills>>;
 }) {
   return (
-    <div className="mb-5 flex items-center gap-2 xl:hidden">
+    <div className="mb-5 flex items-center gap-2">
       <details className="group">
         <summary className="focus-ring inline-flex h-10 cursor-pointer list-none items-center gap-2 rounded-md border border-border bg-white px-3 text-sm font-semibold shadow-sm hover:bg-slate-50">
           <Filter className="size-4" aria-hidden />

@@ -29,7 +29,7 @@ const signInButtonClassName =
   "focus-ring inline-flex items-center gap-1.5 rounded-md border border-border bg-white px-2.5 py-2 text-sm font-semibold text-slate-950 shadow-sm hover:bg-slate-50 sm:gap-2 sm:px-3.5";
 
 export function HeaderAccountSlot() {
-  const [account, setAccount] = useState<Account>({ signedIn: false });
+  const [account, setAccount] = useState<Account | null>(null);
   const [isSigningOut, setIsSigningOut] = useState(false);
 
   useEffect(() => {
@@ -55,6 +55,10 @@ export function HeaderAccountSlot() {
     void loadAccount();
     return () => controller.abort();
   }, []);
+
+  if (!account) {
+    return <div className="h-10 w-36 rounded-md border border-border bg-slate-50 sm:w-44" aria-hidden />;
+  }
 
   if (!account.signedIn) {
     return (

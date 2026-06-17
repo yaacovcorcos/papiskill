@@ -160,6 +160,24 @@ export async function createBlankSkillAction() {
   redirect(`/dashboard/library/${fork.id}/edit`);
 }
 
+export async function archiveLibrarySkillAction(formData: FormData) {
+  const user = await getRequiredUser("/dashboard/library");
+  const profile = await ensureProfile(user);
+  const forkId = stringField(formData, "forkId");
+  if (!forkId) return;
+
+  await getPrisma().skillFork.updateMany({
+    where: { id: forkId, ownerId: user.id, archivedAt: null },
+    data: { archivedAt: new Date() },
+  });
+
+  revalidatePath("/dashboard");
+  revalidatePath("/dashboard/library");
+  revalidatePath("/skills");
+  revalidatePath("/api/v1/skills");
+  revalidatePath(`/u/${profile.handle}`);
+}
+
 export async function forkSkillAction(formData: FormData) {
   return copySkillToLibraryAction(formData);
 }

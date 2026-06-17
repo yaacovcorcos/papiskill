@@ -150,6 +150,11 @@ export async function getVisibleLibrarySource(reference: string, actorId?: strin
   if (!parsed) return null;
 
   if (parsed.kind === "registry") {
+    const fileRegistrySource = await getFileRegistrySkill(parsed.reference);
+    if (fileRegistrySource) {
+      return librarySourceFromCatalogSkill(fileRegistrySource);
+    }
+
     const registryKind = parsed.registryKind === "community" ? SkillRegistryKind.COMMUNITY : SkillRegistryKind.GLOBAL;
     const skill = await getPrisma().skill.findFirst({
       where: {
@@ -159,10 +164,7 @@ export async function getVisibleLibrarySource(reference: string, actorId?: strin
       },
       include: { files: { orderBy: { path: "asc" } } },
     });
-    if (!skill) {
-      const fallback = await getFileRegistrySkill(parsed.reference);
-      return fallback ? librarySourceFromCatalogSkill(fallback) : null;
-    }
+    if (!skill) return null;
     return {
       sourceSkillId: skill.id,
       sourceReference: parsed.reference,

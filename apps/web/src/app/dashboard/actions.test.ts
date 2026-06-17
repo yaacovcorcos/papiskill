@@ -27,6 +27,7 @@ const mocks = vi.hoisted(() => ({
     skillFork: {
       findFirst: vi.fn(),
       update: vi.fn(),
+      updateMany: vi.fn(),
     },
     skillForkFile: {
       upsert: vi.fn(),
@@ -119,6 +120,7 @@ beforeEach(() => {
   mocks.prisma.apiToken.updateMany.mockResolvedValue({ count: 1 });
   mocks.prisma.skillFork.findFirst.mockResolvedValue(null);
   mocks.prisma.skillFork.update.mockReturnValue({ op: "update-fork" });
+  mocks.prisma.skillFork.updateMany.mockResolvedValue({ count: 1 });
   mocks.prisma.skillForkFile.upsert.mockReturnValue({ op: "upsert-file" });
   mocks.prisma.$transaction.mockResolvedValue([]);
 });
@@ -187,6 +189,21 @@ describe("dashboard server actions", () => {
     });
 
     expect(mocks.createLibraryCopy).not.toHaveBeenCalled();
+  });
+
+  it("archives only library skills owned by the session user", async () => {
+    const { archiveLibrarySkillAction } = await import("./actions");
+    const formData = new FormData();
+    formData.set("forkId", "fork_123");
+
+    await archiveLibrarySkillAction(formData);
+
+    expect(mocks.prisma.skillFork.updateMany).toHaveBeenCalledWith({
+      where: { id: "fork_123", ownerId: "user_123", archivedAt: null },
+      data: { archivedAt: expect.any(Date) },
+    });
+    expect(mocks.revalidatePath).toHaveBeenCalledWith("/dashboard/library");
+    expect(mocks.revalidatePath).toHaveBeenCalledWith("/u/yaacov");
   });
 
   it("does not persist invalid fork edits", async () => {

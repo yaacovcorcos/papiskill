@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { Download, ExternalLink, Library, Pencil, Plus, Terminal } from "lucide-react";
+import { Download, ExternalLink, Library, Pencil, Plus, Terminal, Trash2 } from "lucide-react";
 import { AppHeader } from "@/components/app-header";
 import { copyInstallCommandLabel } from "@/components/action-labels";
 import { Badge } from "@/components/badge";
@@ -10,7 +10,7 @@ import { canonicalRegistryReference } from "@/lib/references";
 import { ensureProfile } from "@/lib/server/profiles";
 import { getPrisma } from "@/lib/server/prisma";
 import { getSessionUser } from "@/lib/server/request-auth";
-import { createBlankSkillAction } from "../actions";
+import { archiveLibrarySkillAction, createBlankSkillAction } from "../actions";
 
 export const dynamic = "force-dynamic";
 
@@ -120,11 +120,29 @@ export default async function LibraryPage() {
                       <Link href={`/dashboard/library/${item.id}/edit`} aria-label={`Edit ${item.name}`} title="Edit" className="inline-grid size-10 place-items-center rounded-md bg-slate-950 text-white hover:bg-slate-800">
                         <Pencil className="size-4" aria-hidden />
                       </Link>
+                      <form action={archiveLibrarySkillAction}>
+                        <input type="hidden" name="forkId" value={item.id} />
+                        <button
+                          type="submit"
+                          aria-label={`Delete ${item.name}`}
+                          title="Delete"
+                          className="focus-ring inline-grid size-10 place-items-center rounded-md border border-border text-slate-700 hover:bg-slate-50 hover:text-slate-950"
+                        >
+                          <Trash2 className="size-4" aria-hidden />
+                        </button>
+                      </form>
                     </div>
                   </div>
-                  <div className="mt-4 flex items-center gap-2 rounded-md bg-slate-950 px-3 py-2 font-mono text-xs text-white">
-                    <Terminal className="size-4 shrink-0" aria-hidden />
-                    <span className="break-all">{installCommand}</span>
+                  <div className="mt-4 flex min-w-0 items-center rounded-md border border-border bg-slate-50">
+                    <code className="flex min-w-0 flex-1 items-center gap-2 px-3 py-2 font-mono text-xs text-slate-800">
+                      <Terminal className="size-3.5 shrink-0" aria-hidden />
+                      <span className="truncate">{installCommand}</span>
+                    </code>
+                    <CopyButton
+                      value={installCommand}
+                      label={copyInstallCommandLabel(item.name)}
+                      className="inline-grid size-9 shrink-0 place-items-center border-l border-border text-slate-500 hover:bg-white hover:text-slate-950"
+                    />
                   </div>
                 </article>
               );
