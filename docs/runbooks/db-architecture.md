@@ -32,7 +32,7 @@
 - Download and skill-detail routes must not expose private or unlisted skill metadata to other users.
 - Skill IDs are lowercase slugs.
 - Stars and comments target exactly one public registry skill or one public profile library skill.
-- Comments are public when `VISIBLE`; deleted comments are retained as rows with `DELETED` status for audit continuity.
+- Comments are public when `VISIBLE`; curator-hidden comments use `HIDDEN`; author-deleted comments are retained as rows with `DELETED` status for audit continuity.
 
 ## Schema Change Rules
 

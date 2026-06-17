@@ -41,7 +41,7 @@ The remaining blockers for declaring the overall build complete are:
 | Contribution path | Shipped as docs/runbook | docs contributing and registry operations runbooks |
 | GitHub OAuth | Configured in code and production env; needs user-assisted browser auth pass | Better Auth GitHub provider and sign-in route; GitHub credential prompt reached in automated pass |
 | API tokens for private CLI access | Shipped in code; needs signed-in browser pass | token model, token create/revoke UI, action-level token tests, CLI login/whoami/logout |
-| Stars and comments | Shipped foundation; moderation still backlog | star/comment tables, detail panel, server actions, engagement tests |
+| Stars and comments | Shipped foundation; reporting queue still backlog | star/comment tables, detail panel, curator hide action, server actions, engagement tests |
 | Validation warnings visible | Shipped | cards, detail pages, profile detail pages, CLI info |
 | Vercel production deployment | Shipped | production deployment and domain alias |
 | CI and local quality gates | Shipped | GitHub Actions and `npm run check` |
@@ -69,11 +69,11 @@ live auth remains user-assisted.
 
 ### Engagement
 
-Stars and comments exist, and comment posting has persisted server-side limits. Public production still
-needs moderation hardening before meaningful traffic:
+Stars and comments exist, and comment posting has persisted server-side limits. Public production now
+has first-pass curator hiding for visible comments. Before meaningful public traffic, continue hardening:
 
-- curator/moderator controls for hiding comments
 - reporting or review queue if comments become public-facing at scale
+- moderator view for reviewing hidden or reported comments
 - a dedicated star-toggle action log if star abuse appears in practice
 
 ### Performance and caching

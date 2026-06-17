@@ -1,8 +1,9 @@
 import Link from "next/link";
-import { MessageSquare, Star, Trash2 } from "lucide-react";
+import { EyeOff, MessageSquare, Star, Trash2 } from "lucide-react";
 import type { SkillEngagement } from "@/lib/server/engagement";
 import {
   deleteCommentAction,
+  hideCommentAction,
   toggleStarAction,
 } from "@/app/skills/engagement-actions";
 import { signInToStarLabel, starCountLabel } from "./action-labels";
@@ -68,20 +69,36 @@ export function SkillEngagementPanel({
                   </div>
                   <p className="mt-2 whitespace-pre-wrap text-sm leading-6 text-slate-700">{comment.body}</p>
                 </div>
-                {comment.viewerCanDelete ? (
-                  <form action={deleteCommentAction}>
-                    <input type="hidden" name="reference" value={engagement.reference} />
-                    <input type="hidden" name="commentId" value={comment.id} />
-                    <button
-                      type="submit"
-                      aria-label="Delete comment"
-                      title="Delete"
-                      className="inline-grid size-8 place-items-center rounded-md text-slate-400 hover:bg-slate-50 hover:text-red-700"
-                    >
-                      <Trash2 className="size-4" aria-hidden />
-                    </button>
-                  </form>
-                ) : null}
+                <div className="flex shrink-0 items-center gap-1">
+                  {comment.viewerCanHide ? (
+                    <form action={hideCommentAction}>
+                      <input type="hidden" name="reference" value={engagement.reference} />
+                      <input type="hidden" name="commentId" value={comment.id} />
+                      <button
+                        type="submit"
+                        aria-label="Hide comment"
+                        title="Hide"
+                        className="focus-ring inline-grid size-8 place-items-center rounded-md text-slate-400 hover:bg-slate-50 hover:text-amber-700"
+                      >
+                        <EyeOff className="size-4" aria-hidden />
+                      </button>
+                    </form>
+                  ) : null}
+                  {comment.viewerCanDelete ? (
+                    <form action={deleteCommentAction}>
+                      <input type="hidden" name="reference" value={engagement.reference} />
+                      <input type="hidden" name="commentId" value={comment.id} />
+                      <button
+                        type="submit"
+                        aria-label="Delete comment"
+                        title="Delete"
+                        className="focus-ring inline-grid size-8 place-items-center rounded-md text-slate-400 hover:bg-slate-50 hover:text-red-700"
+                      >
+                        <Trash2 className="size-4" aria-hidden />
+                      </button>
+                    </form>
+                  ) : null}
+                </div>
               </div>
             </article>
           ))
@@ -107,7 +124,7 @@ function StarControl({
         disabled
         aria-label={countLabel}
         title={countLabel}
-        className="inline-flex h-10 items-center gap-2 rounded-md border border-border px-3 text-sm font-semibold text-muted"
+        className="focus-ring inline-flex h-10 items-center gap-2 rounded-md border border-border px-3 text-sm font-semibold text-muted"
       >
         <Star className="size-4" aria-hidden />
         {engagement.starCount}
@@ -136,7 +153,7 @@ function StarControl({
         type="submit"
         aria-label={label}
         title={label}
-        className={`inline-flex h-10 items-center gap-2 rounded-md border px-3 text-sm font-semibold ${engagement.viewerHasStarred ? "border-slate-950 bg-slate-950 text-white hover:bg-slate-800" : "border-border bg-white hover:bg-slate-50"}`}
+        className={`focus-ring inline-flex h-10 items-center gap-2 rounded-md border px-3 text-sm font-semibold ${engagement.viewerHasStarred ? "border-slate-950 bg-slate-950 text-white hover:bg-slate-800" : "border-border bg-white hover:bg-slate-50"}`}
       >
         <Star className="size-4" fill={engagement.viewerHasStarred ? "currentColor" : "none"} aria-hidden />
         {engagement.starCount}

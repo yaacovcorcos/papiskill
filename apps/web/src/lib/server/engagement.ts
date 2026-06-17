@@ -15,6 +15,7 @@ export interface SkillEngagementComment {
   authorName: string | null;
   authorAvatarUrl: string | null;
   viewerCanDelete: boolean;
+  viewerCanHide: boolean;
 }
 
 export interface SkillEngagement {
@@ -95,7 +96,7 @@ export async function getSkillEngagement(
   }
 
   const targetWhere = engagementTargetWhere(target);
-  const [starCount, commentCount, viewerStar, comments] = await Promise.all([
+  const [starCount, commentCount, viewerStar, viewerModeration, comments] = await Promise.all([
     getPrisma().skillStar.count({ where: targetWhere }),
     getPrisma().skillComment.count({
       where: { ...targetWhere, status: SkillCommentStatus.VISIBLE },
@@ -104,6 +105,12 @@ export async function getSkillEngagement(
       ? getPrisma().skillStar.findFirst({
           where: { userId: viewer.id, ...targetWhere },
           select: { id: true },
+        })
+      : null,
+    viewer
+      ? getPrisma().user.findUnique({
+          where: { id: viewer.id },
+          select: { isCurator: true },
         })
       : null,
     getPrisma().skillComment.findMany({
@@ -129,6 +136,7 @@ export async function getSkillEngagement(
       authorName: comment.user.profile?.name ?? comment.user.name,
       authorAvatarUrl: comment.user.profile?.avatarUrl ?? comment.user.image,
       viewerCanDelete: viewer?.id === comment.userId,
+      viewerCanHide: Boolean(viewerModeration?.isCurator),
     })),
   };
 }

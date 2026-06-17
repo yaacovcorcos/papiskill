@@ -140,6 +140,39 @@ export async function deleteCommentAction(formData: FormData) {
   revalidateEngagementPaths(target);
 }
 
+export async function hideCommentAction(formData: FormData) {
+  const user = await getRequiredUser();
+  const reference = stringField(formData, "reference");
+  const commentId = stringField(formData, "commentId");
+  const target = await getPublicEngagementTarget(reference);
+  if (!target || !commentId) {
+    redirect(engagementPathForReference(reference));
+  }
+
+  const moderationUser = await getPrisma().user.findUnique({
+    where: { id: user.id },
+    select: { isCurator: true },
+  });
+
+  if (!moderationUser?.isCurator) {
+    revalidatePath(target.path);
+    return;
+  }
+
+  await getPrisma().skillComment.updateMany({
+    where: {
+      id: commentId,
+      status: SkillCommentStatus.VISIBLE,
+      ...engagementTargetWhere(target),
+    },
+    data: {
+      status: SkillCommentStatus.HIDDEN,
+    },
+  });
+
+  revalidateEngagementPaths(target);
+}
+
 function revalidateEngagementPaths(target: { path: string }) {
   for (const path of engagementRevalidationPaths(target)) {
     revalidatePath(path);
