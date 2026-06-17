@@ -1,8 +1,11 @@
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 import {
+  commentAuthorLabel,
   copyInstallCommandLabel,
+  deleteCommentLabel,
   downloadSkillLabel,
+  hideCommentLabel,
   openProfileSkillLabel,
   signInToStarLabel,
   starCountLabel,
@@ -56,5 +59,9 @@ describe("shared accessibility affordances", () => {
     );
     expect(downloadSkillLabel("Code Review")).toBe("Download Code Review");
     expect(openProfileSkillLabel("Code Review")).toBe("Open Code Review profile page");
+    expect(commentAuthorLabel("yaacovcorcos", null)).toBe("@yaacovcorcos");
+    expect(commentAuthorLabel(null, "Yaacov")).toBe("Yaacov");
+    expect(hideCommentLabel("yaacovcorcos", null)).toBe("Hide comment by @yaacovcorcos");
+    expect(deleteCommentLabel(null, "Yaacov")).toBe("Delete comment by Yaacov");
   });
 });

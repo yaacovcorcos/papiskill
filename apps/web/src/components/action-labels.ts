@@ -17,3 +17,15 @@ export function downloadSkillLabel(name: string) {
 export function openProfileSkillLabel(name: string) {
   return `Open ${name} profile page`;
 }
+
+export function commentAuthorLabel(authorHandle?: string | null, authorName?: string | null) {
+  return authorHandle ? `@${authorHandle}` : (authorName ?? "PapiSkill user");
+}
+
+export function hideCommentLabel(authorHandle?: string | null, authorName?: string | null) {
+  return `Hide comment by ${commentAuthorLabel(authorHandle, authorName)}`;
+}
+
+export function deleteCommentLabel(authorHandle?: string | null, authorName?: string | null) {
+  return `Delete comment by ${commentAuthorLabel(authorHandle, authorName)}`;
+}

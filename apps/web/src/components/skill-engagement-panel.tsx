@@ -6,7 +6,13 @@ import {
   hideCommentAction,
   toggleStarAction,
 } from "@/app/skills/engagement-actions";
-import { signInToStarLabel, starCountLabel } from "./action-labels";
+import {
+  commentAuthorLabel,
+  deleteCommentLabel,
+  hideCommentLabel,
+  signInToStarLabel,
+  starCountLabel,
+} from "./action-labels";
 import { CommentForm } from "./skill-comment-form";
 
 export function SkillEngagementPanel({
@@ -47,61 +53,65 @@ export function SkillEngagementPanel({
             No comments yet.
           </div>
         ) : (
-          engagement.comments.map((comment) => (
-            <article key={comment.id} className="rounded-lg border border-border bg-white p-4 shadow-sm">
-              <div className="flex items-start gap-3">
-                <div className="grid size-9 shrink-0 place-items-center overflow-hidden rounded-md bg-slate-950 text-xs font-semibold text-white">
-                  {comment.authorAvatarUrl ? (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img src={comment.authorAvatarUrl} alt="" className="size-full object-cover" />
-                  ) : (
-                    initials(comment.authorHandle ?? comment.authorName ?? "PS")
-                  )}
-                </div>
-                <div className="min-w-0 flex-1">
-                  <div className="flex flex-wrap items-center gap-2">
-                    <p className="text-sm font-semibold">
-                      {comment.authorHandle ? `@${comment.authorHandle}` : (comment.authorName ?? "PapiSkill user")}
-                    </p>
-                    <time className="text-xs text-muted" dateTime={comment.createdAt.toISOString()}>
-                      {formatCommentDate(comment.createdAt)}
-                    </time>
+          engagement.comments.map((comment) => {
+            const authorLabel = commentAuthorLabel(comment.authorHandle, comment.authorName);
+            const hideLabel = hideCommentLabel(comment.authorHandle, comment.authorName);
+            const deleteLabel = deleteCommentLabel(comment.authorHandle, comment.authorName);
+
+            return (
+              <article key={comment.id} className="rounded-lg border border-border bg-white p-4 shadow-sm">
+                <div className="flex items-start gap-3">
+                  <div className="grid size-9 shrink-0 place-items-center overflow-hidden rounded-md bg-slate-950 text-xs font-semibold text-white">
+                    {comment.authorAvatarUrl ? (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img src={comment.authorAvatarUrl} alt="" className="size-full object-cover" />
+                    ) : (
+                      initials(comment.authorHandle ?? comment.authorName ?? "PS")
+                    )}
                   </div>
-                  <p className="mt-2 whitespace-pre-wrap text-sm leading-6 text-slate-700">{comment.body}</p>
+                  <div className="min-w-0 flex-1">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <p className="text-sm font-semibold">{authorLabel}</p>
+                      <time className="text-xs text-muted" dateTime={comment.createdAt.toISOString()}>
+                        {formatCommentDate(comment.createdAt)}
+                      </time>
+                    </div>
+                    <p className="mt-2 whitespace-pre-wrap text-sm leading-6 text-slate-700">{comment.body}</p>
+                  </div>
+                  <div className="flex shrink-0 items-center gap-1">
+                    {comment.viewerCanHide ? (
+                      <form action={hideCommentAction}>
+                        <input type="hidden" name="reference" value={engagement.reference} />
+                        <input type="hidden" name="commentId" value={comment.id} />
+                        <button
+                          type="submit"
+                          aria-label={hideLabel}
+                          title={hideLabel}
+                          className="focus-ring inline-grid size-8 place-items-center rounded-md text-slate-400 hover:bg-slate-50 hover:text-amber-700"
+                        >
+                          <EyeOff className="size-4" aria-hidden />
+                        </button>
+                      </form>
+                    ) : null}
+                    {comment.viewerCanDelete ? (
+                      <form action={deleteCommentAction}>
+                        <input type="hidden" name="reference" value={engagement.reference} />
+                        <input type="hidden" name="commentId" value={comment.id} />
+                        <button
+                          type="submit"
+                          aria-label={deleteLabel}
+                          title={deleteLabel}
+                          className="focus-ring inline-grid size-8 place-items-center rounded-md text-slate-400 hover:bg-slate-50 hover:text-red-700"
+                        >
+                          <Trash2 className="size-4" aria-hidden />
+                        </button>
+                      </form>
+                    ) : null}
+                  </div>
                 </div>
-                <div className="flex shrink-0 items-center gap-1">
-                  {comment.viewerCanHide ? (
-                    <form action={hideCommentAction}>
-                      <input type="hidden" name="reference" value={engagement.reference} />
-                      <input type="hidden" name="commentId" value={comment.id} />
-                      <button
-                        type="submit"
-                        aria-label="Hide comment"
-                        title="Hide"
-                        className="focus-ring inline-grid size-8 place-items-center rounded-md text-slate-400 hover:bg-slate-50 hover:text-amber-700"
-                      >
-                        <EyeOff className="size-4" aria-hidden />
-                      </button>
-                    </form>
-                  ) : null}
-                  {comment.viewerCanDelete ? (
-                    <form action={deleteCommentAction}>
-                      <input type="hidden" name="reference" value={engagement.reference} />
-                      <input type="hidden" name="commentId" value={comment.id} />
-                      <button
-                        type="submit"
-                        aria-label="Delete comment"
-                        title="Delete"
-                        className="focus-ring inline-grid size-8 place-items-center rounded-md text-slate-400 hover:bg-slate-50 hover:text-red-700"
-                      >
-                        <Trash2 className="size-4" aria-hidden />
-                      </button>
-                    </form>
-                  ) : null}
-                </div>
-              </div>
-            </article>
-          ))
+              </article>
+            );
+          })
         )}
       </div>
     </section>
