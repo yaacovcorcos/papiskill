@@ -19,6 +19,10 @@ export const metadata: Metadata = {
     template: "%s | PapiSkill",
   },
   description: "Discover, copy, edit, install, and contribute portable SKILL.md packages for AI agents.",
+  icons: {
+    icon: [{ url: "/icon.svg", type: "image/svg+xml" }],
+    shortcut: ["/icon.svg"],
+  },
 };
 
 export default function RootLayout({
