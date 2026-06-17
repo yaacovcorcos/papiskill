@@ -8,8 +8,10 @@ import { SkillMarkdown } from "@/components/skill-markdown";
 import { SkillEngagementPanel } from "@/components/skill-engagement-panel";
 import { SkillSourceBlock } from "@/components/skill-source-block";
 import { SkillValidationBadges, SkillValidationPanel } from "@/components/skill-validation";
+import { getFileRegistrySkill } from "@/lib/server/catalog";
 import { hasDatabaseUrl } from "@/lib/server/db-env";
 import { getSkillEngagement } from "@/lib/server/engagement";
+import { isPublicRegistryReference } from "@/lib/server/references";
 import { getSessionUser } from "@/lib/server/request-auth";
 import { getSkillByReference } from "@/lib/server/skills";
 import { compatibilityLabels } from "../skill-filters";
@@ -33,7 +35,10 @@ export default async function SkillDetailPage({
 }) {
   const { reference } = await params;
   const requestedReference = reference.join("/");
-  const skill = await getSkillByReference(requestedReference);
+  const registrySkill = isPublicRegistryReference(requestedReference)
+    ? await getFileRegistrySkill(requestedReference)
+    : null;
+  const skill = registrySkill ?? await getSkillByReference(requestedReference);
   if (!skill) notFound();
   const referenceId = skillReference(skill);
   const viewer = hasDatabaseUrl() ? await getSessionUser().catch(() => null) : null;

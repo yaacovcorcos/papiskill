@@ -19,8 +19,8 @@ export async function GET(
   const joinedReference = reference.join("/");
   const isPublicRegistry = isPublicRegistryReference(joinedReference);
   const actor = isPublicRegistry ? null : await getActor(request);
-  const databaseSkill = await getDatabaseSkill(joinedReference, actor);
-  const skill = databaseSkill ?? (isPublicRegistry ? await getCatalogFallback(joinedReference) : null);
+  const catalogSkill = isPublicRegistry ? await getCatalogFallback(joinedReference) : null;
+  const skill = catalogSkill ?? await getDatabaseSkill(joinedReference, actor);
   if (!skill) {
     return errorResponse("Skill not found.", 404);
   }
