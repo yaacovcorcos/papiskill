@@ -82,7 +82,7 @@ select {
 .skill-markdown {
   color: #1f2a44;
   font-size: 0.975rem;
-  line-height: 1.75;
+  line-height: 1.58;
 }
 
 .skill-markdown > *:first-child {
@@ -102,41 +102,46 @@ select {
   color: #101828;
   font-weight: 650;
   letter-spacing: 0;
-  line-height: 1.2;
+  line-height: 1.25;
 }
 
 .skill-markdown h1 {
-  margin: 0 0 1rem;
+  margin: 0 0 0.85rem;
   border-bottom: 1px solid var(--border);
-  padding-bottom: 0.9rem;
+  padding-bottom: 0.75rem;
   font-size: 2rem;
 }
 
 .skill-markdown h2 {
-  margin: 2.35rem 0 0.85rem;
+  margin: 1.95rem 0 0.65rem;
   border-top: 1px solid #edf0f5;
-  padding-top: 1.2rem;
+  padding-top: 0.95rem;
   font-size: 1.35rem;
 }
 
+.skill-markdown > h2:first-child {
+  border-top: 0;
+  padding-top: 0;
+}
+
 .skill-markdown h3 {
-  margin: 1.75rem 0 0.65rem;
+  margin: 1.45rem 0 0.45rem;
   font-size: 1.05rem;
 }
 
 .skill-markdown h4 {
-  margin: 1.4rem 0 0.45rem;
+  margin: 1.15rem 0 0.35rem;
   font-size: 0.95rem;
 }
 
 .skill-markdown h5,
 .skill-markdown h6 {
-  margin: 1.2rem 0 0.4rem;
+  margin: 1rem 0 0.35rem;
   font-size: 0.9rem;
 }
 
 .skill-markdown p {
-  margin: 0.85rem 0;
+  margin: 0.7rem 0;
 }
 
 .skill-markdown a {
@@ -162,8 +167,8 @@ select {
 
 .skill-markdown ul,
 .skill-markdown ol {
-  margin: 0.85rem 0 1.15rem;
-  padding-left: 1.4rem;
+  margin: 0.65rem 0 0.9rem;
+  padding-left: 1.35rem;
 }
 
 .skill-markdown ul {
@@ -191,7 +196,7 @@ select {
 }
 
 .skill-markdown li {
-  margin: 0.35rem 0;
+  margin: 0.24rem 0;
   padding-left: 0.15rem;
 }
 
@@ -200,15 +205,15 @@ select {
 }
 
 .skill-markdown li > p {
-  margin: 0.35rem 0;
+  margin: 0.3rem 0;
 }
 
 .skill-markdown blockquote {
-  margin: 1.25rem 0;
+  margin: 1rem 0;
   border-left: 3px solid #9ec5ff;
   border-radius: 0 0.45rem 0.45rem 0;
   background: #f5f9ff;
-  padding: 0.85rem 1rem;
+  padding: 0.75rem 0.95rem;
   color: #24466f;
 }
 
@@ -217,7 +222,7 @@ select {
 }
 
 .skill-markdown hr {
-  margin: 2rem 0;
+  margin: 1.6rem 0;
   border: 0;
   border-top: 1px solid var(--border);
 }
@@ -233,12 +238,12 @@ select {
 }
 
 .skill-markdown pre {
-  margin: 1.15rem 0;
+  margin: 1rem 0;
   overflow-x: auto;
   border: 1px solid #d8e0ea;
   border-radius: 0.65rem;
   background: #0f172a;
-  padding: 1rem;
+  padding: 0.9rem;
   box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.04);
 }
 
@@ -250,14 +255,14 @@ select {
   padding: 0;
   color: #e5edf7;
   font-size: 0.82rem;
-  line-height: 1.7;
+  line-height: 1.58;
   white-space: pre;
 }
 
 .skill-markdown table {
   display: block;
   width: 100%;
-  margin: 1.2rem 0;
+  margin: 1rem 0;
   overflow-x: auto;
   border-collapse: collapse;
   font-size: 0.9rem;
@@ -305,7 +310,7 @@ select {
 
 .skill-markdown--compact {
   font-size: 0.9rem;
-  line-height: 1.65;
+  line-height: 1.52;
 }
 
 .skill-markdown--compact h1 {
@@ -313,11 +318,11 @@ select {
 }
 
 .skill-markdown--compact h2 {
-  margin-top: 1.6rem;
+  margin-top: 1.25rem;
   font-size: 1.1rem;
 }
 
 .skill-markdown--compact h3 {
-  margin-top: 1.25rem;
+  margin-top: 1rem;
   font-size: 0.98rem;
 }
