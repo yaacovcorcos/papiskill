@@ -1,7 +1,7 @@
 id: code-review
-name: Code Change Review
+name: Code Review
 summary: Review PRs, branches, commits, patches, and local changes for real bugs, regressions, and risky assumptions.
-description: "A portable code-change review skill for AI agents. It reviews diffs and local workspace changes with findings-first output, severity, source locations, tests, security and deployment risk, agent-generated PR checks, and residual risk."
+description: "Review local code changes for bugs, regressions, missing tests, and risky assumptions. Use when asked to review a diff, pull request, patch, branch, commit, or uncommitted workspace changes before merge, commit, deploy, or promotion."
 version: 1.0.0
 license: MIT
 visibility: public

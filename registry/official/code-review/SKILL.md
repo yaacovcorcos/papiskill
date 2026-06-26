@@ -1,8 +1,26 @@
-# Code Change Review
+---
+name: code-review
+description: Review local code changes for bugs, regressions, missing tests, and risky assumptions. Use when asked to review a diff, pull request, patch, branch, commit, or uncommitted workspace changes before merge, commit, deploy, or promotion.
+---
+
+# Code Review
 
 Use this skill when the user asks to review a pull request, branch diff, commit, patch, staged changes, unstaged changes, untracked local work, or any code change before merge, commit, deploy, or promotion.
 
 This skill reviews changed code. For whole-repository architecture and quality debt, use a codebase quality audit. For a dedicated threat model or full security scan, use a security review.
+
+## Getting Started
+
+First understand what changed and why.
+
+When available, inspect:
+
+- the user's request, PR description, linked issue, ticket, or acceptance criteria
+- the current branch, base branch, and whether the workspace is staged, unstaged, or untracked
+- the changed files and the relevant unchanged code around them
+- tests, migrations, generated files, config, docs, and package or lockfile changes touched by the diff
+
+Prefer existing diff artifacts when the user supplies them. Otherwise compute the smallest truthful diff for the situation, such as staged changes, unstaged changes, a branch against its merge base, or the pasted patch. If there are no git changes, review the files the user named or the files changed earlier in the conversation.
 
 ## Review Stance
 
@@ -23,6 +41,24 @@ Prioritize:
 - complexity that will likely cause future bugs
 
 Do not block on taste, formatting, naming, or broad refactors unless they create real maintainability or correctness risk. If a point is optional, mark it as a nit or mention it after findings.
+
+## High-Signal Bug Patterns
+
+Use these as prompts for analysis, not as a mechanical checklist.
+
+Look especially for:
+
+- unchecked nulls, missing map keys, failed lookups, or unsafe optional relationship access
+- wrong-variable bugs, shadowing, inverted conditions, and `and` versus `or` mistakes in permission or validation logic
+- async work that is started but not awaited when its result or side effect matters
+- stale, duplicated, or redundant state that can drift from the source of truth
+- API, serializer, schema, migration, pagination, cursor, or response-shape contract mismatches
+- non-atomic read-modify-write behavior, ordering races, cache invalidation mistakes, and TOCTOU patterns
+- unclosed resources, missing cleanup, event listener leaks, and unbounded data structures
+- unsafe user-controlled input in SQL, process execution, templates, URLs, redirects, file paths, or HTML
+- OAuth, CSRF, session, ownership, and authorization invariants weakened by the change
+- hot-path bloat, repeated network or database calls, missed concurrency for independent work, or N+1 behavior
+- dead production code, unused imports, unreachable branches, and declared-but-unused functions that suggest an incomplete refactor
 
 ## Choose the Review Mode
 
@@ -163,6 +199,14 @@ Only report a finding when it is:
 - not merely a preference
 
 Avoid speculative findings. If something is plausible but unproven, put it under "Questions" or "Residual Risk" instead of presenting it as a bug.
+
+Before reporting, validate each candidate finding:
+
+- Anchor it to changed code or directly affected unchanged code.
+- Trace the trigger path far enough to show a realistic failure.
+- Check nearby code, callers, helpers, tests, or docs to avoid false positives.
+- Reject style preferences unless they violate a documented convention or clear local pattern and create maintenance risk.
+- Deduplicate findings that share the same root cause, even if they appear in multiple files.
 
 ## Severity
 
