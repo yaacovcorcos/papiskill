@@ -82,6 +82,20 @@ describe("SkillMarkdownEditor", () => {
     expect(html).toContain("Split");
     expect(html).toContain("<h2>Editable Skill</h2>");
   });
+
+  it("can open directly in write mode for new blank library skills", () => {
+    const html = renderToStaticMarkup(
+      <SkillMarkdownEditor
+        name="skillMarkdown"
+        defaultValue="# New Skill"
+        initialMode="write"
+      />,
+    );
+
+    expect(html).toContain('aria-pressed="true"');
+    expect(html).toContain('name="skillMarkdown"');
+    expect(html).not.toContain("<h2>New Skill</h2>");
+  });
 });
 
 describe("SkillSourceBlock", () => {

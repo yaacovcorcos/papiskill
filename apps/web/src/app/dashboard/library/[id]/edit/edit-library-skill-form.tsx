@@ -30,6 +30,7 @@ interface EditLibrarySkillFormProps {
   sourceLabel: string;
   sourceVersion: string;
   lastValidatedAt: string;
+  initialMarkdownMode?: "write" | "preview" | "split";
   initialIssues: SaveForkActionIssue[];
 }
 
@@ -44,6 +45,7 @@ export function EditLibrarySkillForm({
   sourceLabel,
   sourceVersion,
   lastValidatedAt,
+  initialMarkdownMode = "split",
   initialIssues,
 }: EditLibrarySkillFormProps) {
   const [state, action, pending] = useActionState(saveForkAction, initialState);
@@ -133,7 +135,11 @@ export function EditLibrarySkillForm({
           <ValidationPanel issues={issues} />
         </aside>
 
-        <SkillMarkdownEditor name="skillMarkdown" defaultValue={fork.markdown} />
+        <SkillMarkdownEditor
+          name="skillMarkdown"
+          defaultValue={fork.markdown}
+          initialMode={initialMarkdownMode}
+        />
       </form>
     </>
   );

@@ -9,6 +9,7 @@ type MarkdownMode = "write" | "preview" | "split";
 interface SkillMarkdownEditorProps {
   name: string;
   defaultValue: string;
+  initialMode?: MarkdownMode;
   rows?: number;
 }
 
@@ -25,9 +26,10 @@ const modes: Array<{
 export function SkillMarkdownEditor({
   name,
   defaultValue,
+  initialMode = "split",
   rows = 32,
 }: SkillMarkdownEditorProps) {
-  const [mode, setMode] = useState<MarkdownMode>("split");
+  const [mode, setMode] = useState<MarkdownMode>(initialMode);
   const [value, setValue] = useState(defaultValue);
   const showEditor = mode !== "preview";
   const showPreview = mode !== "write";

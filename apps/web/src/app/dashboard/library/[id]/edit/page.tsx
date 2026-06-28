@@ -44,6 +44,7 @@ export default async function EditLibrarySkillPage({
   const installCommand = `papiskill install ${reference}`;
   const publicHref = `/u/${profile.handle}/skills/${fork.slug}`;
   const sourceVersion = fork.sourceVersion ?? fork.sourceSkill?.version ?? fork.sourceFork?.version ?? "unknown";
+  const initialMarkdownMode = fork.sourceReference || fork.sourceSkill || fork.sourceFork ? "split" : "write";
   const validationIssues = fork.validations.map((issue) => ({
     level: issue.level.toLowerCase() as "error" | "warning",
     code: issue.code,
@@ -72,6 +73,7 @@ export default async function EditLibrarySkillPage({
           sourceLabel={sourceLabel(fork)}
           sourceVersion={sourceVersion}
           lastValidatedAt={fork.lastValidatedAt ? formatDate(fork.lastValidatedAt) : "never"}
+          initialMarkdownMode={initialMarkdownMode}
           initialIssues={validationIssues}
         />
       </main>
