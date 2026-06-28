@@ -71,6 +71,8 @@ npm run registry:validate
 Setup, validation commands, and the rule about committing the regenerated
 registry index are in
 [`docs/onboarding.md` Path A](./onboarding.md#path-a--author-or-edit-a-skill).
+Do not skip the generated registry step; stale generated registry output breaks
+CI.
 
 ## Pull requests and review
 
