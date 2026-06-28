@@ -12,6 +12,11 @@ It provides:
 - a flexible CLI for search, install, download, validation, and authenticated private installs
 - production documentation, tests, and release runbooks
 
+> **New contributor?** Start with the **[Onboarding guide](./docs/onboarding.md)**.
+> It takes you from a fresh machine to an open pull request, with paths for skill
+> authors, doc writers, CLI work, the web app, or full-project collaboration —
+> written to be run with a coding agent.
+
 ## Repository Layout
 
 | Path | Purpose |
@@ -49,6 +54,8 @@ npm --workspace papiskill run dev -- search review
 ## Documentation Entry Points
 
 - [Agent Constitution](./AGENTS.md)
+- [Onboarding](./docs/onboarding.md)
+- [Contributing](./docs/contributing.md)
 - [PapiSkill PRD](./docs/product/prd.md)
 - [Architecture Overview](./docs/architecture/overview.md)
 - [Skill Package Specification](./docs/architecture/skill-package-spec.md)
