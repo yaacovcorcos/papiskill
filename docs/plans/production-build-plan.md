@@ -173,7 +173,7 @@ Deliverables:
 Evidence:
 
 - `README.md`
-- `docs/product/requirements.md`
+- `docs/product/prd.md`
 - `docs/architecture/*`
 - `docs/runbooks/*`
 - `docs/cli.md`

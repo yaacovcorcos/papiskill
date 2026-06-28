@@ -10,7 +10,7 @@ Make PapiSkill unusually well documented for users, skill authors, contributors,
 |---|---|---|
 | `README.md` | current | top-level orientation |
 | `AGENTS.md` | current | agent and maintainer operating contract |
-| `docs/product/requirements.md` | current | product definition and scope |
+| `docs/product/prd.md` | current | product definition and scope |
 | `docs/architecture/overview.md` | current | system architecture |
 | `docs/architecture/skill-package-spec.md` | current | package format |
 | `docs/architecture/decision-log.md` | current | architecture decisions |

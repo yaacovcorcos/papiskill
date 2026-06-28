@@ -49,7 +49,7 @@ npm --workspace papiskill run dev -- search review
 ## Documentation Entry Points
 
 - [Agent Constitution](./AGENTS.md)
-- [Product Requirements](./docs/product/requirements.md)
+- [PapiSkill PRD](./docs/product/prd.md)
 - [Architecture Overview](./docs/architecture/overview.md)
 - [Skill Package Specification](./docs/architecture/skill-package-spec.md)
 - [Database Architecture](./docs/runbooks/db-architecture.md)

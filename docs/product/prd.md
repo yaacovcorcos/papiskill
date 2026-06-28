@@ -1,4 +1,4 @@
-# Product Requirements
+# PapiSkill PRD
 
 ## Purpose
 
