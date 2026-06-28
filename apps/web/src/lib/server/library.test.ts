@@ -161,14 +161,14 @@ describe("getVisibleLibrarySource", () => {
     expect(source).toEqual(
       expect.objectContaining({
         sourceReference: "official/code-review",
-        name: "Code Change Review",
+        name: "Code Review",
       }),
     );
     expect(source?.sourceSkillId).toBeUndefined();
     expect(source?.files).toContainEqual(
       expect.objectContaining({
         path: "SKILL.md",
-        content: expect.stringContaining("# Code Change Review"),
+        content: expect.stringContaining("# Code Review"),
       }),
     );
   });
