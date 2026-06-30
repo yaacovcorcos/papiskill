@@ -132,6 +132,12 @@ export const generatedRegistry: CatalogSkill[] = [
     "validationIssues": [
       {
         "level": "warning",
+        "code": "mentions-network",
+        "message": "Skill mentions network access, URLs, API keys, tokens, or webhooks.",
+        "path": "SKILL.md"
+      },
+      {
+        "level": "warning",
         "code": "mentions-secrets",
         "message": "Skill mentions secrets or credentials. Confirm it does not request sensitive data unnecessarily.",
         "path": "SKILL.md"

@@ -24,7 +24,7 @@ const riskyPatterns: Array<{ code: string; pattern: RegExp; message: string }> =
   },
   {
     code: "mentions-network",
-    pattern: /\b(fetch|http:\/\/|https:\/\/|api key|token|webhook|network)\b/i,
+    pattern: /\b(fetch|http:\/\/|https:\/\/|api[\s_-]*key|token|webhook|network)\b/i,
     message: "Skill mentions network access, URLs, API keys, tokens, or webhooks.",
   },
   {

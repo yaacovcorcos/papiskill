@@ -68,6 +68,21 @@ describe("validateSkillPackage", () => {
       ]),
     );
   });
+
+  it("flags API key wording with separators", () => {
+    const result = validateSkillPackage(validFiles.map((file) =>
+      file.path === "SKILL.md"
+        ? { ...file, content: `${file.content}\nConfigure XQUIK_API_KEY before using API-key backed tools.` }
+        : file,
+    ));
+
+    expect(result.ok).toBe(true);
+    expect(result.issues).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ level: "warning", code: "mentions-network" }),
+      ]),
+    );
+  });
 });
 
 describe("resolveInstallTarget", () => {
