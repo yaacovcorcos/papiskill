@@ -1,6 +1,6 @@
 ---
 name: hermes-tweet
-description: Use Hermes Tweet when a Hermes Agent runtime has the hermes-tweet plugin installed and needs X/Twitter search, monitoring, publishing previews, media workflows, giveaway audits, or approval-gated social actions.
+description: Use Hermes Tweet when a Hermes Agent runtime has the hermes-tweet plugin installed and needs X/Twitter search, monitoring, publishing previews, media workflows, giveaway audits, or other Xquik-backed social automation with explicit action approval.
 ---
 
 # Hermes Tweet
