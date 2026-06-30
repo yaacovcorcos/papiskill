@@ -1,0 +1,33 @@
+id: hermes-tweet
+name: Hermes Tweet
+summary: Guide Hermes Agent through X/Twitter search, monitoring, and approval-gated actions with Hermes Tweet.
+description: "Use Hermes Tweet when a Hermes Agent runtime has the hermes-tweet plugin installed and needs X/Twitter search, monitoring, publishing previews, media workflows, giveaway audits, or other Xquik-backed social automation with explicit action approval."
+version: 0.1.6
+license: MIT
+visibility: public
+categories:
+  - social-media
+  - automation
+  - agents
+tags:
+  - hermes-agent
+  - xquik
+  - twitter
+  - x
+  - social-media
+  - monitoring
+  - publishing
+compatible_with:
+  - codex
+  - claude-code
+  - cursor
+  - generic-agent
+install_targets:
+  codex: ~/.codex/skills/hermes-tweet
+  claude-code: ~/.claude/skills/hermes-tweet
+  cursor: ~/.cursor/skills/hermes-tweet
+homepage: https://github.com/Xquik-dev/hermes-tweet#readme
+source_url: https://github.com/Xquik-dev/hermes-tweet/tree/master/skills/hermes-tweet
+maintainers:
+  - github: Xquik-dev
+  - github: kriptoburak
